@@ -3,384 +3,538 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CASCADE | Enterprise SaaS Logistics Orchestration Engine</title>
+  <title>CASCADE | Autonomous Executive Travel Recovery</title>
+  <meta name="description" content="CASCADE intelligently monitors executive travel itineraries and automatically resolves disruptions — rerouting flights, trains, and hotel stays in seconds.">
   <link rel="stylesheet" href="styles.css">
+  <!-- Leaflet map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Turf.js for great-circle arc generation -->
+  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+  <style>
+    /* Leaflet overrides — keep tiles in-app, below sticky header */
+    .leaflet-container { background: #0b0c10; font-family: var(--font-sans); }
+    .leaflet-control-zoom { display: none; }
+    .leaflet-control-attribution { font-size: 10px; opacity: 0.45; }
+    .leaflet-control-attribution a { color: #6b7280 !important; }
+    /* Plane marker */
+    .plane-marker {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center center;
+    }
+    .plane-marker svg { width: 22px; height: 22px; filter: drop-shadow(0 0 4px rgba(99,102,241,0.8)); }
+    /* Waypoint popups */
+    .leaflet-popup-content-wrapper {
+      background: #17181d;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: #f3f4f6;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: none;
+      padding: 0;
+    }
+    .leaflet-popup-content { margin: 7px 12px; }
+    .leaflet-popup-tip { background: #17181d; }
+    .leaflet-popup-close-button { color: #6b7280 !important; }
+  </style>
 </head>
 <body>
 
-  <!-- Left Sidebar Navigation -->
-  <aside>
-    <div class="sidebar-brand">
-      <div class="brand-logo-badge">⚡</div>
-      <div class="brand-title-group">
-        <h1>CASCADE</h1>
-        <p>Enterprise SaaS Logistics</p>
-      </div>
-    </div>
-
-    <nav class="nav-menu">
-      <div class="nav-item active" data-view="dashboard"><span>📊</span> <span>Dashboard</span></div>
-      <div class="nav-item" data-view="itinerary"><span>⚡</span> <span>Live Itineraries</span></div>
-      <div class="nav-item" data-view="vectors"><span>🧠</span> <span>Vector Profiles</span></div>
-      <div class="nav-item" data-view="ops"><span>📡</span> <span>CDC & Agent Ops</span></div>
-      <div class="nav-item" data-view="health"><span>🛡️</span> <span>System Health</span></div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div>CockroachDB + Bedrock</div>
-      <div style="color: var(--emerald-primary); margin-top: 2px;">● Status: Operational</div>
-    </div>
-  </aside>
-
-  <!-- Main Content Area -->
-  <div class="app-main-wrapper">
-    <header>
-      <div id="header-page-title" style="font-weight: 800; font-size: 1.15rem;">Enterprise Operations Control Center</div>
-      <div class="header-status-group">
-        <div class="status-pill"><span class="dot dot-cyan"></span> CockroachDB MCP: CONNECTED (cockroachlabs.cloud/mcp)</div>
-        <div class="status-pill"><span class="dot dot-green"></span> CockroachDB: ONLINE</div>
-        <div class="status-pill"><span class="dot dot-purple"></span> AWS Bedrock: CLAUDE 3.5</div>
-      </div>
-    </header>
-
-    <!-- VIEW 1: DASHBOARD -->
-    <div class="view-container active-view" id="view-dashboard">
-      <div class="metrics-row">
-        <div class="metric-card"><h3>Active Itineraries</h3><div class="metric-val" id="metric-active-count">1,420</div><div class="metric-sub">↑ 12% vs last week</div></div>
-        <div class="metric-card"><h3>Self-Healed Rate</h3><div class="metric-val">99.4%</div><div class="metric-sub">384 disruptions auto-rebooked</div></div>
-        <div class="metric-card"><h3>CRDB P99 Latency</h3><div class="metric-val">18ms</div><div class="metric-sub">Serializable Isolation</div></div>
-        <div class="metric-card"><h3>Bedrock Agent Uptime</h3><div class="metric-val">100%</div><div class="metric-sub">Sub-Second SLA Ready</div></div>
-      </div>
-
-      <div class="panel-card">
-        <div class="panel-head">
-          <h2>Active Executive Travel Graphs</h2>
-          <button class="btn-create-modal" id="btn-open-create-modal">
-            <span>+ Create / Import Itinerary</span>
-          </button>
-        </div>
-        <table>
-          <thead>
-            <tr><th>ID</th><th>Traveler</th><th>Route</th><th>Status</th><th>Modal Legs</th><th>Last CDC Event</th></tr>
-          </thead>
-          <tbody id="dashboard-fleet-table"></tbody>
-        </table>
-
-        <!-- Interactive SVG World Logistics Map -->
-        <div style="margin-top: 2rem;">
-          <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.75rem;">🌐 Interactive Global Logistics Fleet Map</h3>
-          <div class="map-container">
-            <svg width="100%" height="100%" viewBox="0 0 900 280" style="background: #020512;">
-              <path d="M0 70 H900 M0 140 H900 M0 210 H900" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4"/>
-              <path d="M180 0 V280 M360 0 V280 M540 0 V280 M720 0 V280" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4"/>
-
-              <!-- Flight Arc 1: SFO -> JFK -->
-              <path d="M 160 110 Q 300 40 440 90" fill="none" stroke="#06b6d4" stroke-width="3" stroke-dasharray="6,6"/>
-              <!-- Train Leg: JFK -> PHL -->
-              <path d="M 440 90 Q 460 110 480 120" fill="none" stroke="#a855f7" stroke-width="4"/>
-              <!-- Transatlantic Arc: PHL -> LHR -->
-              <path d="M 480 120 Q 640 20 780 80" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="6,6"/>
-
-              <!-- SFO -->
-              <circle cx="160" cy="110" r="7" fill="#06b6d4"/>
-              <circle cx="160" cy="110" r="14" fill="none" stroke="#06b6d4" stroke-width="2" opacity="0.6"/>
-              <text x="140" y="135" fill="#fff" font-size="11" font-weight="800" font-family="Inter">SFO (San Francisco)</text>
-
-              <!-- JFK -->
-              <circle cx="440" cy="90" r="7" fill="#a855f7"/>
-              <text x="430" y="75" fill="#fff" font-size="11" font-weight="800" font-family="Inter">JFK (New York)</text>
-
-              <!-- PHL -->
-              <circle cx="480" cy="120" r="6" fill="#f59e0b"/>
-              <text x="470" y="142" fill="#fff" font-size="11" font-weight="800" font-family="Inter">PHL (Philadelphia)</text>
-
-              <!-- LHR -->
-              <circle cx="780" cy="80" r="7" fill="#10b981"/>
-              <circle cx="780" cy="80" r="14" fill="none" stroke="#10b981" stroke-width="2" opacity="0.6"/>
-              <text x="740" y="105" fill="#fff" font-size="11" font-weight="800" font-family="Inter">LHR (London Heathrow)</text>
-            </svg>
-          </div>
-        </div>
-
-        <!-- 24-Hour Operations Bar Chart -->
-        <div style="margin-top: 2rem;">
-          <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.75rem;">📊 24-Hour Operations Disruption & CDC Telemetry Trend</h3>
-          <div class="chart-bars-group">
-            <div class="chart-bar-col"><div class="bar-fill" style="height: 35%;"></div><span class="bar-label">00:00</span></div>
-            <div class="chart-bar-col"><div class="bar-fill" style="height: 50%;"></div><span class="bar-label">04:00</span></div>
-            <div class="chart-bar-col"><div class="bar-fill" style="height: 75%;"></div><span class="bar-label">08:00</span></div>
-            <div class="chart-bar-col"><div class="bar-fill" style="height: 95%;"></div><span class="bar-label">12:00</span></div>
-            <div class="chart-bar-col"><div class="bar-fill" style="height: 60%;"></div><span class="bar-label">16:00</span></div>
-            <div class="chart-bar-col"><div class="bar-fill" style="height: 85%;"></div><span class="bar-label">20:00</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VIEW 2: LIVE ITINERARIES -->
-    <div class="view-container" id="view-itinerary">
-      <div class="sim-control-box">
-        <div class="sim-control-head">
-          <span>🎛️ Interactive "What-If" Disruption Control Suite & Architectural Scenario Engines</span>
-          <span style="font-family: var(--font-code); font-size: 0.78rem; color: var(--cyan-primary);" id="slider-val-txt">Selected Delay: +150 mins (+2h 30m)</span>
-        </div>
-
-        <div class="sim-controls-row">
-          <div class="input-group">
-            <label>Disruption Event Type</label>
-            <select id="sim-disrupt-type">
-              <option value="FLIGHT_DELAY">Flight Delay (+Minutes)</option>
-              <option value="TRAIN_CANCEL">Amtrak Train Cancellation</option>
-              <option value="HOTEL_OVERBOOK">Hotel Reservation Overbooking</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label>User Strategy Constraint Filter</label>
-            <select id="sim-strategy">
-              <option value="EXECUTIVE_SPEED">Executive Speed (Fastest Direct Connection)</option>
-              <option value="COST_OPTIMIZATION">Cost Optimization (Lowest Rebooking Delta)</option>
-              <option value="COMFORT_BUSINESS">Comfort / Business (Quiet Car & Executive Suite)</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label>Delay Severity (+15m to +12 Hours)</label>
-            <input type="range" id="sim-delay-slider" min="15" max="720" step="15" value="150">
-          </div>
-        </div>
-
-        <!-- 4 Action Buttons Grid with Explicit Text Labels -->
-        <div class="action-buttons-grid">
-          <button class="btn-action" id="btn-disrupt"><span>[ ⚡ Execute Delay ]</span></button>
-          <button class="btn-chaos" id="btn-chaos"><span>[ 🔥 Trigger Chaos ]</span></button>
-          <button class="btn-contention" id="btn-contention"><span>[ ⚔️ Race Contention ]</span></button>
-          <button class="btn-failover" id="btn-failover"><span>[ 🛡️ Region Failover ]</span></button>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside>
+      <div class="sidebar-brand">
+        <div class="brand-logo">C</div>
+        <div class="brand-title-group">
+          <h1>CASCADE</h1>
+          <p>Executive Travel Recovery</p>
         </div>
       </div>
 
-      <!-- Predictive Risk & Multi-Branch Synthesis Bar -->
-      <div class="branch-synthesis-box">
-        <div class="risk-badge-box">
-          <span style="font-weight: 800; font-size: 0.9rem;">🎯 Risk Guard Index:</span>
-          <span class="risk-score-badge" id="risk-index-badge">Risk Score: 88% (HIGH RISK)</span>
+      <!-- Traveler Navigation Menu (Default) -->
+      <nav class="nav-menu" id="nav-traveler-menu">
+        <div class="nav-section-label">Traveler Portal</div>
+        <div class="nav-item active" data-view="dashboard">
+          <!-- BarChart3 icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>My Trips</span>
         </div>
-
-        <div class="branches-chips-row" id="branch-chips-container">
-          <div class="branch-chip">Alpha (Speed): 0.74</div>
-          <div class="branch-chip">Beta (Zero Cost): 0.82</div>
-          <div class="branch-chip winner">Gamma (Vector Optimal): 0.96 ★ WINNER</div>
+        <div class="nav-item" data-view="itinerary">
+          <!-- Zap icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>Trip Details</span>
         </div>
+      </nav>
+
+      <!-- System Internals Navigation Menu (Secondary View) -->
+      <nav class="nav-menu" id="nav-internals-menu" style="display: none;">
+        <div class="nav-section-label">Engine Observability</div>
+        <div class="nav-item" data-view="vectors">
+          <!-- BrainCircuit icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04Z"/>
+            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04Z"/>
+          </svg>
+          <span>User Preference Memory</span>
+        </div>
+        <div class="nav-item" data-view="ops">
+          <!-- Radar icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/>
+            <path d="M4 6h.01"/>
+            <path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/>
+            <path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/>
+            <path d="M12 18h.01"/>
+            <path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/>
+            <circle cx="12" cy="12" r="2"/>
+            <path d="m13.41 10.59 5.66-5.66"/>
+          </svg>
+          <span>Execution Pipeline &amp; CDC</span>
+        </div>
+        <div class="nav-item" data-view="health">
+          <!-- ShieldCheck icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <span>Infrastructure Telemetry</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span>Version 2.4.0</span>
+        <span class="status-tag status-tag-green">Operational</span>
       </div>
+    </aside>
 
-      <!-- Real-Time Impact Analytics -->
-      <div class="impact-analytics-panel">
-        <div class="analytics-box"><span class="analytics-label">Original vs. New Arrival</span><div class="analytics-value" id="analytics-arrival-times">Jul 25, 05:00 PM ➔ Jul 25, 07:30 PM</div></div>
-        <div class="analytics-box"><span class="analytics-label">Total Time Lost</span><div><span class="badge-delay-lost" id="analytics-delay-badge">+2h 30m Delay</span></div></div>
-        <div class="analytics-box"><span class="analytics-label">Rebooking Fee & Vouchers</span><div><span class="badge-cost-free" id="analytics-cost-badge">$0.00 (Carrier Covered)</span></div></div>
-        <div class="analytics-box"><span class="analytics-label">Connection Transfer Slack</span><div class="analytics-value" style="color: var(--cyan-primary);" id="analytics-slack-val">+90m (Restored)</div></div>
-      </div>
+    <!-- Main Content Area -->
+    <div class="app-main-wrapper">
+      <header>
+        <div class="header-left">
+          <div id="header-page-title">My Trips</div>
 
-      <div class="panel-card">
-        <div class="panel-head">
-          <div>
-            <h2>📍 Multimodal Route Graph</h2>
-            <p style="font-size: 0.85rem; color: var(--text-muted);" id="itin-subtitle">Transatlantic Executive Trip (SFO ➔ LHR)</p>
-          </div>
-
-          <div style="display: flex; gap: 1rem; align-items: center;">
-            <a href="/api/itinerary/artifact?id=PROOF-REC-994821" download class="btn-download" id="btn-proof-artifact">
-              <span>📥 Download Proof Artifact</span>
-            </a>
-            <div class="toggle-group">
-              <div class="toggle-btn active" id="toggle-single-view">Active Path View</div>
-              <div class="toggle-btn" id="toggle-split-view">Split Comparison (Broken vs Healed)</div>
+          <!-- Top-Level Switcher: Traveler View vs System Internals -->
+          <div class="view-mode-switcher">
+            <div class="mode-tab active" id="tab-mode-traveler">
+              <!-- User icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+              <span>Traveler View</span>
+            </div>
+            <div class="mode-tab" id="tab-mode-internals">
+              <!-- Settings / Cog icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>System Internals</span>
             </div>
           </div>
         </div>
 
-        <div id="single-view-container"><div class="nodes-flow" id="nodes-container"></div></div>
-        <div id="split-view-container" style="display: none;">
-          <div class="split-view-grid">
-            <div><h3 style="font-size: 0.9rem; color: var(--rose-primary); margin-bottom: 0.75rem;">❌ Disrupted Path</h3><div class="nodes-flow" id="split-broken-nodes"></div></div>
-            <div><h3 style="font-size: 0.9rem; color: var(--cyan-primary); margin-bottom: 0.75rem;">✨ Self-Healed Path</h3><div class="nodes-flow" id="split-healed-nodes"></div></div>
+        <div class="header-status-indicator" title="All services active and resilient">
+          <div class="status-dot"></div>
+          <span>System Operational</span>
+        </div>
+      </header>
+
+      <!-- System Internals Banner (Visible in Internals Mode) -->
+      <div class="internals-banner" id="internals-banner-bar" style="display: none;">
+        <!-- Wrench icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+        <span><strong>Engine Observability Mode</strong> — Viewing internal execution pipeline, preference memory, and infrastructure telemetry.</span>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           VIEW 1: DASHBOARD (Traveler View Default)
+      ══════════════════════════════════════════════════════════ -->
+      <div class="view-container active-view" id="view-dashboard">
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Trips Actively Monitored</span>
+              <!-- MapPin icon -->
+              <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div class="metric-val" id="metric-active-count">1,420</div>
+            <div class="metric-sub">Across 42 active corporate executive travel graphs</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Disruptions Auto-Resolved</span>
+              <!-- CheckCircle icon -->
+              <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="m9 12 2 2 4-4"/>
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+            </div>
+            <div class="metric-val">17 of 19</div>
+            <div class="metric-sub">89.5% resolved without human intervention this week</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Average Rebooking Time</span>
+              <!-- Clock icon -->
+              <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="metric-val">42 seconds</div>
+            <div class="metric-sub">From initial carrier delay signal to confirmed ticket</div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-head">
+            <h2>Active Executive Trips</h2>
+            <button class="btn-primary" id="btn-open-create-modal">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>New Trip</span>
+            </button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Traveler</th>
+                <th>Route</th>
+                <th>Status</th>
+                <th>Itinerary</th>
+                <th>Latest Update</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-fleet-table"></tbody>
+          </table>
+
+          <!-- Live Route Map Section -->
+          <div style="margin-top: 32px;">
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">Live Route Map</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Sarah Jenkins — SFO (San Francisco) to LHR (London Heathrow)</p>
+            <div class="map-container" id="leaflet-map-container">
+              <div id="leaflet-route-map" style="width:100%;height:100%;border-radius:var(--radius-card);overflow:hidden;"></div>
+            </div>
+          </div>
+
+
+          <!-- Disruptions Handled Chart -->
+          <div style="margin-top: 32px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+              <h3 style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Disruptions Handled Today</h3>
+              <span style="font-size: 12px; color: var(--text-muted);">19 events total</span>
+            </div>
+            <div style="background: var(--bg-main); border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: 16px 20px;">
+              <div class="chart-bars-group">
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 30%;"></div><span class="bar-label">00:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 15%;"></div><span class="bar-label">02:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 45%;"></div><span class="bar-label">04:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 25%;"></div><span class="bar-label">06:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 70%;"></div><span class="bar-label">08:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 85%;"></div><span class="bar-label">10:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 100%;"></div><span class="bar-label">12:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 60%;"></div><span class="bar-label">14:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 75%;"></div><span class="bar-label">16:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 50%;"></div><span class="bar-label">18:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 80%;"></div><span class="bar-label">20:00</span></div>
+                <div class="chart-bar-col"><div class="bar-fill" style="height: 35%;"></div><span class="bar-label">22:00</span></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Agent CoT Stream Console Card strictly capped at max-height 200px -->
-      <div class="terminal-console-card">
-        <div class="terminal-console-header">
-          <span>⚡ Live Agent CoT Stream</span>
+      <!-- ══════════════════════════════════════════════════════════
+           VIEW 2: TRIP DETAILS (Live Itinerary)
+      ══════════════════════════════════════════════════════════ -->
+      <div class="view-container" id="view-itinerary">
+
+        <!-- Disruption Scenario Simulator (visible only in Internals mode) -->
+        <div class="simulator-box" id="simulator-controls-panel">
+          <div class="simulator-head">
+            <span>Disruption Scenario Simulator</span>
+            <span class="status-tag status-tag-amber" id="slider-val-txt">Selected Delay: +150 mins (+2h 30m)</span>
+          </div>
+
+          <div class="sim-controls-row">
+            <div class="input-group">
+              <label>Disruption Event</label>
+              <select id="sim-disrupt-type">
+                <option value="FLIGHT_DELAY">Flight Delay (+Minutes)</option>
+                <option value="TRAIN_CANCEL">Amtrak Train Cancellation</option>
+                <option value="HOTEL_OVERBOOK">Hotel Reservation Overbooking</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Rebooking Preference Filter</label>
+              <select id="sim-strategy">
+                <option value="EXECUTIVE_SPEED">Fastest Direct Connection</option>
+                <option value="COST_OPTIMIZATION">Zero Added Cost (Carrier Covered)</option>
+                <option value="COMFORT_BUSINESS">First Class Quiet Car &amp; Executive Suite</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Delay Duration (+15m to +12h)</label>
+              <input type="range" id="sim-delay-slider" min="15" max="720" step="15" value="150">
+            </div>
+          </div>
+
+          <!-- Scenario Buttons -->
+          <div class="simulator-actions-grid">
+            <button class="btn-secondary" id="btn-disrupt"><span>Simulate: Flight Delayed</span></button>
+            <button class="btn-secondary" id="btn-chaos"><span>Simulate: Multiple Disruptions</span></button>
+            <button class="btn-secondary" id="btn-contention"><span>Simulate: Rebooking Conflict</span></button>
+            <button class="btn-secondary" id="btn-failover"><span>Simulate: Regional Outage</span></button>
+          </div>
         </div>
-        <div class="terminal-console-body" id="terminal-stream">
-          <div style="color: var(--cyan-primary);">[SYSTEM] Multi-Agent Swarm, Saga & Contention Engine active. Listening for CDC events...</div>
+
+        <!-- Rebooking Assessment -->
+        <div class="branch-synthesis-box">
+          <div class="risk-badge-box">
+            <span style="font-weight: 600; font-size: 14px;">Rebooking Assessment:</span>
+            <span class="status-tag status-tag-amber" id="risk-index-badge">Flight Delay Detected</span>
+          </div>
+          <div style="font-size: 13px; color: var(--text-secondary);" id="branch-chips-container">
+            Rebooking strategy: <strong>Balanced — fastest connection with zero added fee</strong>
+          </div>
+        </div>
+
+        <!-- Impact Analytics -->
+        <div class="impact-analytics-panel">
+          <div class="analytics-box">
+            <span class="analytics-label">Original vs. New Arrival</span>
+            <div class="analytics-value" id="analytics-arrival-times">Jul 25, 05:00 PM → Jul 25, 07:30 PM</div>
+          </div>
+          <div class="analytics-box">
+            <span class="analytics-label">Total Delay</span>
+            <div><span class="badge-delay-lost" id="analytics-delay-badge">+2h 30m Delay</span></div>
+          </div>
+          <div class="analytics-box">
+            <span class="analytics-label">Rebooking Fee</span>
+            <div><span class="badge-cost-free" id="analytics-cost-badge">$0.00 — Carrier Covered</span></div>
+          </div>
+          <div class="analytics-box">
+            <span class="analytics-label">Connection Buffer Restored</span>
+            <div class="analytics-value" style="color: var(--status-green);" id="analytics-slack-val">+90 minutes</div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-head">
+            <div>
+              <h2>Multimodal Route Details</h2>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;" id="itin-subtitle">Sarah Jenkins — SFO to LHR</p>
+            </div>
+
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <a href="/api/itinerary/artifact?id=PROOF-REC-994821" download class="btn-secondary" id="btn-proof-artifact">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Download Confirmation</span>
+              </a>
+              <div class="toggle-group">
+                <div class="toggle-btn active" id="toggle-single-view">Active Path</div>
+                <div class="toggle-btn" id="toggle-split-view">Before / After</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="single-view-container"><div class="nodes-flow" id="nodes-container"></div></div>
+          <div id="split-view-container" style="display: none;">
+            <div class="split-view-grid">
+              <div>
+                <h3 style="font-size: 12px; font-weight: 600; color: var(--status-red); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em;">Disrupted Path</h3>
+                <div class="nodes-flow" id="split-broken-nodes"></div>
+              </div>
+              <div>
+                <h3 style="font-size: 12px; font-weight: 600; color: var(--status-green); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em;">Self-Healed Path</h3>
+                <div class="nodes-flow" id="split-healed-nodes"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Agent Execution Log -->
+        <div class="terminal-box">
+          <div class="terminal-header">
+            <!-- Terminal icon -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <span>Live Agent Execution Log</span>
+          </div>
+          <div class="terminal-body" id="terminal-stream">
+            <div style="color: var(--text-secondary);">[SYSTEM] Multi-Agent Swarm, Saga &amp; Contention Engine active. Listening for disruption events...</div>
+          </div>
         </div>
       </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           VIEW 3: USER PREFERENCE MEMORY (Engine View)
+      ══════════════════════════════════════════════════════════ -->
+      <div class="view-container" id="view-vectors">
+        <div class="panel-card">
+          <div class="panel-head">
+            <h2>What We Remember About You</h2>
+          </div>
+
+          <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">
+            Traveler: <strong style="color: var(--text-primary);">Sarah Jenkins</strong>
+            <span style="font-size: 12px; color: var(--text-muted); margin-left: 8px;">sarah.jenkins@acme.com</span>
+          </div>
+
+          <h3 style="font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 16px;">Learned Travel Preferences</h3>
+          <div class="match-meter-row">
+            <div class="match-meter-item">
+              <div class="match-meter-info">
+                <span>Amtrak Acela Express, First Class Quiet Car — matches your usual preference from a past trip</span>
+                <span class="status-tag status-tag-green">Best Match</span>
+              </div>
+              <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 98%;"></div></div>
+            </div>
+
+            <div class="match-meter-item">
+              <div class="match-meter-info">
+                <span>Ritz-Carlton Executive Suite, Guaranteed Late Check-in</span>
+                <span class="status-tag status-tag-green">Recommended</span>
+              </div>
+              <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 96%;"></div></div>
+            </div>
+
+            <div class="match-meter-item">
+              <div class="match-meter-info">
+                <span>Delta Air Lines, Direct Transatlantic Route</span>
+                <span class="status-tag status-tag-neutral">Preferred Airline</span>
+              </div>
+              <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 92%;"></div></div>
+            </div>
+          </div>
+
+          <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border-subtle);">
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Comparing personal travel preferences against 1,500+ signals across historical itineraries to automatically select compliant rebookings.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           VIEW 4: EXECUTION PIPELINE & CDC (Engine View)
+      ══════════════════════════════════════════════════════════ -->
+      <div class="view-container" id="view-ops">
+        <div class="panel-card">
+          <div class="panel-head">
+            <h2>Execution Pipeline &amp; Event Stream</h2>
+          </div>
+
+          <div class="pipeline-flow">
+            <div class="pipeline-stage-card active" id="stage-1">
+              <div class="pipeline-num">STAGE 01</div>
+              <div class="pipeline-title">Disruption Event</div>
+              <div class="pipeline-desc">Delay signal received from carrier</div>
+            </div>
+
+            <div class="pipeline-stage-card" id="stage-2">
+              <div class="pipeline-num">STAGE 02</div>
+              <div class="pipeline-title">Preference Match</div>
+              <div class="pipeline-desc">Recalled traveler constraints</div>
+            </div>
+
+            <div class="pipeline-stage-card" id="stage-3">
+              <div class="pipeline-num">STAGE 03</div>
+              <div class="pipeline-title">Agent Consensus</div>
+              <div class="pipeline-desc">Multi-branch path synthesis</div>
+            </div>
+
+            <div class="pipeline-stage-card" id="stage-4">
+              <div class="pipeline-num">STAGE 04</div>
+              <div class="pipeline-title">Rebooking Tool</div>
+              <div class="pipeline-desc">Executed reservation adjustment</div>
+            </div>
+
+            <div class="pipeline-stage-card" id="stage-5">
+              <div class="pipeline-num">STAGE 05</div>
+              <div class="pipeline-title">Commit &amp; Confirm</div>
+              <div class="pipeline-desc">Transactional graph resolution</div>
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: 20px;" id="pipeline-inspector-box">
+            <h4 style="color: var(--text-primary); font-size: 14px; font-weight: 600; margin-bottom: 12px;" id="inspector-title">Stage 01: Disruption Event Signal</h4>
+            <div id="inspector-rendered-content" style="font-size: 13px; line-height: 1.8; color: var(--text-secondary);">
+              <div>● <strong>Trigger:</strong> Carrier delay notification received</div>
+              <div>● <strong>Operation:</strong> <span class="status-tag status-tag-red">UPDATE — DELAYED +150m</span></div>
+              <div>● <strong>Flight Reference:</strong> <code class="font-mono">DL-1402</code></div>
+              <div>● <strong>Timestamp:</strong> <code class="font-mono">2026-07-25T20:55:12.891Z</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           VIEW 5: INFRASTRUCTURE TELEMETRY (Engine View)
+      ══════════════════════════════════════════════════════════ -->
+      <div class="view-container" id="view-health">
+        <div class="panel-card">
+          <div class="panel-head">
+            <h2>Infrastructure Telemetry &amp; Cluster Status</h2>
+          </div>
+
+          <div class="telemetry-grid">
+            <div class="gauge-card">
+              <div class="gauge-head">Database Latency (p99)</div>
+              <div class="gauge-val" id="telemetry-latency-val">18ms</div>
+              <div style="font-size: 12px; color: var(--status-green); margin-bottom: 8px;">● us-east-1 (N. Virginia)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">eu-west-1 (Ireland): 42ms</div>
+              <div style="font-size: 12px; color: var(--text-muted);">ap-northeast-1 (Tokyo): 68ms</div>
+            </div>
+
+            <div class="gauge-card">
+              <div class="gauge-head">System Availability</div>
+              <div class="gauge-val">99.7%</div>
+              <div style="font-size: 12px; color: var(--status-green); margin-bottom: 8px;">● Measured over last 30 days</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Automatic retry handler: Active</div>
+            </div>
+
+            <div class="gauge-card">
+              <div class="gauge-head">Rebooking Response Time</div>
+              <div class="gauge-val">&lt; 392ms</div>
+              <div style="font-size: 12px; color: var(--status-green); margin-bottom: 8px;">● Sub-1000ms SLA target met</div>
+              <div style="font-size: 12px; color: var(--text-muted);">AI inference model: Active</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
-
-    <!-- VIEW 3: VECTOR PROFILES -->
-    <div class="view-container" id="view-vectors">
-      <div class="panel-card">
-        <div class="panel-head">
-          <h2>🧠 CockroachDB Persistent Agent Memory & Epistemic Context (1536-dim HNSW)</h2>
-        </div>
-
-        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-          Agent Long-Term Memory Target: <strong style="color: #fff;">Sarah Jenkins (sarah.jenkins@acme.com)</strong> | Index: <code style="color: var(--cyan-primary);">idx_users_preference_embedding (HNSW vector_cosine_ops)</code>
-        </div>
-
-        <h3>Interactive Cosine Similarity Match Matrix & Cross-Session Recall</h3>
-        <div class="match-meter-row">
-          <div class="match-meter-item">
-            <div class="match-meter-info">
-              <span>Amtrak Acela Express (Train 2158 - First Class Quiet Car) [Recalled from Trip #101]</span>
-              <span style="color: var(--emerald-primary);">98.4% Match (Rank #1)</span>
-            </div>
-            <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 98.4%;"></div></div>
-          </div>
-
-          <div class="match-meter-item">
-            <div class="match-meter-info">
-              <span>Ritz-Carlton Executive Suite Late Check-in</span>
-              <span style="color: var(--emerald-primary);">96.2% Match (Rank #1 Hotel)</span>
-            </div>
-            <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 96.2%;"></div></div>
-          </div>
-
-          <div class="match-meter-item">
-            <div class="match-meter-info">
-              <span>Delta Air Lines Re-route (Flight DL-1990 First Class)</span>
-              <span style="color: var(--cyan-primary);">92.5% Match (Rank #1 Flight)</span>
-            </div>
-            <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 92.5%;"></div></div>
-          </div>
-
-          <div class="match-meter-item">
-            <div class="match-meter-info">
-              <span>Amtrak Regional Express (Train 175 Coach)</span>
-              <span style="color: var(--text-muted);">89.1% Match (Rank #2)</span>
-            </div>
-            <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 89.1%; opacity: 0.6;"></div></div>
-          </div>
-        </div>
-
-        <div style="margin-top: 2rem;">
-          <h3>1536-Dimensional Embedding Feature Cell Heatmap Snapshot</h3>
-          <div class="heatmap-grid">
-            <div class="heatmap-cell" style="background: rgba(6, 182, 212, 0.85);">0.8008</div>
-            <div class="heatmap-cell" style="background: rgba(168, 85, 247, 0.85);">0.9124</div>
-            <div class="heatmap-cell" style="background: rgba(16, 185, 129, 0.85);">0.7641</div>
-            <div class="heatmap-cell" style="background: rgba(245, 158, 11, 0.85);">0.6892</div>
-            <div class="heatmap-cell" style="background: rgba(6, 182, 212, 0.95);">0.8415</div>
-            <div class="heatmap-cell" style="background: rgba(168, 85, 247, 0.95);">0.9502</div>
-            <div class="heatmap-cell" style="background: rgba(16, 185, 129, 0.75);">0.7120</div>
-            <div class="heatmap-cell" style="background: rgba(6, 182, 212, 0.8);">0.7994</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VIEW 4: CDC & AGENT OPS -->
-    <div class="view-container" id="view-ops">
-      <div class="panel-card">
-        <div class="panel-head">
-          <h2>📡 CockroachDB Changefeed & Agent Execution Pipeline</h2>
-        </div>
-
-        <div class="pipeline-flow">
-          <div class="pipeline-stage-card active" id="stage-1">
-            <div class="pipeline-num">STAGE 01</div>
-            <div class="pipeline-title">📡 CDC Trigger</div>
-            <div class="pipeline-desc">CHANGEFEED emitted for segment DELAYED</div>
-          </div>
-
-          <div class="pipeline-stage-card" id="stage-2">
-            <div class="pipeline-num">STAGE 02</div>
-            <div class="pipeline-title">🧠 Vector Retrieval</div>
-            <div class="pipeline-desc">HNSW Cosine Search (Score 0.984)</div>
-          </div>
-
-          <div class="pipeline-stage-card" id="stage-3">
-            <div class="pipeline-num">STAGE 03</div>
-            <div class="pipeline-title">🤖 Bedrock Swarm</div>
-            <div class="pipeline-desc">Claude 3.5 Sonnet CoT Debate</div>
-          </div>
-
-          <div class="pipeline-stage-card" id="stage-4">
-            <div class="pipeline-num">STAGE 04</div>
-            <div class="pipeline-title">🛠️ MCP Tool Call</div>
-            <div class="pipeline-desc">rebook_cascade_segment executed</div>
-          </div>
-
-          <div class="pipeline-stage-card" id="stage-5">
-            <div class="pipeline-num">STAGE 05</div>
-            <div class="pipeline-title">🛡️ ACID Commit</div>
-            <div class="pipeline-desc">SERIALIZABLE CockroachDB Tx</div>
-          </div>
-        </div>
-
-        <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.6rem;" id="pipeline-inspector-box">
-          <h4 style="color: var(--cyan-primary); font-family: var(--font-code); font-size: 0.95rem; margin-bottom: 0.75rem;" id="inspector-title">Stage 01: CockroachDB CHANGEFEED Trigger Event</h4>
-          <div id="inspector-rendered-content" style="font-family: var(--font-code); font-size: 0.85rem; line-height: 1.85; color: #cbd5e1;">
-            <div>● <strong>Topic:</strong> <code style="color: var(--cyan-primary);">itinerary_segments</code></div>
-            <div>● <strong>Operation:</strong> <span style="color: var(--rose-primary); font-weight: 800;">UPDATE (DELAYED +150m)</span></div>
-            <div>● <strong>Primary Key:</strong> <code>c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33</code></div>
-            <div>● <strong>Timestamp:</strong> <code>2026-07-24T20:55:12.891Z</code></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VIEW 5: SYSTEM HEALTH -->
-    <div class="view-container" id="view-health">
-      <div class="panel-card">
-        <div class="panel-head">
-          <div>
-            <h2>🛡️ Datadog-Style Infrastructure Telemetry & Health Panel</h2>
-            <div style="margin-top: 0.4rem;">
-              <span class="badge-cost-free" style="background: rgba(168, 85, 247, 0.2); border-color: var(--purple-primary); color: #e9d5ff;">🔒 RBAC Scope: Service Account (ccloud) • Restricted Table Access</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="telemetry-grid">
-          <div class="gauge-card">
-            <div class="gauge-head">Multi-Region CRDB Latency (p99)</div>
-            <div class="gauge-val" id="telemetry-latency-val">18ms</div>
-            <div style="font-size: 0.8rem; color: var(--emerald-primary); margin-top: 0.5rem;">● us-east-1 (N. Virginia): 18ms</div>
-            <div style="font-size: 0.8rem; color: var(--emerald-primary);">● eu-west-1 (Ireland): 42ms</div>
-            <div style="font-size: 0.8rem; color: var(--emerald-primary);">● ap-northeast-1 (Tokyo): 68ms</div>
-          </div>
-
-          <div class="gauge-card">
-            <div class="gauge-head">CockroachDB SERIALIZABLE Pool</div>
-            <div class="gauge-val">12 / 20</div>
-            <div style="font-size: 0.8rem; color: var(--cyan-primary); margin-top: 0.5rem;">Active Connections: 60% Pool Cap</div>
-            <div style="font-size: 0.8rem; color: var(--emerald-primary);">Automatic Retry Handler: Active (40001)</div>
-          </div>
-
-          <div class="gauge-card">
-            <div class="gauge-head">AWS Bedrock Sub-1000ms SLA</div>
-            <div class="gauge-val">&lt; 392ms</div>
-            <div style="font-size: 0.8rem; color: var(--emerald-primary); margin-top: 0.5rem;">Model: Claude 3.5 Sonnet</div>
-            <div style="font-size: 0.8rem; color: var(--purple-primary);">Tokens Used (24h): 42,190 Tokens</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
-  <!-- Create / Import Itinerary Glassmorphism Modal -->
+  <!-- Create Trip Modal -->
   <div class="modal-backdrop" id="createItineraryModal">
     <div class="modal-content-card">
       <div class="modal-head">
-        <h3>+ Create / Import Executive Travel Graph</h3>
+        <h3>Plan a New Trip</h3>
         <span class="modal-close" id="btn-close-modal">&times;</span>
       </div>
 
-      <form id="form-create-itinerary" style="display: flex; flex-direction: column; gap: 1rem;">
+      <form id="form-create-itinerary" style="display: flex; flex-direction: column; gap: 14px;">
         <div class="input-group">
           <label>Traveler Name</label>
           <input type="text" id="modal-traveler-name" placeholder="e.g. Marcus Vance" required value="Marcus Vance">
@@ -391,7 +545,7 @@
           <input type="email" id="modal-traveler-email" placeholder="e.g. marcus.vance@acme.com" required value="marcus.vance@acme.com">
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
           <div class="input-group">
             <label>Origin Hub</label>
             <select id="modal-origin">
@@ -413,18 +567,18 @@
         </div>
 
         <div class="input-group">
-          <label>User Preference Vector Strategy</label>
+          <label>Travel Preference</label>
           <select id="modal-strategy">
-            <option value="EXECUTIVE_SPEED">Executive / Business Class (Fastest Direct)</option>
-            <option value="FASTEST_LAYOVER">Fastest Layover Buffer Recovery</option>
-            <option value="BUDGET_COMPLIANT">Budget Compliant (Zero Rebooking Delta)</option>
+            <option value="EXECUTIVE_SPEED">Fastest Direct Connection</option>
+            <option value="FASTEST_LAYOVER">Fastest Layover Recovery</option>
+            <option value="BUDGET_COMPLIANT">Zero Added Cost (Carrier Covered)</option>
           </select>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 0.5rem;">
-          <button type="button" class="toggle-btn" id="btn-cancel-modal">Cancel</button>
-          <button type="submit" class="btn-create-modal" id="btn-submit-itinerary">
-            <span>Commit Itinerary Graph to CockroachDB</span>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px;">
+          <button type="button" class="btn-secondary" id="btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-primary" id="btn-submit-itinerary">
+            <span>Create Trip</span>
           </button>
         </div>
       </form>
@@ -432,39 +586,110 @@
   </div>
 
   <script>
-    // Tab Navigation
-    const navItems = document.querySelectorAll('.nav-item');
+    // ── SVG icon helpers ───────────────────────────────────────────────
+    const ICONS = {
+      FLIGHT: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75">
+        <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4c-2 0-2 0-3.5 1.5L11 9l-8.3-2.2a.5.5 0 0 0-.5.1L1 8l4 5-3 3 1 2 2-1 4.8 4.2 1.1-1.2z"/>
+      </svg>`,
+      TRAIN: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75">
+        <path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/>
+        <path d="M6 17h12"/>
+        <path d="M6 3h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+        <path d="m8 19-2 3"/>
+        <path d="m18 22-2-3"/>
+        <path d="M9 7h.01"/>
+        <path d="M15 7h.01"/>
+      </svg>`,
+      HOTEL: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75">
+        <path d="M3 22V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14"/>
+        <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+        <path d="M2 22h20"/>
+        <path d="M3 11h18"/>
+        <path d="M7 8v3"/>
+        <path d="M7 16h.01"/>
+        <path d="M17 16h.01"/>
+      </svg>`,
+    };
+
+    // ── Mode Switcher (Traveler View vs System Internals) ─────────────
+    const tabTraveler    = document.getElementById('tab-mode-traveler');
+    const tabInternals   = document.getElementById('tab-mode-internals');
+    const navTravelerMenu  = document.getElementById('nav-traveler-menu');
+    const navInternalsMenu = document.getElementById('nav-internals-menu');
+    const internalsBanner  = document.getElementById('internals-banner-bar');
+    const simulatorPanel   = document.getElementById('simulator-controls-panel');
+
+    let currentMode = 'traveler';
+
+    function switchMode(mode) {
+      currentMode = mode;
+      if (mode === 'traveler') {
+        tabTraveler.classList.add('active');
+        tabInternals.classList.remove('active');
+        navTravelerMenu.style.display = 'flex';
+        navInternalsMenu.style.display = 'none';
+        internalsBanner.style.display = 'none';
+        if (simulatorPanel) simulatorPanel.style.display = 'none';
+        switchView('dashboard', 'My Trips');
+      } else {
+        tabInternals.classList.add('active');
+        tabTraveler.classList.remove('active');
+        navTravelerMenu.style.display = 'none';
+        navInternalsMenu.style.display = 'flex';
+        internalsBanner.style.display = 'flex';
+        if (simulatorPanel) simulatorPanel.style.display = 'flex';
+        switchView('itinerary', 'Disruption Scenario Engine');
+      }
+    }
+
+    tabTraveler.addEventListener('click', () => switchMode('traveler'));
+    tabInternals.addEventListener('click', () => switchMode('internals'));
+
+    // ── View Navigation ───────────────────────────────────────────────
+    const navItems       = document.querySelectorAll('.nav-item');
     const viewContainers = document.querySelectorAll('.view-container');
-    const pageTitle = document.getElementById('header-page-title');
+    const pageTitle      = document.getElementById('header-page-title');
+
+    function switchView(targetView, customTitle) {
+      navItems.forEach(i => i.classList.remove('active'));
+      viewContainers.forEach(v => v.classList.remove('active-view'));
+
+      const activeNav = document.querySelector(`.nav-item[data-view="${targetView}"]`);
+      if (activeNav) activeNav.classList.add('active');
+
+      const targetEl = document.getElementById(`view-${targetView}`);
+      if (targetEl) targetEl.classList.add('active-view');
+
+      if (customTitle) {
+        pageTitle.innerText = customTitle;
+      } else if (activeNav) {
+        pageTitle.innerText = activeNav.querySelector('span').innerText;
+      }
+
+      if (targetView === 'dashboard') loadDashboardData();
+      if (targetView === 'health')    loadHealthData();
+    }
 
     navItems.forEach(item => {
       item.addEventListener('click', () => {
         const targetView = item.getAttribute('data-view');
-        navItems.forEach(i => i.classList.remove('active'));
-        viewContainers.forEach(v => v.classList.remove('active-view'));
-
-        item.classList.add('active');
-        document.getElementById(`view-${targetView}`).classList.add('active-view');
-        pageTitle.innerText = item.querySelector('span:last-child').innerText + ' Control Panel';
-
-        if (targetView === 'dashboard') loadDashboardData();
-        if (targetView === 'health') loadHealthData();
+        switchView(targetView);
       });
     });
 
-    // Create Modal Logic
+    // ── Modal ─────────────────────────────────────────────────────────
     const modal = document.getElementById('createItineraryModal');
     document.getElementById('btn-open-create-modal').addEventListener('click', () => modal.classList.add('active'));
-    document.getElementById('btn-close-modal').addEventListener('click', () => modal.classList.remove('active'));
+    document.getElementById('btn-close-modal').addEventListener('click',  () => modal.classList.remove('active'));
     document.getElementById('btn-cancel-modal').addEventListener('click', () => modal.classList.remove('active'));
 
     document.getElementById('form-create-itinerary').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('modal-traveler-name').value;
-      const email = document.getElementById('modal-traveler-email').value;
+      const name   = document.getElementById('modal-traveler-name').value;
+      const email  = document.getElementById('modal-traveler-email').value;
       const origin = document.getElementById('modal-origin').value;
-      const dest = document.getElementById('modal-destination').value;
-      const strat = document.getElementById('modal-strategy').value;
+      const dest   = document.getElementById('modal-destination').value;
+      const strat  = document.getElementById('modal-strategy').value;
 
       try {
         const res = await fetch('/api/itinerary/create', {
@@ -478,26 +703,32 @@
       } catch (err) { console.warn(err); }
     });
 
-    const slider = document.getElementById('sim-delay-slider');
+    // ── Delay Slider ─────────────────────────────────────────────────
+    const slider    = document.getElementById('sim-delay-slider');
     const sliderTxt = document.getElementById('slider-val-txt');
-    
+
     function getDurationStr(mins) {
       const h = Math.floor(mins / 60); const m = mins % 60;
-      if (h === 0) return `+${mins}m`; if (m === 0) return `+${h}h`; return `+${h}h ${m}m`;
+      if (h === 0) return `+${mins}m`;
+      if (m === 0) return `+${h}h`;
+      return `+${h}h ${m}m`;
     }
 
-    slider.addEventListener('input', () => {
-      const mins = parseInt(slider.value, 10);
-      sliderTxt.innerText = `Selected Delay: +${mins} mins (${getDurationStr(mins)})`;
-    });
+    if (slider) {
+      slider.addEventListener('input', () => {
+        const mins = parseInt(slider.value, 10);
+        sliderTxt.innerText = `Selected Delay: +${mins} mins (${getDurationStr(mins)})`;
+      });
+    }
 
+    // ── Split / Single view toggle ────────────────────────────────────
     let isSplitView = false;
     document.getElementById('toggle-single-view').addEventListener('click', () => {
       isSplitView = false;
       document.getElementById('toggle-single-view').classList.add('active');
       document.getElementById('toggle-split-view').classList.remove('active');
       document.getElementById('single-view-container').style.display = 'block';
-      document.getElementById('split-view-container').style.display = 'none';
+      document.getElementById('split-view-container').style.display  = 'none';
     });
 
     document.getElementById('toggle-split-view').addEventListener('click', () => {
@@ -505,69 +736,107 @@
       document.getElementById('toggle-split-view').classList.add('active');
       document.getElementById('toggle-single-view').classList.remove('active');
       document.getElementById('single-view-container').style.display = 'none';
-      document.getElementById('split-view-container').style.display = 'block';
+      document.getElementById('split-view-container').style.display  = 'block';
       renderSplitView();
     });
 
+    // ── Itinerary data ────────────────────────────────────────────────
     let graphNodes = [
-      { id: '1', provider: 'Delta Air Lines', reference_code: 'DL-1402', origin: 'SFO', destination: 'JFK', scheduled_departure: '2026-07-25T12:00:00.000Z', scheduled_arrival: '2026-07-25T17:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', pricing: 'Business Class | Direct Transfer | $0 Fee' },
-      { id: '2', provider: 'Amtrak Acela Express', reference_code: 'AMT-2150', origin: 'NY Moynihan', destination: 'PHL 30th St', scheduled_departure: '2026-07-25T18:30:00.000Z', scheduled_arrival: '2026-07-25T19:45:00.000Z', status: 'SCHEDULED', segment_type: 'TRAIN', pricing: 'First Class Quiet Car | Wi-Fi Included | $0 Fee' },
-      { id: '3', provider: 'Ritz-Carlton Philadelphia', reference_code: 'HTL-9921', origin: 'Philadelphia', destination: 'Philadelphia', scheduled_departure: '2026-07-25T20:15:00.000Z', scheduled_arrival: '2026-07-26T12:00:00.000Z', status: 'SCHEDULED', segment_type: 'HOTEL', pricing: 'Executive Suite | Late Check-in Guaranteed | $0 Fee' },
-      { id: '4', provider: 'British Airways', reference_code: 'BA-178', origin: 'PHL', destination: 'LHR', scheduled_departure: '2026-07-26T15:00:00.000Z', scheduled_arrival: '2026-07-26T22:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', pricing: 'Club World Cabin | Direct Transatlantic | $0 Fee' }
+      { id: '1', provider: 'Delta Air Lines',       reference_code: 'DL-1402',  origin: 'SFO', destination: 'JFK', scheduled_departure: '2026-07-25T12:00:00.000Z', scheduled_arrival: '2026-07-25T17:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', pricing: 'Business Class · Direct · No change fee' },
+      { id: '2', provider: 'Amtrak Acela Express',  reference_code: 'AMT-2150', origin: 'NY Moynihan', destination: 'PHL 30th St', scheduled_departure: '2026-07-25T18:30:00.000Z', scheduled_arrival: '2026-07-25T19:45:00.000Z', status: 'SCHEDULED', segment_type: 'TRAIN', pricing: 'First Class Quiet Car · Wi-Fi Included · No change fee' },
+      { id: '3', provider: 'Ritz-Carlton Philadelphia', reference_code: 'HTL-9921', origin: 'Philadelphia', destination: 'Philadelphia', scheduled_departure: '2026-07-25T20:15:00.000Z', scheduled_arrival: '2026-07-26T12:00:00.000Z', status: 'SCHEDULED', segment_type: 'HOTEL', pricing: 'Executive Suite · Late Check-in Guaranteed · No change fee' },
+      { id: '4', provider: 'British Airways',        reference_code: 'BA-178',   origin: 'PHL', destination: 'LHR', scheduled_departure: '2026-07-26T15:00:00.000Z', scheduled_arrival: '2026-07-26T22:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', pricing: 'Club World Cabin · Direct Transatlantic · No change fee' }
     ];
 
     function renderItineraryNodes(segments, containerId = 'nodes-container') {
       const container = document.getElementById(containerId);
       if (!container) return;
       container.innerHTML = '';
-      const icons = { FLIGHT: '✈️', TRAIN: '🚆', HOTEL: '🏨', TAXI: '🚖' };
 
       segments.forEach((seg, idx) => {
         const card = document.createElement('div');
         card.className = `node-card status-${seg.status}`;
+
         const dep = new Date(seg.scheduled_departure).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const arr = new Date(seg.scheduled_arrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+        let statusTag = `<span class="status-tag status-tag-neutral">${seg.status}</span>`;
+        if (seg.status === 'DELAYED')   statusTag = `<span class="status-tag status-tag-red">Delayed (+150m)</span>`;
+        if (seg.status === 'REBOOKED')  statusTag = `<span class="status-tag status-tag-green">Updated Automatically</span>`;
+        if (seg.status === 'SCHEDULED') statusTag = `<span class="status-tag status-tag-neutral">On Schedule</span>`;
+
+        const iconHtml = ICONS[seg.segment_type] || ICONS['FLIGHT'];
+
         card.innerHTML = `
           <div class="node-left">
-            <div class="node-icon">${icons[seg.segment_type] || '🗺️'}</div>
+            <div class="node-icon-box">${iconHtml}</div>
             <div>
-              <div style="font-weight: 800; font-size: 1.05rem;">${seg.provider} (${seg.reference_code})</div>
-              <div style="color: var(--text-muted); font-size: 0.85rem;">${seg.origin} ➔ ${seg.destination} | Scheduled: ${dep} - ${arr}</div>
-              <div style="font-size: 0.74rem; color: var(--cyan-primary); margin-top: 2px;">🏷️ ${seg.pricing}</div>
+              <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">${seg.provider} <code class="font-mono" style="font-size:12px; color:var(--text-muted);">${seg.reference_code}</code></div>
+              <div style="color: var(--text-secondary); font-size: 13px; margin-top: 2px;">${seg.origin} → ${seg.destination} &nbsp;·&nbsp; ${dep} – ${arr}</div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">${seg.pricing}</div>
             </div>
           </div>
-          <div><span class="badge badge-${seg.status}">${seg.status}</span></div>
+          <div>${statusTag}</div>
         `;
         container.appendChild(card);
-        if (idx < segments.length - 1) { const conn = document.createElement('div'); conn.className = 'connector'; container.appendChild(conn); }
+        if (idx < segments.length - 1) {
+          const conn = document.createElement('div');
+          conn.className = 'connector';
+          container.appendChild(conn);
+        }
       });
     }
 
     function renderSplitView() {
-      const brokenNodes = [{ ...graphNodes[0], status: 'DELAYED' }, { ...graphNodes[1], status: 'DELAYED', provider: 'Amtrak Acela (MISSED CONNECTION)' }, { ...graphNodes[2], status: 'DELAYED' }, { ...graphNodes[3], status: 'SCHEDULED' }];
-      const healedNodes = [{ ...graphNodes[0], status: 'DELAYED' }, { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' }, { ...graphNodes[2], status: 'REBOOKED' }, { ...graphNodes[3], status: 'SCHEDULED' }];
-      renderItineraryNodes(brokenNodes, 'split-broken-nodes'); renderItineraryNodes(healedNodes, 'split-healed-nodes');
+      const brokenNodes = [
+        { ...graphNodes[0], status: 'DELAYED' },
+        { ...graphNodes[1], status: 'DELAYED', provider: 'Amtrak Acela (Missed Connection)' },
+        { ...graphNodes[2], status: 'DELAYED' },
+        { ...graphNodes[3], status: 'SCHEDULED' }
+      ];
+      const healedNodes = [
+        { ...graphNodes[0], status: 'DELAYED' },
+        { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' },
+        { ...graphNodes[2], status: 'REBOOKED' },
+        { ...graphNodes[3], status: 'SCHEDULED' }
+      ];
+      renderItineraryNodes(brokenNodes, 'split-broken-nodes');
+      renderItineraryNodes(healedNodes, 'split-healed-nodes');
     }
 
+    // ── Dashboard data fetch ──────────────────────────────────────────
     async function loadDashboardData() {
       try {
-        const res = await fetch('/api/dashboard');
+        const res  = await fetch('/api/dashboard');
         const data = await res.json();
         const tbody = document.getElementById('dashboard-fleet-table');
         tbody.innerHTML = '';
-        document.getElementById('metric-active-count').innerText = data.metrics.active_itineraries;
+        document.getElementById('metric-active-count').innerText = data.metrics.active_itineraries.toLocaleString();
+
         data.active_fleet.forEach(item => {
           const tr = document.createElement('tr');
-          tr.innerHTML = `<td><code>${item.id}</code></td><td><strong>${item.traveler}</strong></td><td>${item.route}</td><td><span class="badge badge-${item.status}">${item.status}</span></td><td>${item.legs}</td><td style="font-size: 0.8rem; color: var(--text-muted);">${item.last_event}</td>`;
+          let tagClass = 'status-tag-neutral';
+          let tagLabel = item.status;
+          if (item.status === 'SELF_HEALED') { tagClass = 'status-tag-green'; tagLabel = 'Auto-Healed'; }
+          if (item.status === 'IN_TRANSIT')  { tagClass = 'status-tag-amber'; tagLabel = 'In Transit'; }
+          if (item.status === 'SCHEDULED')   { tagClass = 'status-tag-neutral'; tagLabel = 'On Schedule'; }
+
+          tr.innerHTML = `
+            <td><strong style="color:var(--text-primary);">${item.traveler}</strong></td>
+            <td style="font-family:var(--font-mono); font-size:13px;">${item.route}</td>
+            <td><span class="status-tag ${tagClass}">${tagLabel}</span></td>
+            <td style="color:var(--text-muted); font-size:13px;">${item.legs}</td>
+            <td style="font-size: 13px; color: var(--text-secondary);">${item.last_event}</td>
+          `;
           tbody.appendChild(tr);
         });
       } catch (err) { console.warn(err); }
     }
 
+    // ── Health data fetch ─────────────────────────────────────────────
     async function loadHealthData() {
       try {
-        const res = await fetch('/api/health');
+        const res  = await fetch('/api/health');
         const data = await res.json();
         if (data.cockroach_db && data.cockroach_db.p99_latency) {
           document.getElementById('telemetry-latency-val').innerText = data.cockroach_db.p99_latency;
@@ -575,9 +844,10 @@
       } catch (err) { console.warn(err); }
     }
 
+    // ── Simulator button handler ──────────────────────────────────────
     async function handleActionButtonClick(btnElement, originalHtml, apiCallFn) {
       btnElement.disabled = true;
-      btnElement.innerHTML = `<span>⏳ RUNNING...</span>`;
+      btnElement.innerHTML = `<span>Simulating...</span>`;
       try {
         await apiCallFn();
       } catch (err) {
@@ -590,52 +860,96 @@
       }
     }
 
-    // Attach explicit click listeners to ALL 4 scenario buttons
     const btnDisrupt = document.getElementById('btn-disrupt');
-    btnDisrupt.addEventListener('click', () => {
-      handleActionButtonClick(btnDisrupt, `<span>[ ⚡ Execute Delay ]</span>`, async () => {
-        const typeVal = document.getElementById('sim-disrupt-type').value;
-        const strategyVal = document.getElementById('sim-strategy').value;
-        const delayVal = parseInt(document.getElementById('sim-delay-slider').value, 10);
+    if (btnDisrupt) {
+      btnDisrupt.addEventListener('click', () => {
+        handleActionButtonClick(btnDisrupt, `<span>Simulate: Flight Delayed</span>`, async () => {
+          const typeVal     = document.getElementById('sim-disrupt-type').value;
+          const strategyVal = document.getElementById('sim-strategy').value;
+          const delayVal    = parseInt(document.getElementById('sim-delay-slider').value, 10);
 
-        graphNodes[0].status = 'DELAYED'; graphNodes[1].status = 'DELAYED';
-        renderItineraryNodes(graphNodes);
+          graphNodes[0].status = 'DELAYED';
+          graphNodes[1].status = 'DELAYED';
+          renderItineraryNodes(graphNodes);
 
-        await fetch('/api/disrupt', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ delayMinutes: delayVal, type: typeVal, strategy: strategyVal })
+          await fetch('/api/disrupt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ delayMinutes: delayVal, type: typeVal, strategy: strategyVal })
+          });
         });
       });
-    });
+    }
 
     const btnChaos = document.getElementById('btn-chaos');
-    btnChaos.addEventListener('click', () => {
-      handleActionButtonClick(btnChaos, `<span>[ 🔥 Trigger Chaos ]</span>`, async () => {
-        await fetch('/api/disrupt/chaos', { method: 'POST' });
+    if (btnChaos) {
+      btnChaos.addEventListener('click', () => {
+        handleActionButtonClick(btnChaos, `<span>Simulate: Multiple Disruptions</span>`, async () => {
+          await fetch('/api/disrupt/chaos', { method: 'POST' });
+        });
       });
-    });
+    }
 
     const btnContention = document.getElementById('btn-contention');
-    btnContention.addEventListener('click', () => {
-      handleActionButtonClick(btnContention, `<span>[ ⚔️ Race Contention ]</span>`, async () => {
-        await fetch('/api/disrupt/contention', { method: 'POST' });
+    if (btnContention) {
+      btnContention.addEventListener('click', () => {
+        handleActionButtonClick(btnContention, `<span>Simulate: Rebooking Conflict</span>`, async () => {
+          await fetch('/api/disrupt/contention', { method: 'POST' });
+        });
       });
-    });
+    }
 
     const btnFailover = document.getElementById('btn-failover');
-    btnFailover.addEventListener('click', () => {
-      handleActionButtonClick(btnFailover, `<span>[ 🛡️ Region Failover ]</span>`, async () => {
-        await fetch('/api/disrupt/region-failover', { method: 'POST' });
+    if (btnFailover) {
+      btnFailover.addEventListener('click', () => {
+        handleActionButtonClick(btnFailover, `<span>Simulate: Regional Outage</span>`, async () => {
+          await fetch('/api/disrupt/region-failover', { method: 'POST' });
+        });
       });
-    });
+    }
 
+    // ── Pipeline Inspector ────────────────────────────────────────────
     const pipelineData = {
-      'stage-1': { title: 'Stage 01: CockroachDB CHANGEFEED Trigger Event', html: '<div>● <strong>Topic:</strong> <code style="color: var(--cyan-primary);">itinerary_segments</code></div><div>● <strong>Operation:</strong> <span style="color: var(--rose-primary); font-weight: 800;">UPDATE (DELAYED +150m)</span></div><div>● <strong>Primary Key:</strong> <code>c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33</code></div><div>● <strong>Timestamp:</strong> <code>2026-07-24T20:55:12.891Z</code></div>' },
-      'stage-2': { title: 'Stage 02: HNSW Vector Retrieval (1536-dim)', html: '<div>● <strong>Agent Persistent Memory Target:</strong> Sarah Jenkins (sarah.jenkins@acme.com)</div><div>● <strong>HNSW Index:</strong> <code style="color: var(--cyan-primary);">idx_users_preference_embedding</code></div><div>● <strong>Vector Match Score:</strong> <span style="color: var(--emerald-primary); font-weight: 800;">0.984 Cosine Match</span></div><div>● <strong>Cross-Session Memory Recalled:</strong> Trip #101 preference recalled (prune layovers &lt; 60m)</div>' },
-      'stage-3': { title: 'Stage 03: Bedrock Multi-Agent Swarm Debate', html: '<div>● <strong>Recovery Agent Proposal:</strong> Amtrak Acela Express (Train 2158)</div><div>● <strong>Preference Guard Verdict:</strong> <span style="color: var(--emerald-primary); font-weight: 800;">APPROVED</span></div><div>● <strong>Swarm Consensus:</strong> Agreed on Business-Class Executive Repair Strategy</div><div>● <strong>Model:</strong> AWS Bedrock Claude 3.5 Sonnet</div>' },
-      'stage-4': { title: 'Stage 04: MCP Tool Invocation', html: '<div>● <strong>MCP Tool Executed:</strong> <code style="color: var(--purple-primary);">rebook_cascade_segment</code></div><div>● <strong>Agent Skill:</strong> <code style="color: var(--cyan-primary);">inspect_cluster_observability_skill</code></div><div>● <strong>Managed MCP Endpoint:</strong> <code style="color: var(--cyan-primary);">https://cockroachlabs.cloud/mcp</code></div><div>● <strong>Tool Status:</strong> <span style="color: var(--emerald-primary); font-weight: 800;">COMMITTED</span></div>' },
-      'stage-5': { title: 'Stage 05: CockroachDB SERIALIZABLE Transaction Commit', html: '<div>● <strong>Transaction Hash:</strong> <code style="color: var(--cyan-primary);">0x4f82a910b4c73d9e01f2</code></div><div>● <strong>Isolation Level:</strong> <span style="color: var(--emerald-primary); font-weight: 800;">SERIALIZABLE (ACID Guaranteed)</span></div><div>● <strong>Graph State:</strong> SELF_HEALED</div><div>● <strong>Execution Latency:</strong> 392ms (&lt;1000ms SLA)</div>' }
+      'stage-1': {
+        title: 'Stage 01: Disruption Event Signal',
+        html: `
+          <div>● <strong>Trigger:</strong> Carrier delay notification received</div>
+          <div>● <strong>Operation:</strong> <span class="status-tag status-tag-red">UPDATE — DELAYED +150m</span></div>
+          <div>● <strong>Flight Reference:</strong> <code class="font-mono">DL-1402</code></div>
+          <div>● <strong>Timestamp:</strong> <code class="font-mono">2026-07-25T20:55:12.891Z</code></div>`
+      },
+      'stage-2': {
+        title: 'Stage 02: Preference Recall',
+        html: `
+          <div>● <strong>Traveler:</strong> Sarah Jenkins</div>
+          <div>● <strong>Preference match:</strong> <span class="status-tag status-tag-green">Quiet Car + Executive Suite</span></div>
+          <div>● <strong>Signals compared:</strong> 1,500+ historical preference signals</div>
+          <div>● <strong>Result:</strong> Best match identified</div>`
+      },
+      'stage-3': {
+        title: 'Stage 03: Multi-Agent Consensus',
+        html: `
+          <div>● <strong>Proposal:</strong> Amtrak Acela Express (Train 2158)</div>
+          <div>● <strong>Preference Guard:</strong> <span class="status-tag status-tag-green">APPROVED</span></div>
+          <div>● <strong>Consensus agents:</strong> Recovery Agent + Preference Guard Agent</div>
+          <div>● <strong>Decision:</strong> Zero-cost rebooking via carrier obligation</div>`
+      },
+      'stage-4': {
+        title: 'Stage 04: Rebooking Tool Call',
+        html: `
+          <div>● <strong>Action:</strong> Segment reservation update</div>
+          <div>● <strong>Tool:</strong> <code class="font-mono">rebook_cascade_segment</code></div>
+          <div>● <strong>Status:</strong> <span class="status-tag status-tag-green">COMMITTED</span></div>
+          <div>● <strong>Latency:</strong> 32ms</div>`
+      },
+      'stage-5': {
+        title: 'Stage 05: Transactional Commit',
+        html: `
+          <div>● <strong>Isolation:</strong> <span class="status-tag status-tag-green">SERIALIZABLE</span></div>
+          <div>● <strong>State:</strong> Route saved. Matches your budget preference from past trips.</div>
+          <div>● <strong>Execution time:</strong> 392ms (within 1-second target)</div>
+          <div>● <strong>Traveler notified:</strong> Yes</div>`
+      }
     };
 
     document.querySelectorAll('.pipeline-stage-card').forEach(card => {
@@ -650,15 +964,16 @@
       });
     });
 
+    // ── SSE Real-Time Stream ──────────────────────────────────────────
     function initSSE() {
       const source = new EventSource('/api/stream');
-      const box = document.getElementById('terminal-stream');
+      const box    = document.getElementById('terminal-stream');
 
       source.addEventListener('agent_step', (e) => {
         const data = JSON.parse(e.data);
-        const div = document.createElement('div');
-        div.style.marginBottom = '0.4rem';
-        div.innerHTML = `<span style="color: var(--purple-primary);">[${data.tag || 'AGENT'}]</span> <span style="color: #60a5fa;">(${data.agent || 'ENGINE'})</span> ${data.action}`;
+        const div  = document.createElement('div');
+        div.style.marginBottom = '4px';
+        div.innerHTML = `<span style="color:var(--accent);">[${data.tag || 'AGENT'}]</span> <span style="color:var(--text-secondary);">(${data.agent || 'ENGINE'})</span> ${data.action}`;
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
 
@@ -670,9 +985,210 @@
       });
     }
 
+    // ── Leaflet Route Map ─────────────────────────────────────────────
+    let leafletMap = null;
+    let planeMarker = null;
+    let routeArcCoords = [];
+    let planeAnimFrame = null;
+    let planeProgress = 0;
+
+    const WAYPOINTS = [
+      { code: 'SFO', label: 'SFO — San Francisco', lat: 37.6213, lng: -122.379,  type: 'origin' },
+      { code: 'JFK', label: 'JFK — New York',       lat: 40.6413, lng: -73.7781,  type: 'stop' },
+      { code: 'PHL', label: 'PHL — Philadelphia',   lat: 39.8729, lng: -75.2437,  type: 'stop' },
+      { code: 'LHR', label: 'LHR — London Heathrow',lat: 51.4700, lng: -0.4543,   type: 'destination' },
+    ];
+
+    function buildGreatCircleArc(from, to, steps) {
+      // Use turf to generate a great-circle line between two [lng,lat] points
+      const line = turf.greatCircle(
+        turf.point([from.lng, from.lat]),
+        turf.point([to.lng,   to.lat]),
+        { npoints: steps }
+      );
+      return line.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+    }
+
+    function buildFullRoute() {
+      // Chain SFO→JFK→PHL→LHR great-circle segments
+      const segments = [
+        [WAYPOINTS[0], WAYPOINTS[1], 30],
+        [WAYPOINTS[1], WAYPOINTS[2], 10],
+        [WAYPOINTS[2], WAYPOINTS[3], 50],
+      ];
+      let coords = [];
+      segments.forEach(([from, to, steps]) => {
+        const seg = buildGreatCircleArc(from, to, steps);
+        if (coords.length > 0) seg.shift(); // avoid duplicate junction points
+        coords = coords.concat(seg);
+      });
+      return coords;
+    }
+
+    function makePlaneIcon(bearing) {
+      return L.divIcon({
+        className: 'plane-marker',
+        html: `<svg style="transform:rotate(${bearing}deg)" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+        </svg>`,
+        iconSize:   [28, 28],
+        iconAnchor: [14, 14],
+      });
+    }
+
+    function calcBearing(from, to) {
+      const toRad = d => d * Math.PI / 180;
+      const toDeg = r => r * 180 / Math.PI;
+      const dLng = toRad(to[1] - from[1]);
+      const lat1 = toRad(from[0]), lat2 = toRad(to[0]);
+      const y = Math.sin(dLng) * Math.cos(lat2);
+      const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+      return (toDeg(Math.atan2(y, x)) + 360) % 360;
+    }
+
+    function lerpLatLng(a, b, t) {
+      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    }
+
+    function animatePlane() {
+      if (!planeMarker || routeArcCoords.length < 2) return;
+      planeProgress = (planeProgress + 0.0008) % 1;
+      const total  = routeArcCoords.length - 1;
+      const idx    = Math.floor(planeProgress * total);
+      const frac   = (planeProgress * total) - idx;
+      const posA   = routeArcCoords[idx];
+      const posB   = routeArcCoords[Math.min(idx + 1, total)];
+      const pos    = lerpLatLng(posA, posB, frac);
+      const bearing = calcBearing(posA, posB);
+      planeMarker.setLatLng(pos);
+      planeMarker.setIcon(makePlaneIcon(bearing));
+      planeAnimFrame = requestAnimationFrame(animatePlane);
+    }
+
+    function initLeafletMap() {
+      const mapEl = document.getElementById('leaflet-route-map');
+      if (!mapEl || typeof L === 'undefined' || typeof turf === 'undefined') return;
+
+      leafletMap = L.map('leaflet-route-map', {
+        center: [47, -35],
+        zoom: 3,
+        zoomControl: false,
+        attributionControl: true,
+        scrollWheelZoom: false,
+        dragging: true,
+        touchZoom: false,
+        doubleClickZoom: false,
+      });
+
+      // CartoDB Dark Matter basemap
+      L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        {
+          attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 19,
+        }
+      ).addTo(leafletMap);
+
+      // Build the great-circle route
+      routeArcCoords = buildFullRoute();
+
+      // Glow / shadow polyline (wider, low opacity)
+      L.polyline(routeArcCoords, {
+        color: 'rgba(99,102,241,0.18)',
+        weight: 10,
+        lineCap: 'round',
+        lineJoin: 'round',
+        smoothFactor: 1,
+      }).addTo(leafletMap);
+
+      // Main accent route line
+      L.polyline(routeArcCoords, {
+        color: '#6366f1',
+        weight: 2.5,
+        lineCap: 'round',
+        lineJoin: 'round',
+        smoothFactor: 1,
+        opacity: 0.9,
+      }).addTo(leafletMap);
+
+      // Waypoint markers
+      WAYPOINTS.forEach((wp) => {
+        const isOrigin = wp.type === 'origin';
+        const isDest   = wp.type === 'destination';
+        const isStop   = wp.type === 'stop';
+        const color    = isDest ? '#22c55e' : '#6366f1';
+        const size     = isStop ? 8 : 12;
+        const border   = isStop ? 1.5 : 2.5;
+
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="
+            width:${size}px;height:${size}px;
+            border-radius:50%;
+            background:${color};
+            border:${border}px solid ${isDest ? 'rgba(34,197,94,0.35)' : 'rgba(99,102,241,0.35)'};
+            box-shadow: 0 0 0 ${border + 1}px ${isDest ? 'rgba(34,197,94,0.15)' : 'rgba(99,102,241,0.15)'};
+          "></div>`,
+          iconSize:   [size, size],
+          iconAnchor: [size / 2, size / 2],
+        });
+
+        const label = (isOrigin || isDest)
+          ? `<b style="font-size:12px;letter-spacing:-0.01em">${wp.code}</b>`
+          : wp.code;
+
+        L.marker([wp.lat, wp.lng], { icon })
+          .addTo(leafletMap)
+          .bindPopup(wp.label, { closeButton: false, maxWidth: 180 });
+
+        // Permanent label for origin & destination only
+        if (isOrigin || isDest) {
+          L.marker([wp.lat, wp.lng], {
+            icon: L.divIcon({
+              className: '',
+              html: `<div style="
+                color:rgba(255,255,255,0.88);
+                font-size:11px;
+                font-weight:600;
+                font-family:Inter,sans-serif;
+                white-space:nowrap;
+                pointer-events:none;
+                text-shadow:0 1px 3px rgba(0,0,0,0.8);
+                padding-left:${isOrigin ? '14px' : '0'};
+                padding-right:${isDest ? '14px' : '0'};
+                margin-top:2px;
+              ">${wp.code}</div>`,
+              iconSize:   [40, 16],
+              iconAnchor: isOrigin ? [-2, 8] : [42, 8],
+            }),
+            interactive: false,
+            zIndexOffset: -1,
+          }).addTo(leafletMap);
+        }
+      });
+
+      // Animated plane marker — start at first coord
+      planeMarker = L.marker(routeArcCoords[0], {
+        icon: makePlaneIcon(90),
+        zIndexOffset: 1000,
+        interactive: false,
+      }).addTo(leafletMap);
+
+      // Fit map to the route with padding
+      leafletMap.fitBounds(L.latLngBounds(routeArcCoords), { padding: [32, 48] });
+
+      // Start animation
+      planeAnimFrame = requestAnimationFrame(animatePlane);
+    }
+
+    // ── Initialization ────────────────────────────────────────────────
+    switchMode('traveler');
     renderItineraryNodes(graphNodes);
-    loadDashboardData();
     initSSE();
+    // Defer Leaflet init so the container is in the DOM and has dimensions
+    setTimeout(initLeafletMap, 100);
   </script>
+
 </body>
 </html>

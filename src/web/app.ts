@@ -38,10 +38,10 @@ cdcEventEmitter.on('cascade_healed', (data) => broadcastSSE('cascade_healed', da
 
 // In-Memory Fleet Database State
 let activeFleetData = [
-  { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'SFO ➔ LHR', status: 'SELF_HEALED', legs: 'Flight ➔ Train ➔ Hotel ➔ Flight', last_event: 'Flight DL-1402 +150m delay resolved via Amtrak AMT-2158', region: 'us-east-1' },
-  { id: 'itin-102', traveler: 'Marcus Vance', route: 'JFK ➔ CDG', status: 'SCHEDULED', legs: 'Flight ➔ Express Rail ➔ Hotel', last_event: 'All connections nominal (+120m buffer)', region: 'eu-west-1' },
-  { id: 'itin-103', traveler: 'Elena Rostova', route: 'ORD ➔ HND', status: 'IN_TRANSIT', legs: 'Flight ➔ Shinkansen ➔ Hotel', last_event: 'Leg 1 departed on time', region: 'ap-northeast-1' },
-  { id: 'itin-104', traveler: 'David Chen', route: 'MIA ➔ LHR', status: 'SELF_HEALED', legs: 'Flight ➔ Taxi ➔ Hotel', last_event: 'Hotel check-in window adjusted (+45m late check-in)', region: 'us-east-1' },
+  { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'SFO → LHR', status: 'SELF_HEALED', legs: 'Flight · Train · Hotel · Flight', last_event: 'Flight delayed +150m — automatically rebooked to next Amtrak Acela Express', region: 'us-east-1' },
+  { id: 'itin-102', traveler: 'Marcus Vance', route: 'JFK → CDG', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer', region: 'eu-west-1' },
+  { id: 'itin-103', traveler: 'Elena Rostova', route: 'ORD → HND', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time', region: 'ap-northeast-1' },
+  { id: 'itin-104', traveler: 'David Chen', route: 'MIA → LHR', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival — guaranteed at no extra cost', region: 'us-east-1' },
 ];
 
 let inMemoryGraphCache: any = {
@@ -156,7 +156,7 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     route: routeStr,
     status: 'SCHEDULED',
     legs: 'Flight ➔ Express Rail ➔ Hotel',
-    last_event: `Itinerary committed to CockroachDB with HNSW Vector Strategy '${strategy || 'EXECUTIVE_SPEED'}'. Cross-Session Memory linked.`,
+    last_event: `New trip planned. Preferences loaded from past trips.`,
     region: 'us-east-1',
   };
 
@@ -166,7 +166,7 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     success: true,
     itineraryId: newId,
     newTrip,
-    message: 'Itinerary graph and 1536-dim vector profile successfully committed to CockroachDB!',
+    message: 'Trip created and traveler preferences loaded successfully.',
   });
 });
 
