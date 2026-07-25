@@ -1,0 +1,50 @@
+{
+  "name": "cascade-logistics",
+  "version": "1.0.0",
+  "description": "Resilient, self-healing multi-agent travel orchestration engine powered by CockroachDB Vector Search & CDC and AWS Bedrock via MCP tools.",
+  "type": "module",
+  "main": "dist/web/app.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/web/app.ts",
+    "dev": "tsx watch src/web/app.ts",
+    "mcp:server": "tsx src/mcp/server.ts",
+    "cdc:listener": "tsx src/services/cdc_listener.ts",
+    "emulator": "tsx src/services/disruption_emulator.ts",
+    "seed": "tsx src/db/seed_runner.ts",
+    "test": "jest"
+  },
+  "keywords": [
+    "cockroachdb",
+    "aws-bedrock",
+    "mcp",
+    "vector-search",
+    "multi-agent",
+    "cdc",
+    "travel-orchestration"
+  ],
+  "author": "CASCADE Team",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.500.0",
+    "@cockroachlabs/crdb-pg": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.7",
+    "@types/pg": "^8.11.5",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  }
+}

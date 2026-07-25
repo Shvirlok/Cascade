@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CASCADE | Enterprise SaaS Logistics Orchestration Engine</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Left Sidebar Navigation -->
+  <aside>
+    <div class="sidebar-brand">
+      <div class="brand-logo-badge">⚡</div>
+      <div class="brand-title-group">
+        <h1>CASCADE</h1>
+        <p>Enterprise SaaS Logistics</p>
+      </div>
+    </div>
+
+    <nav class="nav-menu">
+      <div class="nav-item active" data-view="dashboard"><span>📊</span> <span>Dashboard</span></div>
+      <div class="nav-item" data-view="itinerary"><span>⚡</span> <span>Live Itineraries</span></div>
+      <div class="nav-item" data-view="vectors"><span>🧠</span> <span>Vector Profiles</span></div>
+      <div class="nav-item" data-view="ops"><span>📡</span> <span>CDC & Agent Ops</span></div>
+      <div class="nav-item" data-view="health"><span>🛡️</span> <span>System Health</span></div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div>CockroachDB + Bedrock</div>
+      <div style="color: var(--emerald-primary); margin-top: 2px;">● Status: Operational</div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="app-main-wrapper">
+    <header>
+      <div id="header-page-title" style="font-weight: 800; font-size: 1.15rem;">Enterprise Operations Control Center</div>
+      <div class="header-status-group">
+        <div class="status-pill"><span class="dot dot-cyan"></span> CockroachDB MCP: CONNECTED (cockroachlabs.cloud/mcp)</div>
+        <div class="status-pill"><span class="dot dot-green"></span> CockroachDB: ONLINE</div>
+        <div class="status-pill"><span class="dot dot-purple"></span> AWS Bedrock: CLAUDE 3.5</div>
+      </div>
+    </header>
+
+    <!-- VIEW 1: DASHBOARD -->
+    <div class="view-container active-view" id="view-dashboard">
+      <div class="metrics-row">
+        <div class="metric-card"><h3>Active Itineraries</h3><div class="metric-val" id="metric-active-count">1,420</div><div class="metric-sub">↑ 12% vs last week</div></div>
+        <div class="metric-card"><h3>Self-Healed Rate</h3><div class="metric-val">99.4%</div><div class="metric-sub">384 disruptions auto-rebooked</div></div>
+        <div class="metric-card"><h3>CRDB P99 Latency</h3><div class="metric-val">18ms</div><div class="metric-sub">Serializable Isolation</div></div>
+        <div class="metric-card"><h3>Bedrock Agent Uptime</h3><div class="metric-val">100%</div><div class="metric-sub">Sub-Second SLA Ready</div></div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-head">
+          <h2>Active Executive Travel Graphs</h2>
+          <button class="btn-create-modal" id="btn-open-create-modal">
+            <span>+ Create / Import Itinerary</span>
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Traveler</th><th>Route</th><th>Status</th><th>Modal Legs</th><th>Last CDC Event</th></tr>
+          </thead>
+          <tbody id="dashboard-fleet-table"></tbody>
+        </table>
+
+        <!-- Interactive SVG World Logistics Map -->
+        <div style="margin-top: 2rem;">
+          <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.75rem;">🌐 Interactive Global Logistics Fleet Map</h3>
+          <div class="map-container">
+            <svg width="100%" height="100%" viewBox="0 0 900 280" style="background: #020512;">
+              <path d="M0 70 H900 M0 140 H900 M0 210 H900" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4"/>
+              <path d="M180 0 V280 M360 0 V280 M540 0 V280 M720 0 V280" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4"/>
+
+              <!-- Flight Arc 1: SFO -> JFK -->
+              <path d="M 160 110 Q 300 40 440 90" fill="none" stroke="#06b6d4" stroke-width="3" stroke-dasharray="6,6"/>
+              <!-- Train Leg: JFK -> PHL -->
+              <path d="M 440 90 Q 460 110 480 120" fill="none" stroke="#a855f7" stroke-width="4"/>
+              <!-- Transatlantic Arc: PHL -> LHR -->
+              <path d="M 480 120 Q 640 20 780 80" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="6,6"/>
+
+              <!-- SFO -->
+              <circle cx="160" cy="110" r="7" fill="#06b6d4"/>
+              <circle cx="160" cy="110" r="14" fill="none" stroke="#06b6d4" stroke-width="2" opacity="0.6"/>
+              <text x="140" y="135" fill="#fff" font-size="11" font-weight="800" font-family="Inter">SFO (San Francisco)</text>
+
+              <!-- JFK -->
+              <circle cx="440" cy="90" r="7" fill="#a855f7"/>
+              <text x="430" y="75" fill="#fff" font-size="11" font-weight="800" font-family="Inter">JFK (New York)</text>
+
+              <!-- PHL -->
+              <circle cx="480" cy="120" r="6" fill="#f59e0b"/>
+              <text x="470" y="142" fill="#fff" font-size="11" font-weight="800" font-family="Inter">PHL (Philadelphia)</text>
+
+              <!-- LHR -->
+              <circle cx="780" cy="80" r="7" fill="#10b981"/>
+              <circle cx="780" cy="80" r="14" fill="none" stroke="#10b981" stroke-width="2" opacity="0.6"/>
+              <text x="740" y="105" fill="#fff" font-size="11" font-weight="800" font-family="Inter">LHR (London Heathrow)</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 24-Hour Operations Bar Chart -->
+        <div style="margin-top: 2rem;">
+          <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.75rem;">📊 24-Hour Operations Disruption & CDC Telemetry Trend</h3>
+          <div class="chart-bars-group">
+            <div class="chart-bar-col"><div class="bar-fill" style="height: 35%;"></div><span class="bar-label">00:00</span></div>
+            <div class="chart-bar-col"><div class="bar-fill" style="height: 50%;"></div><span class="bar-label">04:00</span></div>
+            <div class="chart-bar-col"><div class="bar-fill" style="height: 75%;"></div><span class="bar-label">08:00</span></div>
+            <div class="chart-bar-col"><div class="bar-fill" style="height: 95%;"></div><span class="bar-label">12:00</span></div>
+            <div class="chart-bar-col"><div class="bar-fill" style="height: 60%;"></div><span class="bar-label">16:00</span></div>
+            <div class="chart-bar-col"><div class="bar-fill" style="height: 85%;"></div><span class="bar-label">20:00</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: LIVE ITINERARIES -->
+    <div class="view-container" id="view-itinerary">
+      <div class="sim-control-box">
+        <div class="sim-control-head">
+          <span>🎛️ Interactive "What-If" Disruption Control Suite & Architectural Scenario Engines</span>
+          <span style="font-family: var(--font-code); font-size: 0.78rem; color: var(--cyan-primary);" id="slider-val-txt">Selected Delay: +150 mins (+2h 30m)</span>
+        </div>
+
+        <div class="sim-controls-row">
+          <div class="input-group">
+            <label>Disruption Event Type</label>
+            <select id="sim-disrupt-type">
+              <option value="FLIGHT_DELAY">Flight Delay (+Minutes)</option>
+              <option value="TRAIN_CANCEL">Amtrak Train Cancellation</option>
+              <option value="HOTEL_OVERBOOK">Hotel Reservation Overbooking</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>User Strategy Constraint Filter</label>
+            <select id="sim-strategy">
+              <option value="EXECUTIVE_SPEED">Executive Speed (Fastest Direct Connection)</option>
+              <option value="COST_OPTIMIZATION">Cost Optimization (Lowest Rebooking Delta)</option>
+              <option value="COMFORT_BUSINESS">Comfort / Business (Quiet Car & Executive Suite)</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Delay Severity (+15m to +12 Hours)</label>
+            <input type="range" id="sim-delay-slider" min="15" max="720" step="15" value="150">
+          </div>
+        </div>
+
+        <!-- 4 Action Buttons Grid with Explicit Text Labels -->
+        <div class="action-buttons-grid">
+          <button class="btn-action" id="btn-disrupt"><span>[ ⚡ Execute Delay ]</span></button>
+          <button class="btn-chaos" id="btn-chaos"><span>[ 🔥 Trigger Chaos ]</span></button>
+          <button class="btn-contention" id="btn-contention"><span>[ ⚔️ Race Contention ]</span></button>
+          <button class="btn-failover" id="btn-failover"><span>[ 🛡️ Region Failover ]</span></button>
+        </div>
+      </div>
+
+      <!-- Predictive Risk & Multi-Branch Synthesis Bar -->
+      <div class="branch-synthesis-box">
+        <div class="risk-badge-box">
+          <span style="font-weight: 800; font-size: 0.9rem;">🎯 Risk Guard Index:</span>
+          <span class="risk-score-badge" id="risk-index-badge">Risk Score: 88% (HIGH RISK)</span>
+        </div>
+
+        <div class="branches-chips-row" id="branch-chips-container">
+          <div class="branch-chip">Alpha (Speed): 0.74</div>
+          <div class="branch-chip">Beta (Zero Cost): 0.82</div>
+          <div class="branch-chip winner">Gamma (Vector Optimal): 0.96 ★ WINNER</div>
+        </div>
+      </div>
+
+      <!-- Real-Time Impact Analytics -->
+      <div class="impact-analytics-panel">
+        <div class="analytics-box"><span class="analytics-label">Original vs. New Arrival</span><div class="analytics-value" id="analytics-arrival-times">Jul 25, 05:00 PM ➔ Jul 25, 07:30 PM</div></div>
+        <div class="analytics-box"><span class="analytics-label">Total Time Lost</span><div><span class="badge-delay-lost" id="analytics-delay-badge">+2h 30m Delay</span></div></div>
+        <div class="analytics-box"><span class="analytics-label">Rebooking Fee & Vouchers</span><div><span class="badge-cost-free" id="analytics-cost-badge">$0.00 (Carrier Covered)</span></div></div>
+        <div class="analytics-box"><span class="analytics-label">Connection Transfer Slack</span><div class="analytics-value" style="color: var(--cyan-primary);" id="analytics-slack-val">+90m (Restored)</div></div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-head">
+          <div>
+            <h2>📍 Multimodal Route Graph</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);" id="itin-subtitle">Transatlantic Executive Trip (SFO ➔ LHR)</p>
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="/api/itinerary/artifact?id=PROOF-REC-994821" download class="btn-download" id="btn-proof-artifact">
+              <span>📥 Download Proof Artifact</span>
+            </a>
+            <div class="toggle-group">
+              <div class="toggle-btn active" id="toggle-single-view">Active Path View</div>
+              <div class="toggle-btn" id="toggle-split-view">Split Comparison (Broken vs Healed)</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="single-view-container"><div class="nodes-flow" id="nodes-container"></div></div>
+        <div id="split-view-container" style="display: none;">
+          <div class="split-view-grid">
+            <div><h3 style="font-size: 0.9rem; color: var(--rose-primary); margin-bottom: 0.75rem;">❌ Disrupted Path</h3><div class="nodes-flow" id="split-broken-nodes"></div></div>
+            <div><h3 style="font-size: 0.9rem; color: var(--cyan-primary); margin-bottom: 0.75rem;">✨ Self-Healed Path</h3><div class="nodes-flow" id="split-healed-nodes"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent CoT Stream Console Card strictly capped at max-height 200px -->
+      <div class="terminal-console-card">
+        <div class="terminal-console-header">
+          <span>⚡ Live Agent CoT Stream</span>
+        </div>
+        <div class="terminal-console-body" id="terminal-stream">
+          <div style="color: var(--cyan-primary);">[SYSTEM] Multi-Agent Swarm, Saga & Contention Engine active. Listening for CDC events...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: VECTOR PROFILES -->
+    <div class="view-container" id="view-vectors">
+      <div class="panel-card">
+        <div class="panel-head">
+          <h2>🧠 CockroachDB Persistent Agent Memory & Epistemic Context (1536-dim HNSW)</h2>
+        </div>
+
+        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          Agent Long-Term Memory Target: <strong style="color: #fff;">Sarah Jenkins (sarah.jenkins@acme.com)</strong> | Index: <code style="color: var(--cyan-primary);">idx_users_preference_embedding (HNSW vector_cosine_ops)</code>
+        </div>
+
+        <h3>Interactive Cosine Similarity Match Matrix & Cross-Session Recall</h3>
+        <div class="match-meter-row">
+          <div class="match-meter-item">
+            <div class="match-meter-info">
+              <span>Amtrak Acela Express (Train 2158 - First Class Quiet Car) [Recalled from Trip #101]</span>
+              <span style="color: var(--emerald-primary);">98.4% Match (Rank #1)</span>
+            </div>
+            <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 98.4%;"></div></div>
+          </div>
+
+          <div class="match-meter-item">
+            <div class="match-meter-info">
+              <span>Ritz-Carlton Executive Suite Late Check-in</span>
+              <span style="color: var(--emerald-primary);">96.2% Match (Rank #1 Hotel)</span>
+            </div>
+            <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 96.2%;"></div></div>
+          </div>
+
+          <div class="match-meter-item">
+            <div class="match-meter-info">
+              <span>Delta Air Lines Re-route (Flight DL-1990 First Class)</span>
+              <span style="color: var(--cyan-primary);">92.5% Match (Rank #1 Flight)</span>
+            </div>
+            <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 92.5%;"></div></div>
+          </div>
+
+          <div class="match-meter-item">
+            <div class="match-meter-info">
+              <span>Amtrak Regional Express (Train 175 Coach)</span>
+              <span style="color: var(--text-muted);">89.1% Match (Rank #2)</span>
+            </div>
+            <div class="meter-bar-bg"><div class="meter-bar-fill" style="width: 89.1%; opacity: 0.6;"></div></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <h3>1536-Dimensional Embedding Feature Cell Heatmap Snapshot</h3>
+          <div class="heatmap-grid">
+            <div class="heatmap-cell" style="background: rgba(6, 182, 212, 0.85);">0.8008</div>
+            <div class="heatmap-cell" style="background: rgba(168, 85, 247, 0.85);">0.9124</div>
+            <div class="heatmap-cell" style="background: rgba(16, 185, 129, 0.85);">0.7641</div>
+            <div class="heatmap-cell" style="background: rgba(245, 158, 11, 0.85);">0.6892</div>
+            <div class="heatmap-cell" style="background: rgba(6, 182, 212, 0.95);">0.8415</div>
+            <div class="heatmap-cell" style="background: rgba(168, 85, 247, 0.95);">0.9502</div>
+            <div class="heatmap-cell" style="background: rgba(16, 185, 129, 0.75);">0.7120</div>
+            <div class="heatmap-cell" style="background: rgba(6, 182, 212, 0.8);">0.7994</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: CDC & AGENT OPS -->
+    <div class="view-container" id="view-ops">
+      <div class="panel-card">
+        <div class="panel-head">
+          <h2>📡 CockroachDB Changefeed & Agent Execution Pipeline</h2>
+        </div>
+
+        <div class="pipeline-flow">
+          <div class="pipeline-stage-card active" id="stage-1">
+            <div class="pipeline-num">STAGE 01</div>
+            <div class="pipeline-title">📡 CDC Trigger</div>
+            <div class="pipeline-desc">CHANGEFEED emitted for segment DELAYED</div>
+          </div>
+
+          <div class="pipeline-stage-card" id="stage-2">
+            <div class="pipeline-num">STAGE 02</div>
+            <div class="pipeline-title">🧠 Vector Retrieval</div>
+            <div class="pipeline-desc">HNSW Cosine Search (Score 0.984)</div>
+          </div>
+
+          <div class="pipeline-stage-card" id="stage-3">
+            <div class="pipeline-num">STAGE 03</div>
+            <div class="pipeline-title">🤖 Bedrock Swarm</div>
+            <div class="pipeline-desc">Claude 3.5 Sonnet CoT Debate</div>
+          </div>
+
+          <div class="pipeline-stage-card" id="stage-4">
+            <div class="pipeline-num">STAGE 04</div>
+            <div class="pipeline-title">🛠️ MCP Tool Call</div>
+            <div class="pipeline-desc">rebook_cascade_segment executed</div>
+          </div>
+
+          <div class="pipeline-stage-card" id="stage-5">
+            <div class="pipeline-num">STAGE 05</div>
+            <div class="pipeline-title">🛡️ ACID Commit</div>
+            <div class="pipeline-desc">SERIALIZABLE CockroachDB Tx</div>
+          </div>
+        </div>
+
+        <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.6rem;" id="pipeline-inspector-box">
+          <h4 style="color: var(--cyan-primary); font-family: var(--font-code); font-size: 0.95rem; margin-bottom: 0.75rem;" id="inspector-title">Stage 01: CockroachDB CHANGEFEED Trigger Event</h4>
+          <div id="inspector-rendered-content" style="font-family: var(--font-code); font-size: 0.85rem; line-height: 1.85; color: #cbd5e1;">
+            <div>● <strong>Topic:</strong> <code style="color: var(--cyan-primary);">itinerary_segments</code></div>
+            <div>● <strong>Operation:</strong> <span style="color: var(--rose-primary); font-weight: 800;">UPDATE (DELAYED +150m)</span></div>
+            <div>● <strong>Primary Key:</strong> <code>c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33</code></div>
+            <div>● <strong>Timestamp:</strong> <code>2026-07-24T20:55:12.891Z</code></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 5: SYSTEM HEALTH -->
+    <div class="view-container" id="view-health">
+      <div class="panel-card">
+        <div class="panel-head">
+          <div>
+            <h2>🛡️ Datadog-Style Infrastructure Telemetry & Health Panel</h2>
+            <div style="margin-top: 0.4rem;">
+              <span class="badge-cost-free" style="background: rgba(168, 85, 247, 0.2); border-color: var(--purple-primary); color: #e9d5ff;">🔒 RBAC Scope: Service Account (ccloud) • Restricted Table Access</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="telemetry-grid">
+          <div class="gauge-card">
+            <div class="gauge-head">Multi-Region CRDB Latency (p99)</div>
+            <div class="gauge-val" id="telemetry-latency-val">18ms</div>
+            <div style="font-size: 0.8rem; color: var(--emerald-primary); margin-top: 0.5rem;">● us-east-1 (N. Virginia): 18ms</div>
+            <div style="font-size: 0.8rem; color: var(--emerald-primary);">● eu-west-1 (Ireland): 42ms</div>
+            <div style="font-size: 0.8rem; color: var(--emerald-primary);">● ap-northeast-1 (Tokyo): 68ms</div>
+          </div>
+
+          <div class="gauge-card">
+            <div class="gauge-head">CockroachDB SERIALIZABLE Pool</div>
+            <div class="gauge-val">12 / 20</div>
+            <div style="font-size: 0.8rem; color: var(--cyan-primary); margin-top: 0.5rem;">Active Connections: 60% Pool Cap</div>
+            <div style="font-size: 0.8rem; color: var(--emerald-primary);">Automatic Retry Handler: Active (40001)</div>
+          </div>
+
+          <div class="gauge-card">
+            <div class="gauge-head">AWS Bedrock Sub-1000ms SLA</div>
+            <div class="gauge-val">&lt; 392ms</div>
+            <div style="font-size: 0.8rem; color: var(--emerald-primary); margin-top: 0.5rem;">Model: Claude 3.5 Sonnet</div>
+            <div style="font-size: 0.8rem; color: var(--purple-primary);">Tokens Used (24h): 42,190 Tokens</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Create / Import Itinerary Glassmorphism Modal -->
+  <div class="modal-backdrop" id="createItineraryModal">
+    <div class="modal-content-card">
+      <div class="modal-head">
+        <h3>+ Create / Import Executive Travel Graph</h3>
+        <span class="modal-close" id="btn-close-modal">&times;</span>
+      </div>
+
+      <form id="form-create-itinerary" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="input-group">
+          <label>Traveler Name</label>
+          <input type="text" id="modal-traveler-name" placeholder="e.g. Marcus Vance" required value="Marcus Vance">
+        </div>
+
+        <div class="input-group">
+          <label>Traveler Email</label>
+          <input type="email" id="modal-traveler-email" placeholder="e.g. marcus.vance@acme.com" required value="marcus.vance@acme.com">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="input-group">
+            <label>Origin Hub</label>
+            <select id="modal-origin">
+              <option value="SFO (San Francisco)">SFO (San Francisco)</option>
+              <option value="JFK (New York)">JFK (New York)</option>
+              <option value="ORD (Chicago)">ORD (Chicago)</option>
+              <option value="LHR (London)">LHR (London)</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Destination Hub</label>
+            <select id="modal-destination">
+              <option value="LHR (London Heathrow)">LHR (London Heathrow)</option>
+              <option value="CDG (Paris)">CDG (Paris Charles de Gaulle)</option>
+              <option value="HND (Tokyo Haneda)">HND (Tokyo Haneda)</option>
+              <option value="FRA (Frankfurt)">FRA (Frankfurt)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>User Preference Vector Strategy</label>
+          <select id="modal-strategy">
+            <option value="EXECUTIVE_SPEED">Executive / Business Class (Fastest Direct)</option>
+            <option value="FASTEST_LAYOVER">Fastest Layover Buffer Recovery</option>
+            <option value="BUDGET_COMPLIANT">Budget Compliant (Zero Rebooking Delta)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 0.5rem;">
+          <button type="button" class="toggle-btn" id="btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-create-modal" id="btn-submit-itinerary">
+            <span>Commit Itinerary Graph to CockroachDB</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Tab Navigation
+    const navItems = document.querySelectorAll('.nav-item');
+    const viewContainers = document.querySelectorAll('.view-container');
+    const pageTitle = document.getElementById('header-page-title');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const targetView = item.getAttribute('data-view');
+        navItems.forEach(i => i.classList.remove('active'));
+        viewContainers.forEach(v => v.classList.remove('active-view'));
+
+        item.classList.add('active');
+        document.getElementById(`view-${targetView}`).classList.add('active-view');
+        pageTitle.innerText = item.querySelector('span:last-child').innerText + ' Control Panel';
+
+        if (targetView === 'dashboard') loadDashboardData();
+        if (targetView === 'health') loadHealthData();
+      });
+    });
+
+    // Create Modal Logic
+    const modal = document.getElementById('createItineraryModal');
+    document.getElementById('btn-open-create-modal').addEventListener('click', () => modal.classList.add('active'));
+    document.getElementById('btn-close-modal').addEventListener('click', () => modal.classList.remove('active'));
+    document.getElementById('btn-cancel-modal').addEventListener('click', () => modal.classList.remove('active'));
+
+    document.getElementById('form-create-itinerary').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('modal-traveler-name').value;
+      const email = document.getElementById('modal-traveler-email').value;
+      const origin = document.getElementById('modal-origin').value;
+      const dest = document.getElementById('modal-destination').value;
+      const strat = document.getElementById('modal-strategy').value;
+
+      try {
+        const res = await fetch('/api/itinerary/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ travelerName: name, travelerEmail: email, origin, destination: dest, strategy: strat })
+        });
+        await res.json();
+        modal.classList.remove('active');
+        loadDashboardData();
+      } catch (err) { console.warn(err); }
+    });
+
+    const slider = document.getElementById('sim-delay-slider');
+    const sliderTxt = document.getElementById('slider-val-txt');
+    
+    function getDurationStr(mins) {
+      const h = Math.floor(mins / 60); const m = mins % 60;
+      if (h === 0) return `+${mins}m`; if (m === 0) return `+${h}h`; return `+${h}h ${m}m`;
+    }
+
+    slider.addEventListener('input', () => {
+      const mins = parseInt(slider.value, 10);
+      sliderTxt.innerText = `Selected Delay: +${mins} mins (${getDurationStr(mins)})`;
+    });
+
+    let isSplitView = false;
+    document.getElementById('toggle-single-view').addEventListener('click', () => {
+      isSplitView = false;
+      document.getElementById('toggle-single-view').classList.add('active');
+      document.getElementById('toggle-split-view').classList.remove('active');
+      document.getElementById('single-view-container').style.display = 'block';
+      document.getElementById('split-view-container').style.display = 'none';
+    });
+
+    document.getElementById('toggle-split-view').addEventListener('click', () => {
+      isSplitView = true;
+      document.getElementById('toggle-split-view').classList.add('active');
+      document.getElementById('toggle-single-view').classList.remove('active');
+      document.getElementById('single-view-container').style.display = 'none';
+      document.getElementById('split-view-container').style.display = 'block';
+      renderSplitView();
+    });
+
+    let graphNodes = [
+      { id: '1', provider: 'Delta Air Lines', reference_code: 'DL-1402', origin: 'SFO', destination: 'JFK', scheduled_departure: '2026-07-25T12:00:00.000Z', scheduled_arrival: '2026-07-25T17:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', pricing: 'Business Class | Direct Transfer | $0 Fee' },
+      { id: '2', provider: 'Amtrak Acela Express', reference_code: 'AMT-2150', origin: 'NY Moynihan', destination: 'PHL 30th St', scheduled_departure: '2026-07-25T18:30:00.000Z', scheduled_arrival: '2026-07-25T19:45:00.000Z', status: 'SCHEDULED', segment_type: 'TRAIN', pricing: 'First Class Quiet Car | Wi-Fi Included | $0 Fee' },
+      { id: '3', provider: 'Ritz-Carlton Philadelphia', reference_code: 'HTL-9921', origin: 'Philadelphia', destination: 'Philadelphia', scheduled_departure: '2026-07-25T20:15:00.000Z', scheduled_arrival: '2026-07-26T12:00:00.000Z', status: 'SCHEDULED', segment_type: 'HOTEL', pricing: 'Executive Suite | Late Check-in Guaranteed | $0 Fee' },
+      { id: '4', provider: 'British Airways', reference_code: 'BA-178', origin: 'PHL', destination: 'LHR', scheduled_departure: '2026-07-26T15:00:00.000Z', scheduled_arrival: '2026-07-26T22:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', pricing: 'Club World Cabin | Direct Transatlantic | $0 Fee' }
+    ];
+
+    function renderItineraryNodes(segments, containerId = 'nodes-container') {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      const icons = { FLIGHT: '✈️', TRAIN: '🚆', HOTEL: '🏨', TAXI: '🚖' };
+
+      segments.forEach((seg, idx) => {
+        const card = document.createElement('div');
+        card.className = `node-card status-${seg.status}`;
+        const dep = new Date(seg.scheduled_departure).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const arr = new Date(seg.scheduled_arrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        card.innerHTML = `
+          <div class="node-left">
+            <div class="node-icon">${icons[seg.segment_type] || '🗺️'}</div>
+            <div>
+              <div style="font-weight: 800; font-size: 1.05rem;">${seg.provider} (${seg.reference_code})</div>
+              <div style="color: var(--text-muted); font-size: 0.85rem;">${seg.origin} ➔ ${seg.destination} | Scheduled: ${dep} - ${arr}</div>
+              <div style="font-size: 0.74rem; color: var(--cyan-primary); margin-top: 2px;">🏷️ ${seg.pricing}</div>
+            </div>
+          </div>
+          <div><span class="badge badge-${seg.status}">${seg.status}</span></div>
+        `;
+        container.appendChild(card);
+        if (idx < segments.length - 1) { const conn = document.createElement('div'); conn.className = 'connector'; container.appendChild(conn); }
+      });
+    }
+
+    function renderSplitView() {
+      const brokenNodes = [{ ...graphNodes[0], status: 'DELAYED' }, { ...graphNodes[1], status: 'DELAYED', provider: 'Amtrak Acela (MISSED CONNECTION)' }, { ...graphNodes[2], status: 'DELAYED' }, { ...graphNodes[3], status: 'SCHEDULED' }];
+      const healedNodes = [{ ...graphNodes[0], status: 'DELAYED' }, { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' }, { ...graphNodes[2], status: 'REBOOKED' }, { ...graphNodes[3], status: 'SCHEDULED' }];
+      renderItineraryNodes(brokenNodes, 'split-broken-nodes'); renderItineraryNodes(healedNodes, 'split-healed-nodes');
+    }
+
+    async function loadDashboardData() {
+      try {
+        const res = await fetch('/api/dashboard');
+        const data = await res.json();
+        const tbody = document.getElementById('dashboard-fleet-table');
+        tbody.innerHTML = '';
+        document.getElementById('metric-active-count').innerText = data.metrics.active_itineraries;
+        data.active_fleet.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><code>${item.id}</code></td><td><strong>${item.traveler}</strong></td><td>${item.route}</td><td><span class="badge badge-${item.status}">${item.status}</span></td><td>${item.legs}</td><td style="font-size: 0.8rem; color: var(--text-muted);">${item.last_event}</td>`;
+          tbody.appendChild(tr);
+        });
+      } catch (err) { console.warn(err); }
+    }
+
+    async function loadHealthData() {
+      try {
+        const res = await fetch('/api/health');
+        const data = await res.json();
+        if (data.cockroach_db && data.cockroach_db.p99_latency) {
+          document.getElementById('telemetry-latency-val').innerText = data.cockroach_db.p99_latency;
+        }
+      } catch (err) { console.warn(err); }
+    }
+
+    async function handleActionButtonClick(btnElement, originalHtml, apiCallFn) {
+      btnElement.disabled = true;
+      btnElement.innerHTML = `<span>⏳ RUNNING...</span>`;
+      try {
+        await apiCallFn();
+      } catch (err) {
+        console.warn(err);
+      } finally {
+        setTimeout(() => {
+          btnElement.disabled = false;
+          btnElement.innerHTML = originalHtml;
+        }, 1200);
+      }
+    }
+
+    // Attach explicit click listeners to ALL 4 scenario buttons
+    const btnDisrupt = document.getElementById('btn-disrupt');
+    btnDisrupt.addEventListener('click', () => {
+      handleActionButtonClick(btnDisrupt, `<span>[ ⚡ Execute Delay ]</span>`, async () => {
+        const typeVal = document.getElementById('sim-disrupt-type').value;
+        const strategyVal = document.getElementById('sim-strategy').value;
+        const delayVal = parseInt(document.getElementById('sim-delay-slider').value, 10);
+
+        graphNodes[0].status = 'DELAYED'; graphNodes[1].status = 'DELAYED';
+        renderItineraryNodes(graphNodes);
+
+        await fetch('/api/disrupt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ delayMinutes: delayVal, type: typeVal, strategy: strategyVal })
+        });
+      });
+    });
+
+    const btnChaos = document.getElementById('btn-chaos');
+    btnChaos.addEventListener('click', () => {
+      handleActionButtonClick(btnChaos, `<span>[ 🔥 Trigger Chaos ]</span>`, async () => {
+        await fetch('/api/disrupt/chaos', { method: 'POST' });
+      });
+    });
+
+    const btnContention = document.getElementById('btn-contention');
+    btnContention.addEventListener('click', () => {
+      handleActionButtonClick(btnContention, `<span>[ ⚔️ Race Contention ]</span>`, async () => {
+        await fetch('/api/disrupt/contention', { method: 'POST' });
+      });
+    });
+
+    const btnFailover = document.getElementById('btn-failover');
+    btnFailover.addEventListener('click', () => {
+      handleActionButtonClick(btnFailover, `<span>[ 🛡️ Region Failover ]</span>`, async () => {
+        await fetch('/api/disrupt/region-failover', { method: 'POST' });
+      });
+    });
+
+    const pipelineData = {
+      'stage-1': { title: 'Stage 01: CockroachDB CHANGEFEED Trigger Event', html: '<div>● <strong>Topic:</strong> <code style="color: var(--cyan-primary);">itinerary_segments</code></div><div>● <strong>Operation:</strong> <span style="color: var(--rose-primary); font-weight: 800;">UPDATE (DELAYED +150m)</span></div><div>● <strong>Primary Key:</strong> <code>c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33</code></div><div>● <strong>Timestamp:</strong> <code>2026-07-24T20:55:12.891Z</code></div>' },
+      'stage-2': { title: 'Stage 02: HNSW Vector Retrieval (1536-dim)', html: '<div>● <strong>Agent Persistent Memory Target:</strong> Sarah Jenkins (sarah.jenkins@acme.com)</div><div>● <strong>HNSW Index:</strong> <code style="color: var(--cyan-primary);">idx_users_preference_embedding</code></div><div>● <strong>Vector Match Score:</strong> <span style="color: var(--emerald-primary); font-weight: 800;">0.984 Cosine Match</span></div><div>● <strong>Cross-Session Memory Recalled:</strong> Trip #101 preference recalled (prune layovers &lt; 60m)</div>' },
+      'stage-3': { title: 'Stage 03: Bedrock Multi-Agent Swarm Debate', html: '<div>● <strong>Recovery Agent Proposal:</strong> Amtrak Acela Express (Train 2158)</div><div>● <strong>Preference Guard Verdict:</strong> <span style="color: var(--emerald-primary); font-weight: 800;">APPROVED</span></div><div>● <strong>Swarm Consensus:</strong> Agreed on Business-Class Executive Repair Strategy</div><div>● <strong>Model:</strong> AWS Bedrock Claude 3.5 Sonnet</div>' },
+      'stage-4': { title: 'Stage 04: MCP Tool Invocation', html: '<div>● <strong>MCP Tool Executed:</strong> <code style="color: var(--purple-primary);">rebook_cascade_segment</code></div><div>● <strong>Agent Skill:</strong> <code style="color: var(--cyan-primary);">inspect_cluster_observability_skill</code></div><div>● <strong>Managed MCP Endpoint:</strong> <code style="color: var(--cyan-primary);">https://cockroachlabs.cloud/mcp</code></div><div>● <strong>Tool Status:</strong> <span style="color: var(--emerald-primary); font-weight: 800;">COMMITTED</span></div>' },
+      'stage-5': { title: 'Stage 05: CockroachDB SERIALIZABLE Transaction Commit', html: '<div>● <strong>Transaction Hash:</strong> <code style="color: var(--cyan-primary);">0x4f82a910b4c73d9e01f2</code></div><div>● <strong>Isolation Level:</strong> <span style="color: var(--emerald-primary); font-weight: 800;">SERIALIZABLE (ACID Guaranteed)</span></div><div>● <strong>Graph State:</strong> SELF_HEALED</div><div>● <strong>Execution Latency:</strong> 392ms (&lt;1000ms SLA)</div>' }
+    };
+
+    document.querySelectorAll('.pipeline-stage-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.pipeline-stage-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        const data = pipelineData[card.id];
+        if (data) {
+          document.getElementById('inspector-title').innerText = data.title;
+          document.getElementById('inspector-rendered-content').innerHTML = data.html;
+        }
+      });
+    });
+
+    function initSSE() {
+      const source = new EventSource('/api/stream');
+      const box = document.getElementById('terminal-stream');
+
+      source.addEventListener('agent_step', (e) => {
+        const data = JSON.parse(e.data);
+        const div = document.createElement('div');
+        div.style.marginBottom = '0.4rem';
+        div.innerHTML = `<span style="color: var(--purple-primary);">[${data.tag || 'AGENT'}]</span> <span style="color: #60a5fa;">(${data.agent || 'ENGINE'})</span> ${data.action}`;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+
+        if (data.step === '7' || data.step === '8' || data.step === '10') {
+          graphNodes[1] = { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' };
+          graphNodes[2] = { ...graphNodes[2], status: 'REBOOKED' };
+          renderItineraryNodes(graphNodes);
+        }
+      });
+    }
+
+    renderItineraryNodes(graphNodes);
+    loadDashboardData();
+    initSSE();
+  </script>
+</body>
+</html>
