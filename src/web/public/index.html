@@ -11,37 +11,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- Turf.js for great-circle arc generation -->
   <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
-  <style>
-    /* Leaflet overrides — keep tiles in-app, below sticky header */
-    .leaflet-container { background: #0b0c10; font-family: var(--font-sans); }
-    .leaflet-control-zoom { display: none; }
-    .leaflet-control-attribution { font-size: 10px; opacity: 0.45; }
-    .leaflet-control-attribution a { color: #6b7280 !important; }
-    /* Plane marker */
-    .plane-marker {
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform-origin: center center;
-    }
-    .plane-marker svg { width: 22px; height: 22px; filter: drop-shadow(0 0 4px rgba(99,102,241,0.8)); }
-    /* Waypoint popups */
-    .leaflet-popup-content-wrapper {
-      background: #17181d;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 6px;
-      color: #f3f4f6;
-      font-size: 12px;
-      font-weight: 600;
-      box-shadow: none;
-      padding: 0;
-    }
-    .leaflet-popup-content { margin: 7px 12px; }
-    .leaflet-popup-tip { background: #17181d; }
-    .leaflet-popup-close-button { color: #6b7280 !important; }
-  </style>
 </head>
 <body>
 
@@ -113,7 +82,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <span>Version 2.4.0</span>
+        <span>v2.4.0</span>
         <span class="status-tag status-tag-green">Operational</span>
       </div>
     </aside>
@@ -121,10 +90,16 @@
     <!-- Main Content Area -->
     <div class="app-main-wrapper">
       <header>
-        <div class="header-left">
-          <div id="header-page-title">My Trips</div>
+        <!-- Left: Brand -->
+        <div class="header-brand">
+          <div class="header-brand-logo">C</div>
+          <span class="header-brand-name">CASCADE</span>
+          <div class="header-brand-sep"></div>
+          <span class="header-brand-sub">Executive Travel Recovery</span>
+        </div>
 
-          <!-- Top-Level Switcher: Traveler View vs System Internals -->
+        <!-- Center: View mode tabs -->
+        <div class="header-center">
           <div class="view-mode-switcher">
             <div class="mode-tab active" id="tab-mode-traveler">
               <!-- User icon -->
@@ -145,9 +120,30 @@
           </div>
         </div>
 
-        <div class="header-status-indicator" title="All services active and resilient">
-          <div class="status-dot"></div>
-          <span>System Operational</span>
+        <!-- Right: System status + Theme toggle -->
+        <div class="header-right">
+          <div class="header-status-indicator" title="All services active and resilient">
+            <div class="status-dot"></div>
+            <span>System Operational</span>
+          </div>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle light / dark theme" aria-label="Toggle theme">
+            <!-- Moon icon (shown in dark mode) -->
+            <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <!-- Sun icon (shown in light mode, hidden by default) -->
+            <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="display:none">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -374,11 +370,20 @@
         </div>
 
         <!-- Live Agent Execution Log -->
-        <div class="terminal-box">
-          <div class="terminal-header">
-            <!-- Terminal icon -->
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-            <span>Live Agent Execution Log</span>
+        <div class="terminal-box" id="terminal-box">
+          <div class="terminal-header" id="terminal-header">
+            <div class="terminal-header-left">
+              <!-- Terminal icon -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              <span>Live Agent Execution Log</span>
+            </div>
+            <button class="terminal-toggle-btn expanded" id="terminal-toggle-btn" aria-label="Toggle log terminal">
+              <!-- Zap icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span id="terminal-toggle-label">Collapse Logs</span>
+              <!-- Chevron -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
           </div>
           <div class="terminal-body" id="terminal-stream">
             <div style="color: var(--text-secondary);">[SYSTEM] Multi-Agent Swarm, Saga &amp; Contention Engine active. Listening for disruption events...</div>
@@ -648,7 +653,6 @@
     // ── View Navigation ───────────────────────────────────────────────
     const navItems       = document.querySelectorAll('.nav-item');
     const viewContainers = document.querySelectorAll('.view-container');
-    const pageTitle      = document.getElementById('header-page-title');
 
     function switchView(targetView, customTitle) {
       navItems.forEach(i => i.classList.remove('active'));
@@ -661,13 +665,17 @@
       if (targetEl) targetEl.classList.add('active-view');
 
       if (customTitle) {
-        pageTitle.innerText = customTitle;
+        // page title removed from header — no-op kept for compatibility
       } else if (activeNav) {
-        pageTitle.innerText = activeNav.querySelector('span').innerText;
+        // no-op
       }
 
-      if (targetView === 'dashboard') loadDashboardData();
-      if (targetView === 'health')    loadHealthData();
+      if (targetView === 'dashboard') {
+        loadDashboardData();
+        // Fix Leaflet grey tiles after display:none → display:block cycle
+        if (leafletMap) setTimeout(() => leafletMap.invalidateSize(), 60);
+      }
+      if (targetView === 'health') loadHealthData();
     }
 
     navItems.forEach(item => {
@@ -761,9 +769,12 @@
         const arr = new Date(seg.scheduled_arrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         let statusTag = `<span class="status-tag status-tag-neutral">${seg.status}</span>`;
-        if (seg.status === 'DELAYED')   statusTag = `<span class="status-tag status-tag-red">Delayed (+150m)</span>`;
-        if (seg.status === 'REBOOKED')  statusTag = `<span class="status-tag status-tag-green">Updated Automatically</span>`;
-        if (seg.status === 'SCHEDULED') statusTag = `<span class="status-tag status-tag-neutral">On Schedule</span>`;
+        if (seg.status === 'DELAYED')    statusTag = `<span class="status-tag status-tag-red">Delayed (+150m)</span>`;
+        if (seg.status === 'REBOOKED')   statusTag = `<span class="status-tag status-tag-green">Updated Automatically</span>`;
+        if (seg.status === 'SCHEDULED')  statusTag = `<span class="status-tag status-tag-neutral">On Schedule</span>`;
+        if (seg.status === 'CANCELLED')  statusTag = `<span class="status-tag status-tag-red">Cancelled</span>`;
+        if (seg.status === 'REROUTED')   statusTag = `<span class="status-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.3);">Rerouted</span>`;
+        if (seg.status === 'FAILOVER')   statusTag = `<span class="status-tag status-tag-amber">Ground Transit Fallback</span>`;
 
         const iconHtml = ICONS[seg.segment_type] || ICONS['FLIGHT'];
 
@@ -844,10 +855,164 @@
       } catch (err) { console.warn(err); }
     }
 
+    // ── Simulation DOM State Helpers ──────────────────────────────────
+
+    // Scenario configuration — all state for each simulation button
+    const SCENARIOS = {
+      disrupt: {
+        badgeClass:  'status-tag-amber',
+        badgeText:   'Flight Delay Detected',
+        strategy:    'Strategy: Balanced — fastest connection with zero added fee',
+        delay:       '+2h 30m Delay',
+        fee:         '$0.00 — Carrier Covered',
+        buffer:      '+90 minutes',
+        logLines: [
+          '[TRIGGER] Carrier delay signal received: DL-1402 +150m',
+          '[AGENT::RecoveryAgent] Scanning for Amtrak Acela alternatives...',
+          '[PREF-GUARD] Preference match: Quiet Car + Executive Suite → APPROVED',
+          '[COMMIT] Segment 2 rebooked: AMT-2158. Latency: 32ms.',
+          '[SYSTEM] Traveler notified. Total resolution time: 392ms ✓',
+        ],
+        nodes: () => [
+          { ...graphNodes[0], status: 'DELAYED' },
+          { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' },
+          { ...graphNodes[2], status: 'SCHEDULED' },
+          { ...graphNodes[3], status: 'SCHEDULED' },
+        ],
+      },
+      chaos: {
+        badgeClass:  'status-tag-red',
+        badgeText:   'Multi-Segment Cascading Disruption',
+        strategy:    'Strategy: Executive Speed — fastest multi-modal path',
+        delay:       '+5h 15m Delay',
+        fee:         '$0.00 — Force Majeure',
+        buffer:      '+45 minutes',
+        logLines: [
+          '[TRIGGER] Multi-segment disruption event: DL-1402 CANCELLED, AMT-2150 MISSED',
+          '[AGENT::RecoveryAgent] Cascading disruption detected across 3 segments',
+          '[AGENT::OrchestrationAgent] Spawning parallel rebooking agents...',
+          '[PREF-GUARD] Evaluating 12 alternative paths against preference graph...',
+          '[COMMIT] Segments 1+2 rerouted. BA-178 hold confirmed. Latency: 88ms.',
+        ],
+        nodes: () => [
+          { ...graphNodes[0], status: 'CANCELLED', provider: 'Delta Air Lines — Flight Cancelled' },
+          { ...graphNodes[1], status: 'REROUTED',  provider: 'Amtrak Acela (Alternate Route 2291)' },
+          { ...graphNodes[2], status: 'REBOOKED',  provider: 'Ritz-Carlton Philadelphia — Late Arrival Confirmed' },
+          { ...graphNodes[3], status: 'SCHEDULED' },
+        ],
+      },
+      contention: {
+        badgeClass:  '',
+        badgeStyle:  'background:rgba(139,92,246,0.12);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);',
+        badgeText:   'Seat Contention Detected',
+        strategy:    'Strategy: CockroachDB SERIALIZABLE Retry — conflict-free commit',
+        delay:       '+1h 00m Delay',
+        fee:         '$0.00 — Retry Absorbed',
+        buffer:      '+60 minutes',
+        logLines: [
+          '[TRIGGER] Write contention on seat AMT-2150 Row 3A — concurrent booking detected',
+          '[DB::CockroachDB] SERIALIZABLE isolation: transaction aborted, retry initiated',
+          '[AGENT::ContentionResolver] Acquiring next available quiet car seat...',
+          '[DB::CockroachDB] Retry #2: COMMIT successful. Row 4A secured.',
+          '[SYSTEM] Zero data races. Contention resolved in 121ms ✓',
+        ],
+        nodes: () => [
+          { ...graphNodes[0], status: 'DELAYED' },
+          { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela (Seat 4A — Quiet Car)' },
+          { ...graphNodes[2], status: 'SCHEDULED' },
+          { ...graphNodes[3], status: 'SCHEDULED' },
+        ],
+      },
+      failover: {
+        badgeClass:  'status-tag-red',
+        badgeText:   'us-east-1 Outage',
+        strategy:    'Strategy: Multi-Region Failover to Ground Transit',
+        delay:       '+3h 45m Delay',
+        fee:         '$0.00 — Act of Force Majeure',
+        buffer:      '+25 minutes',
+        logLines: [
+          '[TRIGGER] Regional outage detected: us-east-1 rail infrastructure offline',
+          '[AGENT::FailoverAgent] Initiating multi-region failover protocol...',
+          '[DB::CockroachDB] Rerouting reads/writes to us-west-2 replica (RPO: 0ms)',
+          '[AGENT::RecoveryAgent] Ground transit path: PHL → EWR via executive taxi',
+          '[COMMIT] Fallback segment inserted. Airport transfer booked. Latency: 67ms.',
+        ],
+        nodes: () => [
+          { ...graphNodes[0], status: 'DELAYED' },
+          { ...graphNodes[1], status: 'CANCELLED', provider: 'Amtrak — Service Suspended (Regional Outage)' },
+          { ...graphNodes[2], status: 'FAILOVER',  provider: 'Executive Taxi — PHL to EWR Airport Transfer', reference_code: 'GND-TX-01', origin: 'Philadelphia', destination: 'EWR', scheduled_departure: graphNodes[2].scheduled_departure, scheduled_arrival: graphNodes[3].scheduled_departure, segment_type: 'TRAIN', pricing: 'Premium Ground Transfer · Carrier Covered · Door-to-door' },
+          { ...graphNodes[3], status: 'SCHEDULED' },
+        ],
+      },
+    };
+
+    // Helper: update all scenario DOM state at once
+    function applyScenario(key) {
+      const cfg = SCENARIOS[key];
+      if (!cfg) return;
+
+      // 1. Active button highlight — clear all, apply to clicked
+      ['btn-disrupt', 'btn-chaos', 'btn-contention', 'btn-failover'].forEach(id => {
+        document.getElementById(id)?.classList.remove('btn-active-scenario');
+      });
+      const btnMap = { disrupt: 'btn-disrupt', chaos: 'btn-chaos', contention: 'btn-contention', failover: 'btn-failover' };
+      document.getElementById(btnMap[key])?.classList.add('btn-active-scenario');
+
+      // 2. Assessment badge
+      const badge = document.getElementById('risk-index-badge');
+      if (badge) {
+        badge.className = `status-tag ${cfg.badgeClass}`;
+        if (cfg.badgeStyle) badge.setAttribute('style', cfg.badgeStyle);
+        else badge.removeAttribute('style');
+        badge.textContent = cfg.badgeText;
+      }
+
+      // 3. Strategy text
+      const chips = document.getElementById('branch-chips-container');
+      if (chips) chips.innerHTML = `Rebooking strategy: <strong>${cfg.strategy}</strong>`;
+
+      // 4. Metrics cards
+      const delayBadge = document.getElementById('analytics-delay-badge');
+      const costBadge  = document.getElementById('analytics-cost-badge');
+      const slackVal   = document.getElementById('analytics-slack-val');
+      if (delayBadge) delayBadge.textContent = cfg.delay;
+      if (costBadge)  costBadge.textContent  = cfg.fee;
+      if (slackVal)   slackVal.textContent   = cfg.buffer;
+
+      // 5. Route node highlighting
+      renderItineraryNodes(cfg.nodes());
+
+      // 6. Inject log lines with staggered timing
+      const box = document.getElementById('terminal-stream');
+      if (box) {
+        cfg.logLines.forEach((line, i) => {
+          setTimeout(() => {
+            const div = document.createElement('div');
+            div.style.marginBottom = '3px';
+            div.innerHTML = `<span style="color:var(--accent);">[CASCADE]</span> <span style="color:var(--text-secondary);">${line}</span>`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            // Auto-expand terminal if collapsed
+            const body = document.getElementById('terminal-stream');
+            const toggleBtn = document.getElementById('terminal-toggle-btn');
+            if (body?.classList.contains('collapsed') && toggleBtn) {
+              body.classList.remove('collapsed');
+              toggleBtn.classList.add('expanded');
+              document.getElementById('terminal-toggle-label').textContent = 'Collapse Logs';
+            }
+          }, i * 280);
+        });
+      }
+    }
+
     // ── Simulator button handler ──────────────────────────────────────
-    async function handleActionButtonClick(btnElement, originalHtml, apiCallFn) {
+    async function handleActionButtonClick(btnElement, originalHtml, scenarioKey, apiCallFn) {
       btnElement.disabled = true;
       btnElement.innerHTML = `<span>Simulating...</span>`;
+
+      // Apply DOM state immediately (don't wait for API)
+      applyScenario(scenarioKey);
+
       try {
         await apiCallFn();
       } catch (err) {
@@ -856,22 +1021,17 @@
         setTimeout(() => {
           btnElement.disabled = false;
           btnElement.innerHTML = originalHtml;
-        }, 1200);
+        }, 1400);
       }
     }
 
     const btnDisrupt = document.getElementById('btn-disrupt');
     if (btnDisrupt) {
       btnDisrupt.addEventListener('click', () => {
-        handleActionButtonClick(btnDisrupt, `<span>Simulate: Flight Delayed</span>`, async () => {
+        handleActionButtonClick(btnDisrupt, `<span>Simulate: Flight Delayed</span>`, 'disrupt', async () => {
           const typeVal     = document.getElementById('sim-disrupt-type').value;
           const strategyVal = document.getElementById('sim-strategy').value;
           const delayVal    = parseInt(document.getElementById('sim-delay-slider').value, 10);
-
-          graphNodes[0].status = 'DELAYED';
-          graphNodes[1].status = 'DELAYED';
-          renderItineraryNodes(graphNodes);
-
           await fetch('/api/disrupt', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -884,7 +1044,7 @@
     const btnChaos = document.getElementById('btn-chaos');
     if (btnChaos) {
       btnChaos.addEventListener('click', () => {
-        handleActionButtonClick(btnChaos, `<span>Simulate: Multiple Disruptions</span>`, async () => {
+        handleActionButtonClick(btnChaos, `<span>Simulate: Multiple Disruptions</span>`, 'chaos', async () => {
           await fetch('/api/disrupt/chaos', { method: 'POST' });
         });
       });
@@ -893,7 +1053,7 @@
     const btnContention = document.getElementById('btn-contention');
     if (btnContention) {
       btnContention.addEventListener('click', () => {
-        handleActionButtonClick(btnContention, `<span>Simulate: Rebooking Conflict</span>`, async () => {
+        handleActionButtonClick(btnContention, `<span>Simulate: Rebooking Conflict</span>`, 'contention', async () => {
           await fetch('/api/disrupt/contention', { method: 'POST' });
         });
       });
@@ -902,9 +1062,25 @@
     const btnFailover = document.getElementById('btn-failover');
     if (btnFailover) {
       btnFailover.addEventListener('click', () => {
-        handleActionButtonClick(btnFailover, `<span>Simulate: Regional Outage</span>`, async () => {
+        handleActionButtonClick(btnFailover, `<span>Simulate: Regional Outage</span>`, 'failover', async () => {
           await fetch('/api/disrupt/region-failover', { method: 'POST' });
         });
+      });
+    }
+
+    // ── Terminal collapsible toggle ────────────────────────────────────
+    const terminalHeader = document.getElementById('terminal-header');
+    const terminalBody   = document.getElementById('terminal-stream');
+    const terminalToggleBtn = document.getElementById('terminal-toggle-btn');
+    const terminalToggleLabel = document.getElementById('terminal-toggle-label');
+
+    if (terminalHeader && terminalBody) {
+      terminalHeader.addEventListener('click', () => {
+        const isCollapsed = terminalBody.classList.toggle('collapsed');
+        terminalToggleBtn?.classList.toggle('expanded', !isCollapsed);
+        if (terminalToggleLabel) {
+          terminalToggleLabel.textContent = isCollapsed ? 'Expand Logs' : 'Collapse Logs';
+        }
       });
     }
 
@@ -987,10 +1163,14 @@
 
     // ── Leaflet Route Map ─────────────────────────────────────────────
     let leafletMap = null;
+    let leafletTileLayer = null;  // tracked for theme swap
     let planeMarker = null;
     let routeArcCoords = [];
     let planeAnimFrame = null;
     let planeProgress = 0;
+
+    const TILE_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
     const WAYPOINTS = [
       { code: 'SFO', label: 'SFO — San Francisco', lat: 37.6213, lng: -122.379,  type: 'origin' },
@@ -1000,7 +1180,6 @@
     ];
 
     function buildGreatCircleArc(from, to, steps) {
-      // Use turf to generate a great-circle line between two [lng,lat] points
       const line = turf.greatCircle(
         turf.point([from.lng, from.lat]),
         turf.point([to.lng,   to.lat]),
@@ -1010,7 +1189,6 @@
     }
 
     function buildFullRoute() {
-      // Chain SFO→JFK→PHL→LHR great-circle segments
       const segments = [
         [WAYPOINTS[0], WAYPOINTS[1], 30],
         [WAYPOINTS[1], WAYPOINTS[2], 10],
@@ -1019,7 +1197,7 @@
       let coords = [];
       segments.forEach(([from, to, steps]) => {
         const seg = buildGreatCircleArc(from, to, steps);
-        if (coords.length > 0) seg.shift(); // avoid duplicate junction points
+        if (coords.length > 0) seg.shift();
         coords = coords.concat(seg);
       });
       return coords;
@@ -1069,6 +1247,8 @@
       const mapEl = document.getElementById('leaflet-route-map');
       if (!mapEl || typeof L === 'undefined' || typeof turf === 'undefined') return;
 
+      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+
       leafletMap = L.map('leaflet-route-map', {
         center: [47, -35],
         zoom: 3,
@@ -1080,20 +1260,15 @@
         doubleClickZoom: false,
       });
 
-      // CartoDB Dark Matter basemap
-      L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-        }
-      ).addTo(leafletMap);
+      leafletTileLayer = L.tileLayer(isDark ? TILE_DARK : TILE_LIGHT, {
+        attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }).addTo(leafletMap);
 
-      // Build the great-circle route
       routeArcCoords = buildFullRoute();
 
-      // Glow / shadow polyline (wider, low opacity)
+      // Glow / shadow polyline
       L.polyline(routeArcCoords, {
         color: 'rgba(99,102,241,0.18)',
         weight: 10,
@@ -1134,15 +1309,10 @@
           iconAnchor: [size / 2, size / 2],
         });
 
-        const label = (isOrigin || isDest)
-          ? `<b style="font-size:12px;letter-spacing:-0.01em">${wp.code}</b>`
-          : wp.code;
-
         L.marker([wp.lat, wp.lng], { icon })
           .addTo(leafletMap)
           .bindPopup(wp.label, { closeButton: false, maxWidth: 180 });
 
-        // Permanent label for origin & destination only
         if (isOrigin || isDest) {
           L.marker([wp.lat, wp.lng], {
             icon: L.divIcon({
@@ -1168,27 +1338,82 @@
         }
       });
 
-      // Animated plane marker — start at first coord
       planeMarker = L.marker(routeArcCoords[0], {
         icon: makePlaneIcon(90),
         zIndexOffset: 1000,
         interactive: false,
       }).addTo(leafletMap);
 
-      // Fit map to the route with padding
       leafletMap.fitBounds(L.latLngBounds(routeArcCoords), { padding: [32, 48] });
-
-      // Start animation
       planeAnimFrame = requestAnimationFrame(animatePlane);
     }
+
+    // ── Light/Dark Theme Switcher ─────────────────────────────────────
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('cascade-theme', theme);
+
+      // Update icon visibility
+      const moonIcon = document.getElementById('theme-icon-moon');
+      const sunIcon  = document.getElementById('theme-icon-sun');
+      if (moonIcon && sunIcon) {
+        moonIcon.style.display = theme === 'light' ? 'none' : 'block';
+        sunIcon.style.display  = theme === 'light' ? 'block' : 'none';
+      }
+
+      // Swap Leaflet tile layer between CartoDB Dark Matter / Positron
+      if (leafletMap && leafletTileLayer) {
+        leafletTileLayer.remove();
+        leafletTileLayer = L.tileLayer(theme === 'light' ? TILE_LIGHT : TILE_DARK, {
+          attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 19,
+        }).addTo(leafletMap);
+      }
+    }
+
+    // Restore persisted preference (default: dark)
+    applyTheme(localStorage.getItem('cascade-theme') || 'dark');
+
+    document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
 
     // ── Initialization ────────────────────────────────────────────────
     switchMode('traveler');
     renderItineraryNodes(graphNodes);
     initSSE();
-    // Defer Leaflet init so the container is in the DOM and has dimensions
     setTimeout(initLeafletMap, 100);
   </script>
+  </div><!-- /.app-main-wrapper -->
+</div><!-- /.app-container -->
+
+  <!-- ═══════════════════════════════════════════════════════════
+       APP FOOTER — Pinned system status bar
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="app-footer">
+    <div class="footer-left">
+      <span class="footer-version">v2.4.0-production</span>
+      <span class="footer-badge">
+        <span class="footer-badge-dot"></span>
+        CockroachDB MCP
+      </span>
+    </div>
+    <div class="footer-center">
+      Sub-second SLA Target: 1000ms &nbsp;&bull;&nbsp; Current Avg: <span class="footer-latency-val" id="footer-latency">392ms</span>
+    </div>
+    <div class="footer-right">
+      <a href="https://github.com/cockroachdb/cascade" target="_blank" rel="noopener">
+        <!-- GitHub icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+        </svg>
+        GitHub
+      </a>
+      <span class="footer-env">AWS Bedrock &nbsp;&bull;&nbsp; Claude 3.5 Sonnet</span>
+    </div>
+  </footer>
 
 </body>
 </html>
