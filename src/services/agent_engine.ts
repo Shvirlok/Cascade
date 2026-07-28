@@ -10,6 +10,7 @@ import {
   queryTransitAvailability,
   estimateCascadeImpact,
 } from '../mcp/tools/transport_tools.js';
+import { generateAuditReport, AuditReportData } from './audit_report_generator.js';
 
 export interface AgentActionLog {
   timestamp: string;
@@ -37,10 +38,16 @@ export interface ContentionResolution {
   traveler2: { name: string; status: 'REROUTED'; errCode: '40001_SERIALIZATION_FAILURE'; fallbackSeat: string; txLog: string };
 }
 
+export const POLICY_AUTO_APPROVAL_LIMIT_USD = 300;
+
 export interface CascadeResolutionReport {
   itineraryId: string;
   disruptedSegmentId: string;
-  status: 'SELF_HEALED' | 'CONCIERGE_FALLBACK' | 'FAILED';
+  status: 'SELF_HEALED' | 'CONCIERGE_FALLBACK' | 'FAILED' | 'HUMAN_APPROVAL_REQUIRED' | 'FALLBACK_STANDARD_QUEUE';
+  requiresHumanApproval?: boolean;
+  policyLimitUsd?: number;
+  costDeltaUsd?: number;
+  costDeltaFormatted?: string;
   actionLogs: AgentActionLog[];
   rebookedSegments: any[];
   executionTimeMs: number;
@@ -54,6 +61,7 @@ export interface CascadeResolutionReport {
   txHash: string;
   contentionDetails?: ContentionResolution;
   conciergeOptions?: any[];
+  auditReport?: AuditReportData;
   deltaAnalytics: {
     originalArrival: string;
     newArrival: string;
@@ -84,6 +92,109 @@ function formatDuration(mins: number): string {
  * CASCADE Multi-Agent Engine implementing the 6 Core Architectural Pillars & CockroachDB MCP Integration
  */
 export class CascadeAgentEngine {
+  private pendingApprovals = new Map<string, any>();
+
+  public getPendingApproval(itineraryId: string) {
+    return this.pendingApprovals.get(itineraryId);
+  }
+
+  public approvePendingRebooking(itineraryId: string): CascadeResolutionReport | null {
+    const pending = this.pendingApprovals.get(itineraryId);
+    if (!pending) return null;
+
+    const { report, bestOption, disruptedSegmentId } = pending;
+    report.actionLogs.push({
+      timestamp: new Date().toISOString(),
+      step: '11',
+      tag: 'HITL_APPROVED',
+      agent: 'POLICY_GUARDRAIL',
+      action: `[HITL APPROVAL GRANTED]: Corporate Admin approved +$${pending.rebookingCost}.00 rebooking cost delta. CockroachDB transaction committed successfully.`,
+      details: { status: 'COMMITTED', rebookingCost: pending.rebookingCost, approvedBy: 'Corporate Admin' },
+    });
+
+    report.status = 'SELF_HEALED';
+    report.requiresHumanApproval = false;
+    report.rebookedSegments = [
+      {
+        id: disruptedSegmentId,
+        provider: bestOption.provider,
+        reference_code: bestOption.reference_code,
+        status: 'REBOOKED',
+      },
+    ];
+
+    report.auditReport = generateAuditReport({
+      incidentId: report.proofArtifactId,
+      timestamp: new Date().toISOString(),
+      cotExecutionSteps: report.actionLogs,
+      financialDelta: {
+        originalCost: '$2,850.00',
+        rebookingFee: `$${pending.rebookingCost}.00`,
+        carrierCoverage: '+$0.00 (Approved Expense)',
+        totalCostDelta: `+$${pending.rebookingCost}.00 (Human Approved Upgrade)`,
+        policyStatus: 'HUMAN_APPROVED',
+        policyLimit: '$300.00 Auto-Approval Limit',
+      },
+      cockroachDbTelemetry: {
+        txHash: report.txHash,
+        isolationLevel: 'SERIALIZABLE',
+        regionLocality: ['us-east-1', 'eu-west-1', 'ap-northeast-1'],
+        cdcEventId: 'cdc-evt-' + Date.now(),
+        proofSignature: 'sha256-cockroach-bedrock-' + report.txHash.substring(2, 12),
+      },
+    });
+
+    this.pendingApprovals.delete(itineraryId);
+    return report;
+  }
+
+  public rejectPendingRebooking(itineraryId: string, reason: string = 'User rejected upgrade'): CascadeResolutionReport | null {
+    const pending = this.pendingApprovals.get(itineraryId);
+    if (!pending) return null;
+
+    const { report } = pending;
+    report.actionLogs.push({
+      timestamp: new Date().toISOString(),
+      step: '11',
+      tag: 'HITL_REJECTED',
+      agent: 'POLICY_GUARDRAIL',
+      action: `[HITL REJECTED / TIMEOUT]: Rebooking request rejected (${reason}). Falling back to standard concierge queue.`,
+      details: { status: 'FALLBACK_STANDARD_QUEUE', reason },
+    });
+
+    report.status = 'FALLBACK_STANDARD_QUEUE';
+    report.requiresHumanApproval = false;
+
+    report.auditReport = generateAuditReport({
+      incidentId: report.proofArtifactId,
+      timestamp: new Date().toISOString(),
+      cotExecutionSteps: report.actionLogs,
+      healedItinerary: {
+        status: 'FALLBACK_STANDARD_QUEUE',
+        winningBranch: 'Original Itinerary Retained',
+        strategy: 'STANDARD_QUEUE',
+        segments: report.candidateBranches ? report.candidateBranches.map((b: any) => ({
+          type: b.transitType,
+          provider: b.provider,
+          referenceCode: b.referenceCode,
+          route: 'SFO → LHR',
+          status: 'ORIGINAL_HOLD',
+        })) : [],
+      },
+      financialDelta: {
+        originalCost: '$2,850.00',
+        rebookingFee: '$0.00',
+        carrierCoverage: '$0.00',
+        totalCostDelta: '$0.00',
+        policyStatus: 'FALLBACK_QUEUE',
+        policyLimit: '$300.00 Auto-Approval Limit',
+      },
+    });
+
+    this.pendingApprovals.delete(itineraryId);
+    return report;
+  }
+
   /**
    * Multi-Region Failover Simulator (us-east-1 DOWN -> Rerouted to eu-west-1)
    */
@@ -172,7 +283,8 @@ export class CascadeAgentEngine {
     delayMinutes: number,
     disruptionType: string = 'FLIGHT_DELAY',
     strategy: string = 'EXECUTIVE_SPEED',
-    onStepCallback?: (log: AgentActionLog) => void
+    onStepCallback?: (log: AgentActionLog) => void,
+    customCostDelta?: number
   ): Promise<CascadeResolutionReport> {
     const startTime = Date.now();
     const actionLogs: AgentActionLog[] = [];
@@ -276,10 +388,14 @@ export class CascadeAgentEngine {
       recalledRule: 'Prune layovers < 60m',
     });
 
+    const rebookingCost = typeof customCostDelta === 'number'
+      ? customCostDelta
+      : (strategy === 'HIGH_COST_GUARDRAIL' ? 450 : 0);
+
     const candidateBranches: CandidateBranch[] = [
       { name: 'Branch Alpha', code: 'ALPHA', strategyName: 'Speed Priority', score: 0.74, provider: 'Delta Express Re-route', referenceCode: 'DL-1990', transitType: 'FLIGHT', isWinner: false, costDelta: '+$85.00' },
       { name: 'Branch Beta', code: 'BETA', strategyName: 'Zero Cost / Carrier Covered', score: 0.82, provider: 'Amtrak Regional Express', referenceCode: 'AMT-175', transitType: 'TRAIN', isWinner: false, costDelta: '$0.00' },
-      { name: 'Branch Gamma', code: 'GAMMA', strategyName: 'User Preference Optimal (HNSW Cosine Winner)', score: 0.96, provider: 'Amtrak Acela First Class Quiet Car', referenceCode: 'AMT-2158', transitType: 'TRAIN', isWinner: true, costDelta: '$0.00 (Carrier Covered)' },
+      { name: 'Branch Gamma', code: 'GAMMA', strategyName: 'User Preference Optimal (HNSW Cosine Winner)', score: 0.96, provider: 'Amtrak Acela First Class Quiet Car', referenceCode: 'AMT-2158', transitType: 'TRAIN', isWinner: true, costDelta: rebookingCost > 0 ? `+$${rebookingCost}.00 (Business Class Upgrade)` : '$0.00 (Carrier Covered)' },
     ];
 
     const winningBranch = candidateBranches.find((b) => b.isWinner) || candidateBranches[2];
@@ -330,6 +446,86 @@ export class CascadeAgentEngine {
       seat_available: true,
       notes: 'Direct connection from Moynihan Hall to PHL 30th St.',
     };
+
+    const deltaAnalytics = {
+      originalArrival: originalArrivalDate.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      newArrival: newArrivalDate.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      delayMinutes,
+      delayFormatted: formatDuration(delayMinutes),
+      costBreakdown: {
+        rebookingFee: rebookingCost > 0 ? `+$${rebookingCost}.00` : '$0.00 (Carrier Covered)',
+        hotelVoucher: '+$0.00 (Executive Voucher Applied)',
+        totalCostDelta: rebookingCost > 0 ? `+$${rebookingCost}.00 (Corporate Limit Exceeded)` : '$0.00 (Complimentary Auto-Healed)',
+      },
+      slackWindow: {
+        originalSlack: 90,
+        postDelaySlack: isMajor ? -195 : -60,
+        restoredSlack: 90,
+      },
+    };
+
+    // FEATURE 1: Human-in-the-Loop & Policy Guardrail Check ($300 Limit)
+    if (rebookingCost > POLICY_AUTO_APPROVAL_LIMIT_USD) {
+      logStep('5b', 'HITL_GUARDRAIL', 'POLICY_GUARDRAIL', `⚠️ Corporate Policy Threshold Exceeded: Proposed rebooking cost delta ($${rebookingCost}.00) exceeds $300 auto-approval limit. Halting autonomous commit for Human-in-the-Loop Approval.`, {
+        rebookingCost,
+        policyLimit: POLICY_AUTO_APPROVAL_LIMIT_USD,
+        status: 'HUMAN_APPROVAL_REQUIRED',
+        confidenceScore: 0.964,
+      });
+
+      const report: CascadeResolutionReport = {
+        itineraryId,
+        disruptedSegmentId,
+        status: 'HUMAN_APPROVAL_REQUIRED',
+        requiresHumanApproval: true,
+        policyLimitUsd: POLICY_AUTO_APPROVAL_LIMIT_USD,
+        costDeltaUsd: rebookingCost,
+        costDeltaFormatted: `+$${rebookingCost}.00 (Business Class Upgrade)`,
+        actionLogs,
+        rebookedSegments: [],
+        executionTimeMs: Date.now() - startTime,
+        usedFallback: false,
+        strategy,
+        riskScore,
+        candidateBranches,
+        winningBranch,
+        sagaStatus,
+        proofArtifactId,
+        txHash,
+        deltaAnalytics,
+      };
+
+      report.auditReport = generateAuditReport({
+        incidentId: proofArtifactId,
+        timestamp: new Date().toISOString(),
+        cotExecutionSteps: actionLogs,
+        financialDelta: {
+          originalCost: '$2,850.00',
+          rebookingFee: `+$${rebookingCost}.00`,
+          carrierCoverage: '$0.00',
+          totalCostDelta: `+$${rebookingCost}.00 (Requires Human Approval)`,
+          policyStatus: 'FALLBACK_QUEUE',
+          policyLimit: '$300.00 Auto-Approval Threshold',
+        },
+        cockroachDbTelemetry: {
+          txHash,
+          isolationLevel: 'SERIALIZABLE',
+          regionLocality: ['us-east-1', 'eu-west-1', 'ap-northeast-1'],
+          cdcEventId: 'cdc-evt-' + Date.now(),
+          proofSignature: 'sha256-cockroach-bedrock-' + txHash.substring(2, 12),
+        },
+      });
+
+      this.pendingApprovals.set(itineraryId, {
+        itineraryId,
+        disruptedSegmentId,
+        rebookingCost,
+        bestOption,
+        report,
+      });
+
+      return report;
+    }
 
     let bedrockReasoning = `Rebooked winning Branch Gamma (${bestOption.provider} - ${bestOption.reference_code}) adhering to vector preferences.`;
 
@@ -389,24 +585,7 @@ export class CascadeAgentEngine {
 
     const executionTimeMs = Date.now() - startTime;
 
-    const deltaAnalytics = {
-      originalArrival: originalArrivalDate.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      newArrival: newArrivalDate.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      delayMinutes,
-      delayFormatted: formatDuration(delayMinutes),
-      costBreakdown: {
-        rebookingFee: '$0.00 (Carrier Covered)',
-        hotelVoucher: '+$0.00 (Executive Voucher Applied)',
-        totalCostDelta: '$0.00 (Complimentary Auto-Healed)',
-      },
-      slackWindow: {
-        originalSlack: 90,
-        postDelaySlack: isMajor ? -195 : -60,
-        restoredSlack: 90,
-      },
-    };
-
-    logStep('10', 'CASCADE_COMPLETE', 'ORCHESTRATOR', `🎉 CASCADE Route Graph self-healed in ${executionTimeMs}ms! Winning Branch: ${winningBranch.name} (${winningBranch.score} HNSW Match Score).`, {
+    logStep('10', 'CASCADE_COMPLETE', 'ORCHESTRATOR', `🎉 CASCADE Route Graph self-healed in ${executionTimeMs}ms! Winning Branch: ${winningBranch.name} (${winningBranch.score} HNSW Match Score). Policy Check: PASS (Cost <= $300).`, {
       executionTimeMs,
       usedFallback,
       strategy,
@@ -421,10 +600,14 @@ export class CascadeAgentEngine {
       status: 'SELF_HEALED',
     });
 
-    return {
+    const report: CascadeResolutionReport = {
       itineraryId,
       disruptedSegmentId,
       status: 'SELF_HEALED',
+      requiresHumanApproval: false,
+      policyLimitUsd: POLICY_AUTO_APPROVAL_LIMIT_USD,
+      costDeltaUsd: rebookingCost,
+      costDeltaFormatted: rebookingCost > 0 ? `+$${rebookingCost}.00` : '$0.00 (Carrier Covered)',
       actionLogs,
       rebookedSegments,
       executionTimeMs,
@@ -438,6 +621,29 @@ export class CascadeAgentEngine {
       txHash,
       deltaAnalytics,
     };
+
+    report.auditReport = generateAuditReport({
+      incidentId: proofArtifactId,
+      timestamp: new Date().toISOString(),
+      cotExecutionSteps: actionLogs,
+      financialDelta: {
+        originalCost: '$2,850.00',
+        rebookingFee: '$0.00',
+        carrierCoverage: '$450.00 (Carrier Covered)',
+        totalCostDelta: '$0.00 (Net Zero Corporate Delta)',
+        policyStatus: 'AUTO_APPROVED',
+        policyLimit: '$300.00 Auto-Approval Limit',
+      },
+      cockroachDbTelemetry: {
+        txHash,
+        isolationLevel: 'SERIALIZABLE',
+        regionLocality: ['us-east-1', 'eu-west-1', 'ap-northeast-1'],
+        cdcEventId: 'cdc-evt-' + Date.now(),
+        proofSignature: 'sha256-cockroach-bedrock-' + txHash.substring(2, 12),
+      },
+    });
+
+    return report;
   }
 
   /**

@@ -38,6 +38,14 @@
   --radius-card: 8px;
   --radius-full: 9999px;
 
+  /* ── Apple Design: Spring & Easing Curves ───────────────────── */
+  /* Standard ease-out — navigation, fades, color transitions      */
+  --ease-out:    cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Spring overshoot — tactile press release, card lift, scale    */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Swift enter — modal, sheet emergence                          */
+  --ease-enter:  cubic-bezier(0.22, 1, 0.36, 1);
+
   /* Leaflet tile URL for theme swap */
   --leaflet-tile-url: 'dark';
 }
@@ -81,6 +89,9 @@ body {
   display: flex;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  /* Apple Principle 9: Optical typography rendering */
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 /* Monospace Utility Class strictly for IDs, flight codes, and code blocks */
@@ -489,6 +500,23 @@ header {
   flex-shrink: 0;
 }
 
+/* Degraded / offline state — applied via JS */
+.status-dot.degraded {
+  background: var(--status-amber);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.status-dot.offline {
+  background: var(--status-red);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  animation: none;
+}
+
+/* Latency value color states — applied via JS */
+.latency-good   { color: var(--status-green) !important; }
+.latency-warn   { color: var(--status-amber) !important; }
+.latency-bad    { color: var(--status-red) !important; }
+
 @keyframes pulse-dot {
 
   0%,
@@ -649,8 +677,31 @@ tr:last-child td {
   border-bottom: none;
 }
 
+tbody tr {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
 tr:hover td {
   background: rgba(255, 255, 255, 0.02);
+}
+
+/* Selected row — traveler selection */
+tbody tr.row-selected td {
+  background: var(--accent-light);
+  color: var(--text-primary);
+}
+
+tbody tr.row-selected:hover td {
+  background: rgba(99, 102, 241, 0.14);
+}
+
+[data-theme="light"] tr:hover td {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+[data-theme="light"] tbody tr.row-selected td {
+  background: rgba(99, 102, 241, 0.07);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -771,6 +822,9 @@ button:disabled {
   position: relative;
   overflow: hidden;
   margin-top: 16px;
+  /* Keep Leaflet below modal backdrop */
+  z-index: 1;
+  isolation: isolate;
 }
 
 .map-svg-layer {
@@ -1389,9 +1443,11 @@ button:disabled {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(4px);
-  z-index: 200;
+  /* Unified glassmorphic overlay — above Leaflet (z ~400) AND sidebar (z 100) */
+  background: rgba(11, 15, 23, 0.70);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
   display: none;
   align-items: center;
   justify-content: center;
@@ -1399,6 +1455,10 @@ button:disabled {
 
 .modal-backdrop.active {
   display: flex;
+}
+
+[data-theme="light"] .modal-backdrop {
+  background: rgba(249, 250, 251, 0.72);
 }
 
 .modal-content-card {
@@ -1587,4 +1647,1165 @@ input[type="range"] {
 
 [data-theme="light"] .mode-tab:hover {
   background: rgba(0, 0, 0, 0.04);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   APPLE DESIGN POLISH
+   17 principles: tactile feedback, spring easing, glassmorphism,
+   typography, depth, restraint, reduced-motion compliance.
+   All rules here layer on top of — and override — the base rules
+   above, keyed off the same selectors with cascade order.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Principle 1-2: Tactile Feedback & Spring Easing ─────────────
+   Replace flat `0.15s ease` with spring cubic-bezier on buttons.  */
+.btn-primary,
+.btn-secondary {
+  transition:
+    background 0.22s var(--ease-out),
+    border-color 0.22s var(--ease-out),
+    color 0.22s var(--ease-out),
+    box-shadow 0.22s var(--ease-out),
+    transform 0.18s var(--ease-spring);
+  will-change: transform;
+}
+
+/* Hover: subtle lift — depth cue without visual weight */
+.btn-primary:hover,
+.btn-secondary:hover {
+  transform: translateY(-1px);
+}
+
+/* Active: physical "push" press — spring snaps back on release */
+.btn-primary:active,
+.btn-secondary:active {
+  transform: scale(0.96) translateY(0px);
+  transition-duration: 0.08s;
+}
+
+/* ── Principle 3: Focus Rings — AAA-compliant, Apple-style glow ── */
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-main),
+    0 0 0 4px var(--accent);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-main),
+    0 0 0 4px var(--accent);
+}
+
+/* Enhanced focus ring on form elements */
+select:focus,
+input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22);
+  outline: none;
+}
+
+/* ── Principle 4: Fluid Nav — spring translate + colour ─────────── */
+.nav-item {
+  transition:
+    background 0.2s var(--ease-out),
+    color 0.2s var(--ease-out),
+    transform 0.18s var(--ease-spring);
+  will-change: transform;
+}
+
+.nav-item:hover {
+  transform: translateX(2px);
+}
+
+.nav-item:active {
+  transform: scale(0.97) translateX(1px);
+  transition-duration: 0.08s;
+}
+
+/* Nav icon inherits spring via parent */
+.nav-item svg {
+  transition: color 0.2s var(--ease-out), transform 0.18s var(--ease-spring);
+}
+
+/* ── Principle 5: Mode Tabs — spring scale on press ─────────────── */
+.mode-tab {
+  transition:
+    background 0.2s var(--ease-out),
+    color 0.2s var(--ease-out),
+    transform 0.18s var(--ease-spring);
+  will-change: transform;
+}
+
+.mode-tab:active {
+  transform: scale(0.94);
+  transition-duration: 0.08s;
+}
+
+/* ── Principle 6: Theme Toggle — spring rotation ─────────────────── */
+.theme-toggle-btn {
+  transition:
+    background 0.22s var(--ease-out),
+    color 0.22s var(--ease-out),
+    border-color 0.22s var(--ease-out),
+    transform 0.3s var(--ease-spring);
+  will-change: transform;
+}
+
+.theme-toggle-btn:hover {
+  transform: rotate(18deg) scale(1.08);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.88);
+  transition-duration: 0.08s;
+}
+
+/* ── Principle 7-8: Card Lift — perceived physical depth ─────────── */
+.metric-card {
+  transition:
+    border-color 0.22s var(--ease-out),
+    box-shadow 0.22s var(--ease-out),
+    transform 0.22s var(--ease-out);
+  will-change: transform;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.18);
+  border-color: var(--border-hover);
+}
+
+.gauge-card {
+  transition:
+    border-color 0.22s var(--ease-out),
+    box-shadow 0.22s var(--ease-out),
+    transform 0.22s var(--ease-out);
+  will-change: transform;
+}
+
+.gauge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border-color: var(--border-hover);
+}
+
+/* ── Principle 9: Pipeline Cards — interactive spring ───────────── */
+.pipeline-stage-card {
+  transition:
+    border-color 0.2s var(--ease-out),
+    background 0.2s var(--ease-out),
+    transform 0.18s var(--ease-spring),
+    box-shadow 0.2s var(--ease-out);
+  will-change: transform;
+}
+
+.pipeline-stage-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+}
+
+.pipeline-stage-card:active {
+  transform: scale(0.97);
+  transition-duration: 0.08s;
+}
+
+/* ── Principle 10: Table Rows — spring hover ─────────────────────── */
+tbody tr {
+  transition: background 0.18s var(--ease-out);
+}
+
+/* ── Principle 11: Meter fill — spring timing ───────────────────── */
+.meter-bar-fill {
+  transition: width 0.8s var(--ease-enter);
+}
+
+/* ── Principle 12: Typography — tabular numbers on numeric values ── */
+.metric-val,
+.gauge-val,
+.footer-latency-val {
+  font-feature-settings: "kern" 1, "tnum" 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Principle 13-14: Glassmorphism — Modal upgrade ─────────────────
+   Dark-mode glass: layered blur + inset edge highlight + spring
+   entrance animation. The card gets 24px blur to sit above content.
+   Border becomes a bright thin top-edge highlight (Apple material
+   language: "specular layer").
+─────────────────────────────────────────────────────────────────── */
+.modal-content-card {
+  background: rgba(17, 24, 39, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow:
+    /* Specular top-edge highlight */
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    /* Deep ambient shadow */
+    0 32px 64px rgba(0, 0, 0, 0.55),
+    0 8px 24px rgba(0, 0, 0, 0.32);
+}
+
+[data-theme="light"] .modal-content-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 32px 64px rgba(0, 0, 0, 0.18),
+    0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Spring entrance: scale from 0.94 with gentle overshoot to 1 */
+@keyframes modal-spring-in {
+  0%   { opacity: 0; transform: scale(0.93) translateY(10px); }
+  65%  { opacity: 1; transform: scale(1.015) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-backdrop.active {
+  animation: backdrop-fade-in 0.2s var(--ease-out) forwards;
+}
+
+.modal-backdrop.active .modal-content-card {
+  animation: modal-spring-in 0.38s var(--ease-spring) forwards;
+}
+
+/* ── Principle 15: Modal Close — micro-spring ───────────────────── */
+.modal-close {
+  transition:
+    color 0.18s var(--ease-out),
+    transform 0.18s var(--ease-spring);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+}
+
+.modal-close:hover {
+  transform: scale(1.15);
+  color: var(--text-primary);
+}
+
+.modal-close:active {
+  transform: scale(0.88);
+  transition-duration: 0.07s;
+}
+
+/* ── Principle 16: Terminal header — smoother collapse ───────────── */
+.terminal-header {
+  transition: background 0.2s var(--ease-out);
+}
+
+.terminal-toggle-btn {
+  transition:
+    background 0.2s var(--ease-out),
+    color 0.2s var(--ease-out),
+    border-color 0.2s var(--ease-out),
+    transform 0.2s var(--ease-spring);
+}
+
+.terminal-toggle-btn:hover {
+  transform: scale(1.04);
+}
+
+.terminal-toggle-btn:active {
+  transform: scale(0.95);
+  transition-duration: 0.07s;
+}
+
+.terminal-toggle-btn svg {
+  transition: transform 0.28s var(--ease-spring);
+}
+
+.terminal-body {
+  transition: max-height 0.32s var(--ease-enter), padding 0.24s var(--ease-out);
+}
+
+/* ── Principle 17: Prefers-Reduced-Motion ── honour the OS setting ──
+   All physical/spring animations collapse to instant transitions.
+   Colour and opacity fades remain (they carry information, not
+   purely motion sensation).                                        */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Restore the pulsing dot — it carries live status information */
+  .status-dot {
+    animation: none;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   FEATURE 1: HUMAN-IN-THE-LOOP GLASSMORPHISM APPROVAL BANNER
+───────────────────────────────────────────────────────────────── */
+.hitl-banner-container {
+  margin-bottom: 20px;
+  display: none;
+  animation: modal-spring-in 0.4s var(--ease-spring) forwards;
+}
+
+.hitl-banner-container.active {
+  display: block;
+}
+
+.hitl-glass-card {
+  background: rgba(245, 158, 11, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 16px 36px rgba(245, 158, 11, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="light"] .hitl-glass-card {
+  background: rgba(254, 243, 199, 0.85);
+  border: 1px solid rgba(217, 119, 6, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 12px 30px rgba(217, 119, 6, 0.12);
+}
+
+.hitl-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hitl-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hitl-badge-warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.hitl-title-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hitl-timer-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+.hitl-progress-bar-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hitl-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  width: 100%;
+  transition: width 1s linear;
+}
+
+.hitl-body-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+[data-theme="light"] .hitl-body-grid {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.hitl-detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.hitl-detail-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hitl-delta-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ef4444;
+  font-family: var(--font-mono);
+}
+
+.hitl-score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hitl-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-hitl-approve {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-btn);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  transition: transform 0.18s var(--ease-spring), box-shadow 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-hitl-approve:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+}
+
+.btn-hitl-reject {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 10px 20px;
+  border-radius: var(--radius-btn);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s var(--ease-spring);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-hitl-reject:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   FEATURE 2: APPLE DESIGN EXECUTIVE AUDIT REPORT MODAL
+───────────────────────────────────────────────────────────────── */
+.audit-modal-card {
+  width: 820px;
+  max-width: 92vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.6);
+}
+
+.audit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 20px;
+}
+
+.audit-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.audit-header-title h2 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.audit-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.audit-badge-verified {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.audit-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.audit-metric-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.audit-metric-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.audit-metric-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.audit-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.audit-matrix-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.audit-matrix-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+[data-theme="light"] .audit-matrix-card {
+  background: rgba(243, 244, 246, 0.8);
+}
+
+.audit-segment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+}
+
+[data-theme="light"] .audit-segment-item {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.audit-segment-item:last-child {
+  border-bottom: none;
+}
+
+.audit-cot-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+[data-theme="light"] .audit-cot-timeline {
+  background: #f9fafb;
+}
+
+.audit-cot-line {
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.audit-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 18px;
+}
+
+.btn-audit-export {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 10px 18px;
+  border-radius: var(--radius-btn);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.18s ease;
+}
+
+.btn-audit-export:hover {
+  background: var(--bg-hover);
+}
+
+.btn-audit-print {
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-btn);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+  transition: transform 0.18s var(--ease-spring);
+}
+
+.btn-audit-print:hover {
+  transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PRINT OPTIMIZATION (@media print)
+───────────────────────────────────────────────────────────────── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  .modal-backdrop,
+  .modal-backdrop.active {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    display: block !important;
+  }
+
+  .audit-modal-card,
+  .audit-modal-card * {
+    visibility: visible;
+  }
+
+  .audit-modal-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    padding: 0 !important;
+  }
+
+  .audit-toolbar,
+  .modal-close {
+    display: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MULTI-TRAVELER SELECTOR DROPDOWN (HEADER & INSPECTION)
+───────────────────────────────────────────────────────────────── */
+.traveler-select-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.traveler-select-dropdown {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 2px 6px;
+  outline: none;
+  cursor: pointer;
+}
+
+.traveler-select-dropdown option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   DYNAMIC CITY AUTOCOMPLETE DROPDOWN (GLASSMORPHISM)
+───────────────────────────────────────────────────────────────── */
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: rgba(17, 24, 39, 0.94);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.suggestions-dropdown.active {
+  display: block;
+}
+
+[data-theme="light"] .suggestions-dropdown {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.15s ease;
+}
+
+[data-theme="light"] .suggestion-item {
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.suggestion-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flag-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.suggestion-city {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.airport-code-pill {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   TAB 2 TRAVELER SYNC BAR & TABLE HIGHLIGHTS
+───────────────────────────────────────────────────────────────── */
+.tab2-traveler-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+}
+
+[data-theme="light"] .tab2-traveler-bar {
+  background: rgba(243, 244, 246, 0.85);
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.clickable-row:hover {
+  background: rgba(59, 130, 246, 0.12) !important;
+}
+
+.active-row-highlight {
+  background: rgba(59, 130, 246, 0.22) !important;
+  border-left: 4px solid var(--accent) !important;
+  box-shadow: inset 0 0 16px rgba(59, 130, 246, 0.25);
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   TOAST NOTIFICATION SYSTEM (GLASSMORPHISM)
+───────────────────────────────────────────────────────────────── */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast-item {
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 380px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: rgba(17, 24, 39, 0.92);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: toastSlideIn 0.3s var(--ease-spring) forwards;
+}
+
+[data-theme="light"] .toast-item {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.toast-item.toast-success { border-left: 4px solid #22c55e; }
+.toast-item.toast-warning { border-left: 4px solid #f59e0b; }
+.toast-item.toast-error   { border-left: 4px solid #ef4444; }
+.toast-item.toast-info    { border-left: 4px solid #3b82f6; }
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   FEATURE 3: FINANCIAL ROI & CUMULATIVE METRICS HEADER BAR
+───────────────────────────────────────────────────────────────── */
+.header-roi-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.roi-metric-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.roi-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+
+}
+
+.roi-val {
+  color: #22c55e;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   FEATURE 4: INTERACTIVE IN-APP IOS PUSH CARD BANNER
+───────────────────────────────────────────────────────────────── */
+#ios-push-notification-banner {
+  position: fixed;
+  top: 76px;
+  right: 24px;
+  z-index: 9999;
+  display: none;
+  pointer-events: none;
+}
+
+#ios-push-notification-banner.active {
+  display: block;
+}
+
+.ios-push-card {
+  pointer-events: auto;
+  width: 360px;
+  background: rgba(17, 24, 39, 0.94);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  animation: iosPushSlideDown 0.35s var(--ease-spring) forwards;
+}
+
+[data-theme="light"] .ios-push-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+.ios-push-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.ios-push-app-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ios-push-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.ios-push-body {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.ios-push-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-ios-action {
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.btn-ios-action:hover {
+  transform: scale(1.03);
+}
+
+@keyframes iosPushSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   FEATURE 2: AUDIO EXECUTIVE BRIEFING BUTTON ("🔊 LISTEN BRIEFING")
+───────────────────────────────────────────────────────────────── */
+.btn-audio-briefing {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-audio-briefing:hover {
+  background: rgba(16, 185, 129, 0.22);
+  transform: translateY(-1px);
+}
+
+.btn-audio-briefing.speaking {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+  animation: pulseSpeaking 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseSpeaking {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   TELEGRAM MINI APP & MOBILE COMPANION MODE STYLING
+───────────────────────────────────────────────────────────────── */
+body.mobile-companion-mode {
+  padding: 0;
+  background: var(--bg-dark);
+}
+
+body.mobile-companion-mode .app-header {
+  padding: 10px 14px;
+}
+
+body.mobile-companion-mode .header-center,
+body.mobile-companion-mode .header-roi-bar,
+body.mobile-companion-mode .app-footer {
+  display: none !important;
+}
+
+body.mobile-companion-mode .app-main-wrapper {
+  padding: 10px;
+}
+
+body.mobile-companion-mode .panel-card {
+  padding: 14px;
+  border-radius: 12px;
+}
+
+body.mobile-companion-mode .node-card {
+  padding: 12px;
+}
+
+body.mobile-companion-mode .map-container {
+  height: 280px;
 }

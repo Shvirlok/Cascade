@@ -12,7 +12,7 @@
     "cdc:listener": "tsx src/services/cdc_listener.ts",
     "emulator": "tsx src/services/disruption_emulator.ts",
     "seed": "tsx src/db/seed_runner.ts",
-    "test": "jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "keywords": [
     "cockroachdb",

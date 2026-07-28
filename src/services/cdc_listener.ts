@@ -99,7 +99,8 @@ export class CDCListenerService {
     segmentId: string,
     delayMinutes: number,
     disruptionType: string = 'FLIGHT_DELAY',
-    strategy: string = 'EXECUTIVE_SPEED'
+    strategy: string = 'EXECUTIVE_SPEED',
+    customCostDelta?: number
   ): Promise<void> {
     const defaultItinId = itineraryId || 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22';
     const defaultSegId = segmentId || 'c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33';
@@ -116,19 +117,29 @@ export class CDCListenerService {
             itineraryId: defaultItinId,
             ...actionLog,
           });
-        }
+        },
+        customCostDelta
       );
 
-      cdcEventEmitter.emit('cascade_healed', {
-        itineraryId: defaultItinId,
-        segmentId: defaultSegId,
-        executionTimeMs: report.executionTimeMs,
-        delayMinutes,
-        disruptionType,
-        strategy,
-        rebookedSegments: report.rebookedSegments,
-        timestamp: new Date().toISOString(),
-      });
+      if (report.status === 'HUMAN_APPROVAL_REQUIRED') {
+        cdcEventEmitter.emit('human_approval_required', {
+          itineraryId: defaultItinId,
+          segmentId: defaultSegId,
+          report,
+          timestamp: new Date().toISOString(),
+        });
+      } else {
+        cdcEventEmitter.emit('cascade_healed', {
+          itineraryId: defaultItinId,
+          segmentId: defaultSegId,
+          executionTimeMs: report.executionTimeMs,
+          delayMinutes,
+          disruptionType,
+          strategy,
+          rebookedSegments: report.rebookedSegments,
+          timestamp: new Date().toISOString(),
+        });
+      }
     } catch (_err) {
       // Dynamic CoT step generator based on severity and strategy
       const isMinor = delayMinutes < 60 && disruptionType === 'FLIGHT_DELAY';

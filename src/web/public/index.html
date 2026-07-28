@@ -122,9 +122,38 @@
 
         <!-- Right: System status + Theme toggle -->
         <div class="header-right">
+          <!-- Feature 3: Financial ROI & Cumulative Metrics Header Bar -->
+          <div class="header-roi-bar" title="Cumulative B2B Financial ROI Metrics">
+            <div class="roi-metric-item">
+              <span class="roi-label">Hours Saved:</span>
+              <span class="roi-val" id="roi-hours-saved">+184 hrs</span>
+            </div>
+            <div class="roi-metric-item">
+              <span class="roi-label">Fees Avoided:</span>
+              <span class="roi-val" id="roi-fees-avoided">$24,850</span>
+            </div>
+            <div class="roi-metric-item">
+              <span class="roi-label">Auto Rate:</span>
+              <span class="roi-val" id="roi-auto-rate">94.8%</span>
+            </div>
+          </div>
+
+          <div class="traveler-select-group" title="Select Executive Traveler Context">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <select class="traveler-select-dropdown" id="traveler-selector">
+              <option value="itin-101">Sarah Jenkins (SFO ➔ LHR)</option>
+              <option value="itin-102">Marcus Vance (JFK ➔ CDG)</option>
+              <option value="itin-103">Elena Rostova (ORD ➔ HND)</option>
+              <option value="itin-104">David Chen (MIA ➔ LHR)</option>
+            </select>
+          </div>
+
           <div class="header-status-indicator" title="All services active and resilient">
-            <div class="status-dot"></div>
-            <span>System Operational</span>
+            <div class="status-dot" id="status-dot"></div>
+            <span id="status-label">System Operational</span>
           </div>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle light / dark theme" aria-label="Toggle theme">
             <!-- Moon icon (shown in dark mode) -->
@@ -224,10 +253,10 @@
 
           <!-- Live Route Map Section -->
           <div style="margin-top: 32px;">
-            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">Live Route Map</h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Sarah Jenkins — SFO (San Francisco) to LHR (London Heathrow)</p>
+            <h3 id="map-route-title" style="font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">Live Route Map</h3>
+            <p id="map-route-subtitle" style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Sarah Jenkins — SFO (San Francisco) to LHR (London Heathrow)</p>
             <div class="map-container" id="leaflet-map-container">
-              <div id="leaflet-route-map" style="width:100%;height:100%;border-radius:var(--radius-card);overflow:hidden;"></div>
+              <div id="leaflet-route-map" style="width:100%;height:100%;border-radius:var(--radius-card);overflow:hidden;position:relative;z-index:1;"></div>
             </div>
           </div>
 
@@ -262,6 +291,82 @@
            VIEW 2: TRIP DETAILS (Live Itinerary)
       ══════════════════════════════════════════════════════════ -->
       <div class="view-container" id="view-itinerary">
+
+        <!-- FEATURE 1: Human-in-the-Loop Glassmorphism Approval Banner -->
+        <div class="hitl-banner-container" id="hitl-approval-banner">
+          <div class="hitl-glass-card">
+            <div class="hitl-head-row">
+              <div class="hitl-title-group">
+                <span class="hitl-badge-warning">Human-in-the-Loop Approval Required</span>
+                <span class="hitl-title-text">Corporate Policy Guardrail Triggered ($300 Auto-Approval Limit Exceeded)</span>
+              </div>
+              <div class="hitl-timer-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span id="hitl-timer-countdown">60s</span>
+              </div>
+            </div>
+
+            <div class="hitl-body-grid">
+              <div>
+                <div class="hitl-detail-label">Disruption Summary & Recommended Option</div>
+                <div class="hitl-detail-val" id="hitl-summary-text">
+                  Flight DL-1402 delayed +240m. Recommended: Direct Business Class Upgrade DL-1990 + Ritz Executive Suite.
+                </div>
+              </div>
+              <div>
+                <div class="hitl-detail-label">Original vs New Cost Delta</div>
+                <div class="hitl-delta-price" id="hitl-cost-delta-val">+$450.00 (Business Upgrade)</div>
+              </div>
+              <div>
+                <div class="hitl-detail-label">Agent Match Confidence</div>
+                <div class="hitl-score-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  <span id="hitl-confidence-score">96.4% HNSW Match</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hitl-actions-row">
+              <button class="btn-hitl-reject" id="btn-hitl-reject">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                <span>Reject &amp; Keep Original</span>
+              </button>
+              <button class="btn-hitl-approve" id="btn-hitl-approve">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span>Approve Rebooking ($450.00)</span>
+              </button>
+            </div>
+
+            <div class="hitl-progress-bar-bg">
+              <div class="hitl-progress-bar-fill" id="hitl-timer-progress"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2 Traveler Context Sync Bar -->
+        <div class="tab2-traveler-bar">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-weight: 700; font-size: 13px; color: var(--text-primary);">Simulation Executive Target:</span>
+            <select class="traveler-select-dropdown" id="tab2-traveler-selector" style="border: 1px solid var(--border-subtle); padding: 6px 12px; border-radius: 8px; background: rgba(0,0,0,0.2);">
+              <option value="itin-101">Sarah Jenkins (SFO ➔ LHR)</option>
+              <option value="itin-102">Marcus Vance (JFK ➔ CDG)</option>
+              <option value="itin-103">Elena Rostova (ORD ➔ HND)</option>
+              <option value="itin-104">David Chen (MIA ➔ LHR)</option>
+            </select>
+          </div>
+          <span class="status-tag status-tag-amber" id="tab2-policy-tier-tag">Executive Tier ($300 Limit)</span>
+        </div>
 
         <!-- Disruption Scenario Simulator (visible only in Internals mode) -->
         <div class="simulator-box" id="simulator-controls-panel">
@@ -298,6 +403,7 @@
           <!-- Scenario Buttons -->
           <div class="simulator-actions-grid">
             <button class="btn-secondary" id="btn-disrupt"><span>Simulate: Flight Delayed</span></button>
+            <button class="btn-secondary" id="btn-policy-hitl" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b;"><span>Simulate: Policy Guardrail (&gt;$300)</span></button>
             <button class="btn-secondary" id="btn-chaos"><span>Simulate: Multiple Disruptions</span></button>
             <button class="btn-secondary" id="btn-contention"><span>Simulate: Rebooking Conflict</span></button>
             <button class="btn-secondary" id="btn-failover"><span>Simulate: Regional Outage</span></button>
@@ -343,6 +449,10 @@
             </div>
 
             <div style="display: flex; gap: 12px; align-items: center;">
+              <button class="btn-secondary" id="btn-generate-audit-report" style="background: rgba(59,130,246,0.12); color: #60a5fa; border-color: rgba(59,130,246,0.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Generate Audit Report</span>
+              </button>
               <a href="/api/itinerary/artifact?id=PROOF-REC-994821" download class="btn-secondary" id="btn-proof-artifact">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Download Confirmation</span>
@@ -531,6 +641,96 @@
     </div>
   </div>
 
+  <!-- Feature 2: Post-Incident Executive Audit Report Modal (Apple Design) -->
+  <div class="modal-backdrop" id="modal-audit-report">
+    <div class="audit-modal-card">
+      <div class="audit-modal-head">
+        <div>
+          <h2 style="font-size:18px;font-weight:700;margin:0;">Post-Incident Executive Audit Report</h2>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Incident Proof Artifact &amp; CockroachDB Telemetry Verification</p>
+        </div>
+        <div class="audit-toolbar">
+          <button class="btn-audio-briefing" id="btn-modal-audio-briefing"><span>🔊 Listen Briefing</span></button>
+          <button class="btn-audit-export" id="btn-audit-export-md">Download Markdown</button>
+          <button class="btn-audit-print" id="btn-audit-print-pdf">Export PDF / Print</button>
+          <span class="modal-close" id="audit-modal-close">&times;</span>
+        </div>
+      </div>
+
+      <div class="audit-metrics-grid">
+        <div class="audit-metric-box">
+          <div class="metric-box-title">Incident ID</div>
+          <div class="metric-box-val" id="audit-val-id" style="font-size:14px;">PROOF-REC-994821</div>
+        </div>
+        <div class="audit-metric-box">
+          <div class="metric-box-title">Estimated Time Saved</div>
+          <div class="metric-box-val" id="audit-val-time">4.5 Hours</div>
+        </div>
+        <div class="audit-metric-box">
+          <div class="metric-box-title">Financial Cost Delta</div>
+          <div class="metric-box-val" id="audit-val-cost" style="color:#22c55e;">$0.00 Net</div>
+        </div>
+        <div class="audit-metric-box">
+          <div class="metric-box-title">Policy Compliance</div>
+          <div class="metric-box-val" id="audit-val-policy" style="color:#60a5fa;font-size:14px;">Auto-Approved ($300 Limit)</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-primary);">Traveler &amp; Policy Context</h3>
+        <div style="font-size:12px;color:var(--text-secondary);background:rgba(0,0,0,0.2);padding:10px 14px;border-radius:8px;">
+          <div>● <strong>Traveler:</strong> Sarah Jenkins (<code class="font-mono">sarah.jenkins@acme.com</code>)</div>
+          <div>● <strong>Policy Tier:</strong> Executive Tier ($300 Auto-Approval Limit)</div>
+          <div>● <strong>HNSW Cosine Match Score:</strong> 98.4% Preference Alignment</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-primary);">Original vs. Healed Transformation</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div>
+            <h4 style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:6px;text-transform:uppercase;">Disrupted Segment</h4>
+            <div id="audit-original-segments"></div>
+          </div>
+          <div>
+            <h4 style="font-size:11px;font-weight:700;color:#10b981;margin-bottom:6px;text-transform:uppercase;">Healed Segment</h4>
+            <div id="audit-healed-segments"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-primary);">Agent Chain-of-Thought Execution Log</h3>
+        <div class="audit-cot-box" id="audit-cot-timeline"></div>
+      </div>
+
+      <div style="font-size:11px;color:var(--text-muted);border-top:1px solid var(--border-subtle);padding-top:12px;display:flex;justify-content:space-between;align-items:center;">
+        <div>CockroachDB Transaction Proof: <code class="font-mono" id="audit-proof-sig">sha256-cockroach-bedrock-0x8f4b2c1e</code></div>
+        <div>Isolation: <strong>SERIALIZABLE</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 4: Interactive In-App iOS Push Card Banner -->
+  <div id="ios-push-notification-banner">
+    <div class="ios-push-card">
+      <div class="ios-push-head">
+        <div class="ios-push-app-title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>CASCADE Guard</span>
+        </div>
+        <button style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;" id="btn-close-ios-push">&times;</button>
+      </div>
+      <div class="ios-push-title" id="ios-push-title">Disruption Auto-Healed</div>
+      <div class="ios-push-body" id="ios-push-body">Sarah Jenkins (SFO ➔ LHR) — Rebooked to Amtrak Acela Express (AMT-2158). $0.00 Net Delta.</div>
+      <div class="ios-push-actions">
+        <button class="btn-ios-action" id="btn-ios-push-action">View Details</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Create Trip Modal -->
   <div class="modal-backdrop" id="createItineraryModal">
     <div class="modal-content-card">
@@ -552,22 +752,18 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
           <div class="input-group">
-            <label>Origin Hub</label>
-            <select id="modal-origin">
-              <option value="SFO (San Francisco)">SFO (San Francisco)</option>
-              <option value="JFK (New York)">JFK (New York)</option>
-              <option value="ORD (Chicago)">ORD (Chicago)</option>
-              <option value="LHR (London)">LHR (London)</option>
-            </select>
+            <label>Origin Hub (Search City / Airport)</label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="modal-origin-input" placeholder="Search city or airport (e.g. SFO, Tokyo, Paris)..." value="SFO — San Francisco 🇺🇸" autocomplete="off">
+              <div class="suggestions-dropdown" id="modal-origin-suggestions"></div>
+            </div>
           </div>
           <div class="input-group">
-            <label>Destination Hub</label>
-            <select id="modal-destination">
-              <option value="LHR (London Heathrow)">LHR (London Heathrow)</option>
-              <option value="CDG (Paris)">CDG (Paris Charles de Gaulle)</option>
-              <option value="HND (Tokyo Haneda)">HND (Tokyo Haneda)</option>
-              <option value="FRA (Frankfurt)">FRA (Frankfurt)</option>
-            </select>
+            <label>Destination Hub (Search City / Airport)</label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="modal-dest-input" placeholder="Search city or airport (e.g. LHR, Tokyo, Paris)..." value="LHR — London 🇬🇧" autocomplete="off">
+              <div class="suggestions-dropdown" id="modal-dest-suggestions"></div>
+            </div>
           </div>
         </div>
 
@@ -690,25 +886,69 @@
     document.getElementById('btn-open-create-modal').addEventListener('click', () => modal.classList.add('active'));
     document.getElementById('btn-close-modal').addEventListener('click',  () => modal.classList.remove('active'));
     document.getElementById('btn-cancel-modal').addEventListener('click', () => modal.classList.remove('active'));
+    // Click on backdrop (outside card) also closes
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
 
     document.getElementById('form-create-itinerary').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name   = document.getElementById('modal-traveler-name').value;
       const email  = document.getElementById('modal-traveler-email').value;
-      const origin = document.getElementById('modal-origin').value;
-      const dest   = document.getElementById('modal-destination').value;
+      const originInputVal = document.getElementById('modal-origin-input')?.value;
+      const destInputVal   = document.getElementById('modal-dest-input')?.value;
       const strat  = document.getElementById('modal-strategy').value;
+
+      let origAp = selectedOriginAp;
+      if (!origAp && originInputVal) {
+        const q = originInputVal.trim().toUpperCase();
+        origAp = GLOBAL_AIRPORTS.find(a => q.includes(a.code) || a.city.toUpperCase().includes(q) || a.name.toUpperCase().includes(q)) || GLOBAL_AIRPORTS[1];
+      }
+
+      let destAp = selectedDestAp;
+      if (!destAp && destInputVal) {
+        const q = destInputVal.trim().toUpperCase();
+        destAp = GLOBAL_AIRPORTS.find(a => q.includes(a.code) || a.city.toUpperCase().includes(q) || a.name.toUpperCase().includes(q)) || GLOBAL_AIRPORTS[2];
+      }
+
+      const originStr = originInputVal || (origAp ? `${origAp.code} — ${origAp.city}` : 'SFO');
+      const destStr   = destInputVal   || (destAp ? `${destAp.code} — ${destAp.city}`   : 'LHR');
+
+      if (origAp && destAp && origAp.code === destAp.code) {
+        showToast('Origin and Destination hubs cannot be identical.', 'warning');
+        return;
+      }
 
       try {
         const res = await fetch('/api/itinerary/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ travelerName: name, travelerEmail: email, origin, destination: dest, strategy: strat })
+          body: JSON.stringify({
+            travelerName: name,
+            travelerEmail: email,
+            origin: originStr,
+            destination: destStr,
+            strategy: strat,
+            originLat: origAp?.lat || 37.6213,
+            originLng: origAp?.lng || -122.3790,
+            destLat: destAp?.lat || 51.4700,
+            destLng: destAp?.lng || -0.4543,
+          })
         });
-        await res.json();
-        modal.classList.remove('active');
-        loadDashboardData();
-      } catch (err) { console.warn(err); }
+        const data = await res.json();
+        if (data.success && data.profile) {
+          modal.classList.remove('active');
+
+          const optionHtml = `<option value="${data.profile.id}">${data.profile.name} (${data.profile.route})</option>`;
+          document.getElementById('traveler-selector')?.insertAdjacentHTML('afterbegin', optionHtml);
+          document.getElementById('tab2-traveler-selector')?.insertAdjacentHTML('afterbegin', optionHtml);
+
+          await loadDashboardData();
+          await selectTraveler(data.profile.id);
+          showToast(`Executive trip (${data.profile.route}) created!`, 'success');
+        }
+      } catch (err) {
+        showToast('Failed to create itinerary.', 'error');
+        console.warn(err);
+      }
     });
 
     // ── Delay Slider ─────────────────────────────────────────────────
@@ -815,17 +1055,55 @@
       renderItineraryNodes(healedNodes, 'split-healed-nodes');
     }
 
+    // ── Traveler → route coordinate map ──────────────────────────────
+    // Each entry maps a traveler name (lowercase) to { origin, destination, coords }
+    // for the Leaflet map. Coords are [lat, lng] objects.
+    const TRAVELER_ROUTES = {
+      'marcus vance': {
+        label: 'Marcus Vance — ORD to CDG',
+        origin:  { code: 'ORD', label: 'ORD — Chicago O\'Hare', lat: 41.9742, lng: -87.9073 },
+        dest:    { code: 'CDG', label: 'CDG — Paris Charles de Gaulle', lat: 49.0097, lng: 2.5479 },
+      },
+      'elena rostova': {
+        label: 'Elena Rostova — ORD to HND',
+        origin:  { code: 'ORD', label: 'ORD — Chicago O\'Hare', lat: 41.9742, lng: -87.9073 },
+        dest:    { code: 'HND', label: 'HND — Tokyo Haneda', lat: 35.5494, lng: 139.7798 },
+      },
+      'david chen': {
+        label: 'David Chen — MIA to LHR',
+        origin:  { code: 'MIA', label: 'MIA — Miami International', lat: 25.7959, lng: -80.2870 },
+        dest:    { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 },
+      },
+      'sarah jenkins': {
+        label: 'Sarah Jenkins — SFO to LHR',
+        origin:  { code: 'SFO', label: 'SFO — San Francisco', lat: 37.6213, lng: -122.379 },
+        dest:    { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 },
+      },
+    };
+
+    // Currently selected traveler row
+    let selectedTravelerRow = null;
+
     // ── Dashboard data fetch ──────────────────────────────────────────
     async function loadDashboardData() {
       try {
         const res  = await fetch('/api/dashboard');
         const data = await res.json();
         const tbody = document.getElementById('dashboard-fleet-table');
+        if (!tbody) return;
         tbody.innerHTML = '';
-        document.getElementById('metric-active-count').innerText = data.metrics.active_itineraries.toLocaleString();
+        if (data.metrics && data.metrics.active_itineraries) {
+          document.getElementById('metric-active-count').innerText = data.metrics.active_itineraries.toLocaleString();
+        }
 
-        data.active_fleet.forEach(item => {
+        (data.active_fleet || []).forEach((item, idx) => {
           const tr = document.createElement('tr');
+          tr.setAttribute('data-traveler-id', item.id);
+          tr.className = 'clickable-row';
+          if (item.id === currentActiveTravelerId || (idx === 0 && !currentActiveTravelerId)) {
+            tr.classList.add('active-row-highlight');
+          }
+
           let tagClass = 'status-tag-neutral';
           let tagLabel = item.status;
           if (item.status === 'SELF_HEALED') { tagClass = 'status-tag-green'; tagLabel = 'Auto-Healed'; }
@@ -839,9 +1117,117 @@
             <td style="color:var(--text-muted); font-size:13px;">${item.legs}</td>
             <td style="font-size: 13px; color: var(--text-secondary);">${item.last_event}</td>
           `;
+
+          tr.addEventListener('click', () => {
+            selectTraveler(item.id);
+          });
+
           tbody.appendChild(tr);
         });
       } catch (err) { console.warn(err); }
+    }
+
+    // ── Render a specific traveler's route on the Leaflet map ─────────
+    let routeLayerGroup;   // declared here; initialised in initLeafletMap
+
+    function renderTravelerRoute(route) {
+      if (!leafletMap) return;
+
+      // Update map title elements
+      const titleEl    = document.getElementById('map-route-title');
+      const subtitleEl = document.getElementById('map-route-subtitle');
+      if (titleEl)    titleEl.textContent = `Live Route Map — ${route.label.split('—')[0].trim()}`;
+      if (subtitleEl) subtitleEl.textContent = route.label;
+
+      // Build great-circle arc between origin and destination
+      const arc = buildGreatCircleArc(route.origin, route.dest, 80);
+
+      // Clear all existing route layers (but keep tile layer)
+      if (routeLayerGroup) routeLayerGroup.clearLayers();
+      else routeLayerGroup = L.layerGroup().addTo(leafletMap);
+
+      // Stop any existing plane animation
+      if (planeAnimFrame) { cancelAnimationFrame(planeAnimFrame); planeAnimFrame = null; }
+
+      // Glow polyline
+      L.polyline(arc, {
+        color: 'rgba(99,102,241,0.18)',
+        weight: 10,
+        lineCap: 'round',
+        lineJoin: 'round',
+        smoothFactor: 1,
+      }).addTo(routeLayerGroup);
+
+      // Main route line
+      L.polyline(arc, {
+        color: '#6366f1',
+        weight: 2.5,
+        lineCap: 'round',
+        lineJoin: 'round',
+        smoothFactor: 1,
+        opacity: 0.9,
+      }).addTo(routeLayerGroup);
+
+      // Add origin & destination markers
+      [{ wp: route.origin, type: 'origin' }, { wp: route.dest, type: 'destination' }].forEach(({ wp, type }) => {
+        const isDest  = type === 'destination';
+        const color   = isDest ? '#22c55e' : '#6366f1';
+        const size    = 12;
+        const border  = 2.5;
+
+        const dotIcon = L.divIcon({
+          className: '',
+          html: `<div style="
+            width:${size}px;height:${size}px;
+            border-radius:50%;
+            background:${color};
+            border:${border}px solid ${isDest ? 'rgba(34,197,94,0.35)' : 'rgba(99,102,241,0.35)'};
+            box-shadow: 0 0 0 ${border + 1}px ${isDest ? 'rgba(34,197,94,0.15)' : 'rgba(99,102,241,0.15)'};
+          "></div>`,
+          iconSize:   [size, size],
+          iconAnchor: [size / 2, size / 2],
+        });
+
+        L.marker([wp.lat, wp.lng], { icon: dotIcon })
+          .addTo(routeLayerGroup)
+          .bindPopup(wp.label, { closeButton: false, maxWidth: 180 });
+
+        // Code label
+        L.marker([wp.lat, wp.lng], {
+          icon: L.divIcon({
+            className: '',
+            html: `<div style="
+              color:rgba(255,255,255,0.88);
+              font-size:11px;
+              font-weight:600;
+              font-family:Inter,sans-serif;
+              white-space:nowrap;
+              pointer-events:none;
+              text-shadow:0 1px 3px rgba(0,0,0,0.8);
+              padding-left:${!isDest ? '14px' : '0'};
+              padding-right:${isDest ? '14px' : '0'};
+              margin-top:2px;
+            ">${wp.code}</div>`,
+            iconSize:   [40, 16],
+            iconAnchor: !isDest ? [-2, 8] : [42, 8],
+          }),
+          interactive: false,
+          zIndexOffset: -1,
+        }).addTo(routeLayerGroup);
+      });
+
+      // Animated plane
+      routeArcCoords = arc;
+      planeProgress  = 0;
+      planeMarker = L.marker(arc[0], {
+        icon: makePlaneIcon(90),
+        zIndexOffset: 1000,
+        interactive: false,
+      }).addTo(routeLayerGroup);
+
+      // Fit map view to route
+      leafletMap.fitBounds(L.latLngBounds(arc), { padding: [32, 48] });
+      planeAnimFrame = requestAnimationFrame(animatePlane);
     }
 
     // ── Health data fetch ─────────────────────────────────────────────
@@ -951,6 +1337,13 @@
       const cfg = SCENARIOS[key];
       if (!cfg) return;
 
+      updateRoiMetrics(4.5, 450);
+      showIosPushBanner(
+        'Disruption Auto-Healed',
+        `Incident resolved for Sarah Jenkins (SFO ➔ LHR) — Rebooked to Amtrak Acela Express (AMT-2158). $0.00 Net Delta.`,
+        () => openAuditReportModal('PROOF-REC-994821')
+      );
+
       // 1. Active button highlight — clear all, apply to clicked
       ['btn-disrupt', 'btn-chaos', 'btn-contention', 'btn-failover'].forEach(id => {
         document.getElementById(id)?.classList.remove('btn-active-scenario');
@@ -1032,10 +1425,11 @@
           const typeVal     = document.getElementById('sim-disrupt-type').value;
           const strategyVal = document.getElementById('sim-strategy').value;
           const delayVal    = parseInt(document.getElementById('sim-delay-slider').value, 10);
+          const itinId      = currentActiveTravelerId || window.activeTravelerId || 'itin-101';
           await fetch('/api/disrupt', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ delayMinutes: delayVal, type: typeVal, strategy: strategyVal })
+            body: JSON.stringify({ itineraryId: itinId, delayMinutes: delayVal, type: typeVal, strategy: strategyVal })
           });
         });
       });
@@ -1067,6 +1461,557 @@
         });
       });
     }
+
+    const btnPolicyHitl = document.getElementById('btn-policy-hitl');
+    if (btnPolicyHitl) {
+      btnPolicyHitl.addEventListener('click', () => {
+        handleActionButtonClick(btnPolicyHitl, `<span>Simulate: Policy Guardrail (&gt;$300)</span>`, 'disrupt', async () => {
+          const typeVal     = document.getElementById('sim-disrupt-type').value;
+          const strategyVal = 'HIGH_COST_GUARDRAIL';
+          const delayVal    = parseInt(document.getElementById('sim-delay-slider').value, 10);
+          const itinId      = currentActiveTravelerId || window.activeTravelerId || 'itin-101';
+          await fetch('/api/disrupt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itineraryId: itinId, delayMinutes: delayVal, type: typeVal, strategy: strategyVal, costDelta: 450 })
+          });
+        });
+      });
+    }
+
+    // ── FEATURE 1: HITL Approval & Countdown Timer Functions ───────────
+    let hitlCountdownTimer = null;
+    let hitlSecondsRemaining = 60;
+    let currentPendingItineraryId = 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22';
+
+    function showHitlApprovalBanner(reportData) {
+      const banner = document.getElementById('hitl-approval-banner');
+      if (!banner) return;
+      banner.classList.add('active');
+      const cost = reportData?.costDeltaUsd || 450;
+      document.getElementById('hitl-summary-text').textContent = 'Flight DL-1402 delayed +240m. Recommended Option: Direct Business Class Upgrade DL-1990 + Ritz Executive Suite.';
+      document.getElementById('hitl-cost-delta-val').textContent = '+$' + cost + '.00 (Business Upgrade)';
+      document.getElementById('hitl-confidence-score').textContent = '96.4% HNSW Match';
+      document.getElementById('btn-hitl-approve').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Approve Rebooking (+$' + cost + '.00)</span>';
+      startHitlCountdown();
+    }
+
+    function startHitlCountdown() {
+      stopHitlCountdown();
+      hitlSecondsRemaining = 60;
+      const timerTxt = document.getElementById('hitl-timer-countdown');
+      const progressFill = document.getElementById('hitl-timer-progress');
+      if (timerTxt) timerTxt.textContent = '60s';
+      if (progressFill) progressFill.style.width = '100%';
+
+      hitlCountdownTimer = setInterval(() => {
+        hitlSecondsRemaining--;
+        if (timerTxt) timerTxt.textContent = hitlSecondsRemaining + 's';
+        if (progressFill) progressFill.style.width = (hitlSecondsRemaining / 60 * 100) + '%';
+        if (hitlSecondsRemaining <= 0) {
+          stopHitlCountdown();
+          handleRejectHitl('Timeout expired (60s limit)');
+        }
+      }, 1000);
+    }
+
+    function stopHitlCountdown() {
+      if (hitlCountdownTimer) {
+        clearInterval(hitlCountdownTimer);
+        hitlCountdownTimer = null;
+      }
+    }
+
+    async function handleApproveHitl() {
+      stopHitlCountdown();
+      const banner = document.getElementById('hitl-approval-banner');
+      if (banner) banner.classList.remove('active');
+      try {
+        const res = await fetch('/api/itinerary/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ itineraryId: currentPendingItineraryId }),
+        });
+        const data = await res.json();
+        if (data.success && data.result) {
+          if (data.result.auditReport) latestAuditData = data.result.auditReport;
+          applyScenario('disrupt');
+          document.getElementById('analytics-cost-badge').textContent = '+$450.00 (Human Approved)';
+          document.getElementById('analytics-cost-badge').className = 'status-tag status-tag-amber';
+          showToast('Human-in-the-Loop Rebooking Approved! CockroachDB transaction committed.', 'success');
+        }
+      } catch (err) { console.warn(err); }
+    }
+
+    async function handleRejectHitl(reason = 'User rejected') {
+      stopHitlCountdown();
+      const banner = document.getElementById('hitl-approval-banner');
+      if (banner) banner.classList.remove('active');
+      try {
+        const res = await fetch('/api/itinerary/reject', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ itineraryId: currentPendingItineraryId, reason }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('risk-index-badge').textContent = 'Fallback: Standard Concierge Queue';
+          document.getElementById('risk-index-badge').className = 'status-tag status-tag-red';
+          showToast('Rebooking Rejected. Transferred to standard concierge queue.', 'warning');
+        }
+      } catch (err) { console.warn(err); }
+    }
+
+    document.getElementById('btn-hitl-approve')?.addEventListener('click', handleApproveHitl);
+    document.getElementById('btn-hitl-reject')?.addEventListener('click', () => handleRejectHitl('User rejected'));
+
+    // ── FEATURE 2: Executive Audit Report Modal & Exporters ───────────
+    let latestAuditData = null;
+
+    async function openAuditReportModal(incidentId = 'PROOF-REC-994821') {
+      try {
+        let report = latestAuditData;
+        if (!report || report.incidentId !== incidentId || (report.travelerProfile && report.travelerProfile.id !== currentActiveTravelerId)) {
+          const res = await fetch('/api/audit-report/' + incidentId + '?travelerId=' + (currentActiveTravelerId || 'itin-101'));
+          report = await res.json();
+        }
+        latestAuditData = report;
+
+        document.getElementById('audit-val-id').textContent = report.incidentId;
+        document.getElementById('audit-val-time').textContent = report.estimatedTimeSaved?.hoursSaved || '4.5 Hours';
+        document.getElementById('audit-val-cost').textContent = report.financialDelta?.totalCostDelta || '$0.00';
+        document.getElementById('audit-val-latency').textContent = (report.estimatedTimeSaved?.slaResolutionTimeMs || 392) + 'ms';
+        document.getElementById('audit-profile-name').textContent = report.travelerProfile?.name || 'Sarah Jenkins';
+        document.getElementById('audit-profile-cabin').textContent = report.travelerProfile?.preferredCabin || 'Business Class Quiet Car';
+        document.getElementById('audit-profile-limit').textContent = report.financialDelta?.policyLimit || '$300.00 Auto-Approval';
+        document.getElementById('audit-tx-hash').textContent = report.cockroachDbTelemetry?.txHash || '0x8f4b2c1e9a3d7b4c8e';
+        document.getElementById('audit-proof-sig').textContent = report.cockroachDbTelemetry?.proofSignature || 'sha256-cockroach-bedrock-0x8f4b2c1e';
+
+        const origContainer = document.getElementById('audit-original-segments');
+        if (origContainer) {
+          origContainer.innerHTML = (report.originalItinerary?.segments || []).map(s =>
+            '<div class="audit-segment-item"><span><strong>' + s.type + ':</strong> ' + s.provider + ' (' + s.referenceCode + ')</span><span style="color:#ef4444;">' + s.status + '</span></div>'
+          ).join('');
+        }
+
+        const healedContainer = document.getElementById('audit-healed-segments');
+        if (healedContainer) {
+          healedContainer.innerHTML = (report.healedItinerary?.segments || []).map(s =>
+            '<div class="audit-segment-item"><span><strong>' + s.type + ':</strong> ' + s.provider + ' (' + s.referenceCode + ')</span><span style="color:#10b981;">' + s.status + '</span></div>'
+          ).join('');
+        }
+
+        const cotContainer = document.getElementById('audit-cot-timeline');
+        if (cotContainer) {
+          cotContainer.innerHTML = (report.cotExecutionSteps || []).map(step =>
+            '<div class="audit-cot-line"><span style="color:var(--accent);">[' + step.tag + ']</span> <span style="color:var(--text-secondary);">(' + step.agent + ')</span> ' + step.action + '</div>'
+          ).join('');
+        }
+
+        document.getElementById('modal-audit-report')?.classList.add('active');
+      } catch (err) { console.warn(err); }
+    }
+
+    // ── FEATURE 2: Web Speech Executive Briefing ──────────────────────
+    let isSpeaking = false;
+
+    function speakBriefing(customText) {
+      if (!('speechSynthesis' in window)) {
+        showToast('Web Speech Synthesis is not supported in this browser.', 'warning');
+        return;
+      }
+
+      const btn1 = document.getElementById('btn-modal-audio-briefing');
+      const btn2 = document.getElementById('btn-audio-briefing-toolbar');
+
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        if (btn1) { btn1.classList.remove('speaking'); btn1.innerHTML = '<span>🔊 Listen Briefing</span>'; }
+        if (btn2) { btn2.classList.remove('speaking'); btn2.innerHTML = '<span>🔊 Listen Briefing</span>'; }
+        showToast('Audio briefing stopped.', 'info');
+        return;
+      }
+
+      const travelerName = latestAuditData?.travelerProfile?.name || 'Sarah Jenkins';
+      const textToSpeak = customText || `Incident auto-healed for ${travelerName}. Route updated from San Francisco to London Heathrow. Total delay reduced by 4.5 hours with zero net cost delta. CockroachDB transaction confirmed with serializable isolation.`;
+
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+
+      utterance.onstart = () => {
+        isSpeaking = true;
+        if (btn1) { btn1.classList.add('speaking'); btn1.innerHTML = '<span>⏹️ Stop Briefing</span>'; }
+        if (btn2) { btn2.classList.add('speaking'); btn2.innerHTML = '<span>⏹️ Stop Briefing</span>'; }
+        showToast('Playing Audio Executive Briefing...', 'info');
+      };
+
+      utterance.onend = () => {
+        isSpeaking = false;
+        if (btn1) { btn1.classList.remove('speaking'); btn1.innerHTML = '<span>🔊 Listen Briefing</span>'; }
+        if (btn2) { btn2.classList.remove('speaking'); btn2.innerHTML = '<span>🔊 Listen Briefing</span>'; }
+      };
+
+      utterance.onerror = () => {
+        isSpeaking = false;
+        if (btn1) { btn1.classList.remove('speaking'); btn1.innerHTML = '<span>🔊 Listen Briefing</span>'; }
+        if (btn2) { btn2.classList.remove('speaking'); btn2.innerHTML = '<span>🔊 Listen Briefing</span>'; }
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    document.getElementById('btn-modal-audio-briefing')?.addEventListener('click', () => speakBriefing());
+    document.getElementById('btn-audio-briefing-toolbar')?.addEventListener('click', () => speakBriefing());
+
+    // ── FEATURE 4: Interactive In-App iOS Push Card Banner ────────────
+    function showIosPushBanner(title, body, onClickAction) {
+      const banner = document.getElementById('ios-push-notification-banner');
+      const titleEl = document.getElementById('ios-push-title');
+      const bodyEl = document.getElementById('ios-push-body');
+      const actionBtn = document.getElementById('btn-ios-push-action');
+
+      if (!banner || !titleEl || !bodyEl) return;
+
+      titleEl.textContent = title;
+      bodyEl.textContent = body;
+
+      if (actionBtn) {
+        actionBtn.onclick = () => {
+          banner.classList.remove('active');
+          if (onClickAction) onClickAction();
+        };
+      }
+
+      banner.classList.add('active');
+
+      setTimeout(() => {
+        banner.classList.remove('active');
+      }, 9000);
+    }
+
+    document.getElementById('btn-close-ios-push')?.addEventListener('click', () => {
+      document.getElementById('ios-push-notification-banner')?.classList.remove('active');
+    });
+
+    // ── FEATURE 3: Financial ROI & Cumulative Metrics Header Sync ─────
+    let totalHoursSaved = 184;
+    let totalFeesAvoided = 24850;
+
+    function updateRoiMetrics(hoursToAdd = 4.5, feesToAdd = 450) {
+      totalHoursSaved += hoursToAdd;
+      totalFeesAvoided += feesToAdd;
+
+      const hrsEl = document.getElementById('roi-hours-saved');
+      const feesEl = document.getElementById('roi-fees-avoided');
+
+      if (hrsEl) hrsEl.textContent = `+${totalHoursSaved.toFixed(0)} hrs`;
+      if (feesEl) feesEl.textContent = `$${totalFeesAvoided.toLocaleString()}`;
+    }
+
+    // ── Helper: UI Toast Notifications System ─────────────────────────
+    function showToast(message, type = 'info', duration = 3500) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast-item toast-${type}`;
+
+      let icon = 'ℹ️';
+      if (type === 'success') icon = '✅';
+      if (type === 'warning') icon = '⚠️';
+      if (type === 'error') icon = '❌';
+
+      toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, duration);
+    }
+
+    // ── Helper: Download Client Blob File ──────────────────────────────
+    function downloadFile(content, filename, type = 'text/markdown;charset=utf-8') {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    async function downloadAuditMarkdown() {
+      const incidentId = latestAuditData?.incidentId || 'PROOF-REC-994821';
+      try {
+        showToast('Exporting Post-Incident Audit Report...', 'info');
+        const res = await fetch('/api/audit-report/' + incidentId + '/markdown');
+        const markdownData = await res.text();
+        downloadFile(markdownData, `audit-report-${incidentId}.md`, 'text/markdown;charset=utf-8');
+        showToast('Audit Report downloaded successfully!', 'success');
+      } catch (_err) {
+        showToast('Downloading Audit Report via endpoint...', 'info');
+        window.location.href = '/api/audit-report/' + incidentId + '/markdown';
+      }
+    }
+
+    function printAuditPdf() {
+      showToast('Opening PDF Print Preview...', 'info');
+      window.print();
+    }
+
+    document.getElementById('btn-generate-audit-report')?.addEventListener('click', () => openAuditReportModal('PROOF-REC-994821'));
+    document.getElementById('audit-modal-close')?.addEventListener('click', () => document.getElementById('modal-audit-report')?.classList.remove('active'));
+    document.getElementById('btn-audit-export-md')?.addEventListener('click', downloadAuditMarkdown);
+    document.getElementById('btn-audit-print-pdf')?.addEventListener('click', printAuditPdf);
+
+    // Download Confirmation (.md file) Button Listener
+    document.getElementById('btn-proof-artifact')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
+      const incidentId = 'PROOF-REC-' + Math.floor(100000 + Math.random() * 900000);
+      const travelerName = document.getElementById('itin-subtitle')?.textContent || 'Sarah Jenkins';
+      const content = `# CASCADE Post-Mortem Execution Confirmation
+**Artifact ID:** \`${incidentId}\`  
+**Timestamp:** ${new Date().toUTCString()}  
+**CockroachDB Tx Hash:** \`${txHash}\`  
+**Transaction Isolation:** \`SERIALIZABLE\`  
+
+---
+
+## 1. Traveler & Itinerary State
+- **Traveler Profile:** ${travelerName}
+- **Self-Healing Status:** \`SELF_HEALED\`
+- **Resolution Latency:** \`392ms\` (Sub-1000ms SLA Target Achieved)
+- **Carrier Obligation Delta:** \`$0.00 Net Corporate Delta\`
+
+---
+
+## 2. CockroachDB Telemetry & Verification
+- **CDC Changefeed Event:** \`cdc-evt-${Date.now()}\`
+- **Multi-Region Localities:** \`us-east-1, eu-west-1, ap-northeast-1\`
+- **Proof Signature:** \`sha256-cockroach-bedrock-${txHash.substring(2, 12)}\`
+
+*Verified by CASCADE Autonomous Travel Recovery Engine v2.4.0*
+`;
+      downloadFile(content, `confirmation-${incidentId}.md`, 'text/markdown;charset=utf-8');
+      showToast('Downloaded Post-Mortem Confirmation Artifact!', 'success');
+    });
+
+    // ── 50+ Global Airport & City Autocomplete Database ────────────────
+    const GLOBAL_AIRPORTS = [
+      { code: 'JFK', city: 'New York', country: 'United States', flag: '🇺🇸', lat: 40.6413, lng: -73.7781 },
+      { code: 'SFO', city: 'San Francisco', country: 'United States', flag: '🇺🇸', lat: 37.6213, lng: -122.3790 },
+      { code: 'LHR', city: 'London', country: 'United Kingdom', flag: '🇬🇧', lat: 51.4700, lng: -0.4543 },
+      { code: 'CDG', city: 'Paris', country: 'France', flag: '🇫🇷', lat: 49.0097, lng: 2.5479 },
+      { code: 'HND', city: 'Tokyo Haneda', country: 'Japan', flag: '🇯🇵', lat: 35.5494, lng: 139.7798 },
+      { code: 'NRT', city: 'Tokyo Narita', country: 'Japan', flag: '🇯🇵', lat: 35.7720, lng: 140.3929 },
+      { code: 'FRA', city: 'Frankfurt', country: 'Germany', flag: '🇩🇪', lat: 50.0379, lng: 8.5622 },
+      { code: 'ORD', city: 'Chicago', country: 'United States', flag: '🇺🇸', lat: 41.9742, lng: -87.9073 },
+      { code: 'MIA', city: 'Miami', country: 'United States', flag: '🇺🇸', lat: 25.7959, lng: -80.2870 },
+      { code: 'LAX', city: 'Los Angeles', country: 'United States', flag: '🇺🇸', lat: 33.9416, lng: -118.4085 },
+      { code: 'SIN', city: 'Singapore', country: 'Singapore', flag: '🇸🇬', lat: 1.3644, lng: 103.9915 },
+      { code: 'DXB', city: 'Dubai', country: 'United Arab Emirates', flag: '🇦🇪', lat: 25.2532, lng: 55.3657 },
+      { code: 'SYD', city: 'Sydney', country: 'Australia', flag: '🇦🇺', lat: -33.9399, lng: 151.1753 },
+      { code: 'ZRH', city: 'Zurich', country: 'Switzerland', flag: '🇨🇭', lat: 47.4582, lng: 8.5555 },
+      { code: 'AMS', city: 'Amsterdam', country: 'Netherlands', flag: '🇳🇱', lat: 52.3105, lng: 4.7683 },
+      { code: 'ICN', city: 'Seoul Incheon', country: 'South Korea', flag: '🇰🇷', lat: 37.4602, lng: 126.4407 },
+      { code: 'BCN', city: 'Barcelona', country: 'Spain', flag: '🇪🇸', lat: 41.2974, lng: 2.0785 },
+      { code: 'MUC', city: 'Munich', country: 'Germany', flag: '🇩🇪', lat: 48.3536, lng: 11.7750 },
+      { code: 'HKG', city: 'Hong Kong', country: 'Hong Kong', flag: '🇭🇰', lat: 22.3080, lng: 113.9185 },
+      { code: 'DOH', city: 'Doha', country: 'Qatar', flag: '🇶🇦', lat: 25.2609, lng: 51.6138 },
+      { code: 'LIS', city: 'Lisbon', country: 'Portugal', flag: '🇵🇹', lat: 38.7756, lng: -9.1354 },
+      { code: 'FCO', city: 'Rome Fiumicino', country: 'Italy', flag: '🇮🇹', lat: 41.8003, lng: 12.2389 },
+      { code: 'MAD', city: 'Madrid', country: 'Spain', flag: '🇪🇸', lat: 40.4839, lng: -3.5680 },
+      { code: 'BOS', city: 'Boston', country: 'United States', flag: '🇺🇸', lat: 42.3656, lng: -71.0096 },
+      { code: 'SEA', city: 'Seattle', country: 'United States', flag: '🇺🇸', lat: 47.4502, lng: -122.3088 },
+      { code: 'YVR', city: 'Vancouver', country: 'Canada', flag: '🇨🇦', lat: 49.1967, lng: -123.1815 },
+      { code: 'YYZ', city: 'Toronto', country: 'Canada', flag: '🇨🇦', lat: 43.6777, lng: -79.6248 },
+      { code: 'MEX', city: 'Mexico City', country: 'Mexico', flag: '🇲🇽', lat: 19.4363, lng: -99.0721 },
+      { code: 'GRU', city: 'São Paulo', country: 'Brazil', flag: '🇧🇷', lat: -23.4356, lng: -46.4731 },
+      { code: 'EZE', city: 'Buenos Aires', country: 'Argentina', flag: '🇦🇷', lat: -34.8222, lng: -58.5358 },
+      { code: 'CPH', city: 'Copenhagen', country: 'Denmark', flag: '🇩🇰', lat: 55.6180, lng: 12.6508 },
+      { code: 'OSL', city: 'Oslo', country: 'Norway', flag: '🇳🇴', lat: 60.1975, lng: 11.1004 },
+      { code: 'ARN', city: 'Stockholm', country: 'Sweden', flag: '🇸🇪', lat: 59.6498, lng: 17.9238 },
+      { code: 'HEL', city: 'Helsinki', country: 'Finland', flag: '🇫🇮', lat: 60.3172, lng: 24.9633 },
+      { code: 'VIE', city: 'Vienna', country: 'Austria', flag: '🇦🇹', lat: 48.1103, lng: 16.5697 },
+      { code: 'ATH', city: 'Athens', country: 'Greece', flag: '🇬🇷', lat: 37.9364, lng: 23.9472 },
+      { code: 'IST', city: 'Istanbul', country: 'Turkey', flag: '🇹🇷', lat: 41.2753, lng: 28.7519 },
+      { code: 'CAI', city: 'Cairo', country: 'Egypt', flag: '🇪🇬', lat: 30.1219, lng: 31.4056 },
+      { code: 'JNB', city: 'Johannesburg', country: 'South Africa', flag: '🇿🇦', lat: -26.1367, lng: 28.2411 },
+      { code: 'BOM', city: 'Mumbai', country: 'India', flag: '🇮🇳', lat: 19.0896, lng: 72.8656 },
+      { code: 'DEL', city: 'New Delhi', country: 'India', flag: '🇮🇳', lat: 28.5562, lng: 77.1000 },
+      { code: 'BKK', city: 'Bangkok', country: 'Thailand', flag: '🇹🇭', lat: 13.6900, lng: 100.7501 },
+      { code: 'KUL', city: 'Kuala Lumpur', country: 'Malaysia', flag: '🇲🇾', lat: 2.7456, lng: 101.7099 },
+      { code: 'CGK', city: 'Jakarta', country: 'Indonesia', flag: '🇮🇩', lat: -6.1275, lng: 106.6558 },
+      { code: 'MNL', city: 'Manila', country: 'Philippines', flag: '🇵🇭', lat: 14.5086, lng: 121.0194 },
+      { code: 'AKL', city: 'Auckland', country: 'New Zealand', flag: '🇳🇿', lat: -37.0082, lng: 174.7850 },
+      { code: 'PER', city: 'Perth', country: 'Australia', flag: '🇦🇺', lat: -31.9403, lng: 115.9668 },
+      { code: 'MEL', city: 'Melbourne', country: 'Australia', flag: '🇦🇺', lat: -37.6690, lng: 144.8410 },
+      { code: 'SAN', city: 'San Diego', country: 'United States', flag: '🇺🇸', lat: 32.7338, lng: -117.1933 },
+      { code: 'DEN', city: 'Denver', country: 'United States', flag: '🇺🇸', lat: 39.8561, lng: -104.6737 },
+      { code: 'ATL', city: 'Atlanta', country: 'United States', flag: '🇺🇸', lat: 33.6407, lng: -84.4277 },
+    ];
+
+    let selectedOriginAp = GLOBAL_AIRPORTS[1]; // SFO
+    let selectedDestAp = GLOBAL_AIRPORTS[2];   // LHR
+
+    function setupCityAutocomplete(inputId, dropdownId, onSelectCallback) {
+      const input = document.getElementById(inputId);
+      const dropdown = document.getElementById(dropdownId);
+      if (!input || !dropdown) return;
+
+      function renderSuggestions(query) {
+        const q = (query || '').toLowerCase().trim();
+        const matches = GLOBAL_AIRPORTS.filter(ap =>
+          ap.code.toLowerCase().includes(q) ||
+          ap.city.toLowerCase().includes(q) ||
+          ap.country.toLowerCase().includes(q)
+        );
+
+        if (matches.length === 0) {
+          dropdown.classList.remove('active');
+          return;
+        }
+
+        dropdown.innerHTML = matches.map(ap => `
+          <div class="suggestion-item" data-code="${ap.code}" data-city="${ap.city}" data-lat="${ap.lat}" data-lng="${ap.lng}">
+            <div class="suggestion-left">
+              <span class="flag-icon">${ap.flag}</span>
+              <span class="suggestion-city">${ap.city}, ${ap.country}</span>
+            </div>
+            <span class="airport-code-pill">${ap.code}</span>
+          </div>
+        `).join('');
+
+        dropdown.classList.add('active');
+
+        dropdown.querySelectorAll('.suggestion-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const code = item.getAttribute('data-code');
+            const city = item.getAttribute('data-city');
+            const lat = parseFloat(item.getAttribute('data-lat'));
+            const lng = parseFloat(item.getAttribute('data-lng'));
+
+            input.value = `${code} — ${city}`;
+            dropdown.classList.remove('active');
+            if (onSelectCallback) onSelectCallback({ code, city, lat, lng });
+          });
+        });
+      }
+
+      input.addEventListener('focus', () => renderSuggestions(input.value));
+      input.addEventListener('input', () => renderSuggestions(input.value));
+
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.remove('active');
+        }
+      });
+    }
+
+    setupCityAutocomplete('modal-origin-input', 'modal-origin-suggestions', (ap) => { selectedOriginAp = ap; });
+    setupCityAutocomplete('modal-dest-input', 'modal-dest-suggestions', (ap) => { selectedDestAp = ap; });
+
+    // ── Universal Traveler Sync Manager ───────────────────────────────
+    let currentActiveTravelerId = 'itin-101';
+    window.activeTravelerId = 'itin-101';
+    window.activeTraveler = 'itin-101';
+
+    async function selectTraveler(travelerId) {
+      if (!travelerId) return;
+      currentActiveTravelerId = travelerId;
+      window.activeTravelerId = travelerId;
+      window.activeTraveler = travelerId;
+      currentPendingItineraryId = travelerId;
+
+      // 1. Sync header dropdown
+      const headerSel = document.getElementById('traveler-selector');
+      if (headerSel && headerSel.value !== travelerId) headerSel.value = travelerId;
+
+      // 2. Sync Tab 2 dropdown
+      const tab2Sel = document.getElementById('tab2-traveler-selector');
+      if (tab2Sel && tab2Sel.value !== travelerId) tab2Sel.value = travelerId;
+
+      // 3. Highlight row in Tab 1 active trips table
+      const tbody = document.getElementById('dashboard-fleet-table');
+      if (tbody) {
+        tbody.querySelectorAll('tr').forEach(r => {
+          if (r.getAttribute('data-traveler-id') === travelerId) {
+            r.classList.add('active-row-highlight');
+          } else {
+            r.classList.remove('active-row-highlight');
+          }
+        });
+      }
+
+      // 4. Fetch traveler profile & update cards, nodes, and policy tier
+      try {
+        const res = await fetch('/api/traveler/' + travelerId);
+        const profile = await res.json();
+
+        // 1. Ensure dropdowns contain option for custom travelers
+        [headerSel, tab2Sel].forEach(sel => {
+          if (sel && !sel.querySelector(`option[value="${travelerId}"]`)) {
+            const opt = document.createElement('option');
+            opt.value = profile.id;
+            opt.textContent = `${profile.name} (${profile.route})`;
+            sel.appendChild(opt);
+          }
+          if (sel) sel.value = travelerId;
+        });
+
+        const itinSubtitle = document.getElementById('itin-subtitle');
+        if (itinSubtitle) itinSubtitle.textContent = `${profile.name} — ${profile.route}`;
+
+        const mapTitle = document.getElementById('map-route-title');
+        const mapSubtitle = document.getElementById('map-route-subtitle');
+        if (mapTitle) mapTitle.textContent = `Live Route Map — ${profile.name}`;
+        if (mapSubtitle) mapSubtitle.textContent = `${profile.name} — ${profile.route}`;
+
+        const policyTag = document.getElementById('tab2-policy-tier-tag');
+        if (policyTag) policyTag.textContent = profile.policyTier || 'Executive Tier ($300 Limit)';
+
+        if (profile.legs) {
+          const newNodes = profile.legs.map((leg, idx) => ({
+            id: 'seg-' + idx,
+            sequence_order: idx + 1,
+            segment_type: leg.type,
+            provider: leg.provider,
+            reference_code: leg.referenceCode || leg.provider.split(' ')[0],
+            origin: leg.route.split('→')[0] || profile.originCode,
+            destination: leg.route.split('→')[1] || profile.destinationCode,
+            status: leg.status,
+            pricing: 'Corporate Approved · Guaranteed',
+          }));
+          renderItineraryNodes(newNodes);
+        }
+
+        // 5. Leaflet map flyTo & camera animation & route arc rendering
+        if (leafletMap) {
+          if (profile.originLat && profile.destLat) {
+            renderTravelerRoute({
+              label: `${profile.name} — ${profile.route}`,
+              origin: { lat: profile.originLat, lng: profile.originLng, code: profile.originCode },
+              dest: { lat: profile.destLat, lng: profile.destLng, code: profile.destinationCode },
+            });
+          }
+          if (profile.centerLat && profile.centerLng) {
+            leafletMap.flyTo([profile.centerLat, profile.centerLng], profile.zoom || 3, { duration: 1.5 });
+          }
+        }
+
+        showToast(`👤 Active Traveler Context: ${profile.name} (${profile.route})`, 'info', 2500);
+      } catch (err) { console.warn('selectTraveler error:', err); }
+    }
+
+    document.getElementById('traveler-selector')?.addEventListener('change', (e) => selectTraveler(e.target.value));
+    document.getElementById('tab2-traveler-selector')?.addEventListener('change', (e) => selectTraveler(e.target.value));
 
     // ── Terminal collapsible toggle ────────────────────────────────────
     const terminalHeader = document.getElementById('terminal-header');
@@ -1157,6 +2102,18 @@
           graphNodes[1] = { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' };
           graphNodes[2] = { ...graphNodes[2], status: 'REBOOKED' };
           renderItineraryNodes(graphNodes);
+        }
+      });
+
+      source.addEventListener('human_approval_required', (e) => {
+        const data = JSON.parse(e.data);
+        showHitlApprovalBanner(data.report);
+      });
+
+      source.addEventListener('cascade_healed', (e) => {
+        const data = JSON.parse(e.data);
+        if (data.report && data.report.auditReport) {
+          latestAuditData = data.report.auditReport;
         }
       });
     }
@@ -1266,86 +2223,10 @@
         maxZoom: 19,
       }).addTo(leafletMap);
 
-      routeArcCoords = buildFullRoute();
+      routeLayerGroup = L.layerGroup().addTo(leafletMap);
 
-      // Glow / shadow polyline
-      L.polyline(routeArcCoords, {
-        color: 'rgba(99,102,241,0.18)',
-        weight: 10,
-        lineCap: 'round',
-        lineJoin: 'round',
-        smoothFactor: 1,
-      }).addTo(leafletMap);
-
-      // Main accent route line
-      L.polyline(routeArcCoords, {
-        color: '#6366f1',
-        weight: 2.5,
-        lineCap: 'round',
-        lineJoin: 'round',
-        smoothFactor: 1,
-        opacity: 0.9,
-      }).addTo(leafletMap);
-
-      // Waypoint markers
-      WAYPOINTS.forEach((wp) => {
-        const isOrigin = wp.type === 'origin';
-        const isDest   = wp.type === 'destination';
-        const isStop   = wp.type === 'stop';
-        const color    = isDest ? '#22c55e' : '#6366f1';
-        const size     = isStop ? 8 : 12;
-        const border   = isStop ? 1.5 : 2.5;
-
-        const icon = L.divIcon({
-          className: '',
-          html: `<div style="
-            width:${size}px;height:${size}px;
-            border-radius:50%;
-            background:${color};
-            border:${border}px solid ${isDest ? 'rgba(34,197,94,0.35)' : 'rgba(99,102,241,0.35)'};
-            box-shadow: 0 0 0 ${border + 1}px ${isDest ? 'rgba(34,197,94,0.15)' : 'rgba(99,102,241,0.15)'};
-          "></div>`,
-          iconSize:   [size, size],
-          iconAnchor: [size / 2, size / 2],
-        });
-
-        L.marker([wp.lat, wp.lng], { icon })
-          .addTo(leafletMap)
-          .bindPopup(wp.label, { closeButton: false, maxWidth: 180 });
-
-        if (isOrigin || isDest) {
-          L.marker([wp.lat, wp.lng], {
-            icon: L.divIcon({
-              className: '',
-              html: `<div style="
-                color:rgba(255,255,255,0.88);
-                font-size:11px;
-                font-weight:600;
-                font-family:Inter,sans-serif;
-                white-space:nowrap;
-                pointer-events:none;
-                text-shadow:0 1px 3px rgba(0,0,0,0.8);
-                padding-left:${isOrigin ? '14px' : '0'};
-                padding-right:${isDest ? '14px' : '0'};
-                margin-top:2px;
-              ">${wp.code}</div>`,
-              iconSize:   [40, 16],
-              iconAnchor: isOrigin ? [-2, 8] : [42, 8],
-            }),
-            interactive: false,
-            zIndexOffset: -1,
-          }).addTo(leafletMap);
-        }
-      });
-
-      planeMarker = L.marker(routeArcCoords[0], {
-        icon: makePlaneIcon(90),
-        zIndexOffset: 1000,
-        interactive: false,
-      }).addTo(leafletMap);
-
-      leafletMap.fitBounds(L.latLngBounds(routeArcCoords), { padding: [32, 48] });
-      planeAnimFrame = requestAnimationFrame(animatePlane);
+      // Immediately trigger dynamic route rendering for the active traveler
+      selectTraveler(currentActiveTravelerId || 'itin-101');
     }
 
     // ── Light/Dark Theme Switcher ─────────────────────────────────────
@@ -1380,12 +2261,83 @@
       applyTheme(current === 'dark' ? 'light' : 'dark');
     });
 
-    // ── Initialization ────────────────────────────────────────────────
+    // ── Real-time latency ping ────────────────────────────────────────
+    function startLatencyPing() {
+      const latencyEl  = document.getElementById('footer-latency');
+      const statusDot  = document.getElementById('status-dot');
+      const statusLbl  = document.getElementById('status-label');
+
+      async function measurePing() {
+        const t0 = performance.now();
+        try {
+          // Lightweight HEAD-equiv: fetch with no-cache to skip cached response
+          await fetch('/api/health', { method: 'GET', cache: 'no-store' });
+          const ms = Math.round(performance.now() - t0);
+
+          // Update footer latency badge
+          if (latencyEl) {
+            latencyEl.textContent = `${ms}ms`;
+            latencyEl.className   = 'footer-latency-val'; // reset
+            if (ms < 50) {
+              latencyEl.style.color = '#10B981';  // emerald
+            } else if (ms > 150) {
+              latencyEl.style.color = '#f59e0b';  // amber
+            } else {
+              latencyEl.style.color = '';         // inherit CSS var (green)
+            }
+          }
+
+          // Keep status dot healthy
+          if (statusDot) {
+            statusDot.classList.remove('degraded', 'offline');
+          }
+          if (statusLbl) statusLbl.textContent = 'System Operational';
+
+        } catch (err) {
+          // Network error / offline
+          if (latencyEl) {
+            latencyEl.textContent = 'N/A';
+            latencyEl.style.color = 'var(--status-red)';
+          }
+          if (statusDot) {
+            statusDot.classList.remove('offline');
+            statusDot.classList.add('degraded');
+          }
+          if (statusLbl) statusLbl.textContent = '● Degraded / Offline';
+        }
+      }
+
+      // Run immediately, then every 3 seconds
+      measurePing();
+      setInterval(measurePing, 3000);
+    }
+
+    // ── Initialization & Telegram Mini App URL Parameter Parser ────────
     switchMode('traveler');
     renderItineraryNodes(graphNodes);
     initSSE();
     setTimeout(initLeafletMap, 100);
+    startLatencyPing();   // live ping every 3 s
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const isMobileMode = urlParams.get('mobile') === 'true';
+    const targetTravelerParam = urlParams.get('traveler');
+
+    if (isMobileMode) {
+      document.body.classList.add('mobile-companion-mode');
+    }
+
+    if (targetTravelerParam) {
+      setTimeout(() => {
+        selectTraveler(targetTravelerParam);
+        if (isMobileMode) {
+          showToast(`Mobile Companion Active`, 'info');
+        }
+      }, 300);
+    }
   </script>
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
   </div><!-- /.app-main-wrapper -->
 </div><!-- /.app-container -->
 

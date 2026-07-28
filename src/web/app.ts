@@ -8,6 +8,8 @@ import { getItineraryGraph } from '../mcp/tools/db_tools.js';
 import { simulateFlightDisruption } from '../services/disruption_emulator.js';
 import { CDCListenerService, cdcEventEmitter } from '../services/cdc_listener.js';
 import { CascadeAgentEngine } from '../services/agent_engine.js';
+import { generateAuditReport, exportAuditReportMarkdown } from '../services/audit_report_generator.js';
+import { sendTelegramAlert } from '../services/telegram_service.js';
 
 dotenv.config();
 
@@ -35,6 +37,7 @@ function broadcastSSE(eventType: string, data: any) {
 cdcEventEmitter.on('cdc_event', (data) => broadcastSSE('cdc_event', data));
 cdcEventEmitter.on('agent_step', (data) => broadcastSSE('agent_step', data));
 cdcEventEmitter.on('cascade_healed', (data) => broadcastSSE('cascade_healed', data));
+cdcEventEmitter.on('human_approval_required', (data) => broadcastSSE('human_approval_required', data));
 
 // In-Memory Fleet Database State
 let activeFleetData = [
@@ -145,18 +148,56 @@ app.get('/api/dashboard', async (_req: Request, res: Response) => {
  * Create / Import Executive Itinerary Endpoint
  */
 app.post('/api/itinerary/create', async (req: Request, res: Response) => {
-  const { travelerName, travelerEmail, origin, destination, strategy } = req.body;
+  const { travelerName, travelerEmail, origin, destination, strategy, originLat, originLng, destLat, destLng } = req.body;
 
-  const newId = 'itin-' + Math.floor(105 + Math.random() * 900);
-  const routeStr = `${origin || 'JFK'} ➔ ${destination || 'LHR'}`;
+  const newId = `traveler_${Date.now()}`;
+  const origCode = (origin || 'JFK').split(' ')[0].split('—')[0].trim();
+  const destCode = (destination || 'LHR').split(' ')[0].split('—')[0].trim();
+  const routeStr = `${origCode} ➔ ${destCode}`;
+
+  const resolvedOrigLat = typeof originLat === 'number' ? originLat : 37.6213;
+  const resolvedOrigLng = typeof originLng === 'number' ? originLng : -122.3790;
+  const resolvedDestLat = typeof destLat === 'number' ? destLat : 51.4700;
+  const resolvedDestLng = typeof destLng === 'number' ? destLng : -0.4543;
+
+  const cLat = (resolvedOrigLat + resolvedDestLat) / 2;
+  const cLng = (resolvedOrigLng + resolvedDestLng) / 2;
+
+  const newProfile = {
+    id: newId,
+    name: travelerName || 'Executive Traveler',
+    email: travelerEmail || 'executive@acme.com',
+    route: routeStr,
+    originCode: origCode,
+    destinationCode: destCode,
+    originLat: resolvedOrigLat,
+    originLng: resolvedOrigLng,
+    destLat: resolvedDestLat,
+    destLng: resolvedDestLng,
+    status: 'SCHEDULED',
+    policyTier: strategy === 'COMFORT_BUSINESS' ? 'VIP Executive ($500 Limit)' : 'Executive Tier ($300 Limit)',
+    policyLimitUsd: strategy === 'COMFORT_BUSINESS' ? 500 : 300,
+    preferredCabin: strategy === 'COMFORT_BUSINESS' ? 'First Class Quiet Car' : 'Business Class Direct',
+    vectorScore: 0.965,
+    centerLat: cLat,
+    centerLng: cLng,
+    zoom: 3,
+    legs: [
+      { type: 'FLIGHT', provider: `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`, route: `${origCode} → ${destCode}`, status: 'SCHEDULED' },
+      { type: 'TRAIN', provider: 'Express Rail Connection', route: `${destCode} Central Station`, status: 'SCHEDULED' },
+      { type: 'HOTEL', provider: 'Luxury Five-Star Executive Hotel', route: `${destCode} Downtown`, status: 'CONFIRMED' },
+    ],
+  };
+
+  TRAVELER_PROFILES[newId] = newProfile;
 
   const newTrip = {
     id: newId,
-    traveler: travelerName || 'Executive Traveler',
+    traveler: newProfile.name,
     route: routeStr,
     status: 'SCHEDULED',
-    legs: 'Flight ➔ Express Rail ➔ Hotel',
-    last_event: `New trip planned. Preferences loaded from past trips.`,
+    legs: 'Flight · Express Rail · Hotel',
+    last_event: `New trip created (${routeStr}). Traveler preferences loaded.`,
     region: 'us-east-1',
   };
 
@@ -166,8 +207,128 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     success: true,
     itineraryId: newId,
     newTrip,
+    profile: newProfile,
     message: 'Trip created and traveler preferences loaded successfully.',
   });
+});
+
+const TRAVELER_PROFILES: Record<string, any> = {
+  'itin-101': {
+    id: 'itin-101',
+    name: 'Sarah Jenkins',
+    email: 'sarah.jenkins@acme.com',
+    route: 'SFO ➔ LHR',
+    originCode: 'SFO',
+    destinationCode: 'LHR',
+    originLat: 37.6213,
+    originLng: -122.3790,
+    destLat: 51.4700,
+    destLng: -0.4543,
+    status: 'SELF_HEALED',
+    policyTier: 'Executive Tier ($300 Limit)',
+    policyLimitUsd: 300,
+    preferredCabin: 'Business Class Quiet Car',
+    vectorScore: 0.984,
+    centerLat: 45.0,
+    centerLng: -60.0,
+    zoom: 3,
+    legs: [
+      { type: 'FLIGHT', provider: 'Delta Air Lines (DL-1402)', route: 'SFO → JFK', status: 'DELAYED' },
+      { type: 'TRAIN', provider: 'Amtrak Acela Express (AMT-2158)', route: 'NY Moynihan → PHL 30th St', status: 'REBOOKED' },
+      { type: 'HOTEL', provider: 'Ritz-Carlton Philadelphia', route: 'Philadelphia Downtown', status: 'CONFIRMED' },
+      { type: 'FLIGHT', provider: 'British Airways (BA-178)', route: 'PHL → LHR', status: 'SCHEDULED' },
+    ],
+  },
+  'itin-102': {
+    id: 'itin-102',
+    name: 'Marcus Vance',
+    email: 'marcus.vance@acme.com',
+    route: 'JFK ➔ CDG',
+    originCode: 'JFK',
+    destinationCode: 'CDG',
+    originLat: 40.6413,
+    originLng: -73.7781,
+    destLat: 49.0097,
+    destLng: 2.5479,
+    status: 'SCHEDULED',
+    policyTier: 'VIP Executive ($500 Limit)',
+    policyLimitUsd: 500,
+    preferredCabin: 'First Class Express',
+    vectorScore: 0.962,
+    centerLat: 44.0,
+    centerLng: -35.0,
+    zoom: 4,
+    legs: [
+      { type: 'FLIGHT', provider: 'Air France (AF-007)', route: 'JFK → CDG', status: 'SCHEDULED' },
+      { type: 'TRAIN', provider: 'TGV InOui (TGV-6821)', route: 'Paris CDG → Lyon Part-Dieu', status: 'SCHEDULED' },
+      { type: 'HOTEL', provider: 'Four Seasons Hotel George V', route: 'Paris Eighth Arrondissement', status: 'CONFIRMED' },
+    ],
+  },
+  'itin-103': {
+    id: 'itin-103',
+    name: 'Elena Rostova',
+    email: 'elena.rostova@acme.com',
+    route: 'ORD ➔ HND',
+    originCode: 'ORD',
+    destinationCode: 'HND',
+    originLat: 41.9742,
+    originLng: -87.9073,
+    destLat: 35.5494,
+    destLng: 139.7798,
+    status: 'IN_TRANSIT',
+    policyTier: 'Global Operations ($250 Limit)',
+    policyLimitUsd: 250,
+    preferredCabin: 'Premium Economy',
+    vectorScore: 0.941,
+    centerLat: 38.0,
+    centerLng: 170.0,
+    zoom: 3,
+    legs: [
+      { type: 'FLIGHT', provider: 'ANA All Nippon Airways (NH-111)', route: 'ORD → HND', status: 'IN_TRANSIT' },
+      { type: 'TRAIN', provider: 'Shinkansen Nozomi (NK-309)', route: 'Tokyo → Kyoto', status: 'SCHEDULED' },
+      { type: 'HOTEL', provider: 'Park Hyatt Tokyo', route: 'Shinjuku Tokyo', status: 'CONFIRMED' },
+    ],
+  },
+  'itin-104': {
+    id: 'itin-104',
+    name: 'David Chen',
+    email: 'david.chen@acme.com',
+    route: 'MIA ➔ LHR',
+    originCode: 'MIA',
+    destinationCode: 'LHR',
+    originLat: 25.7959,
+    originLng: -80.2870,
+    destLat: 51.4700,
+    destLng: -0.4543,
+    status: 'SELF_HEALED',
+    policyTier: 'Executive Tier ($300 Limit)',
+    policyLimitUsd: 300,
+    preferredCabin: 'Business Class Aisle',
+    vectorScore: 0.975,
+    centerLat: 38.0,
+    centerLng: -40.0,
+    zoom: 3,
+    legs: [
+      { type: 'FLIGHT', provider: 'American Airlines (AA-038)', route: 'MIA → LHR', status: 'REBOOKED' },
+      { type: 'TAXI', provider: 'Executive Airport Chauffeur', route: 'LHR → Central London', status: 'CONFIRMED' },
+      { type: 'HOTEL', provider: 'The Savoy London', route: 'Strand London', status: 'CONFIRMED' },
+    ],
+  },
+};
+
+/**
+ * Endpoint: List All Executive Travelers
+ */
+app.get('/api/travelers', (_req: Request, res: Response) => {
+  res.json(Object.values(TRAVELER_PROFILES));
+});
+
+/**
+ * Endpoint: Get Traveler Inspection Context by ID
+ */
+app.get('/api/traveler/:id', (req: Request, res: Response) => {
+  const profile = TRAVELER_PROFILES[req.params.id] || TRAVELER_PROFILES['itin-101'];
+  res.json(profile);
 });
 
 /**
@@ -180,7 +341,32 @@ app.get('/api/itinerary', async (_req: Request, res: Response) => {
 });
 
 app.get('/api/itinerary/:id', async (req: Request, res: Response) => {
-  res.json(inMemoryGraphCache);
+  const profile = TRAVELER_PROFILES[req.params.id];
+  if (profile) {
+    res.json({
+      itinerary: {
+        id: profile.id,
+        title: `${profile.name} — ${profile.route}`,
+        origin: profile.originCode,
+        destination: profile.destinationCode,
+        status: profile.status,
+        total_cost: 2850.00,
+      },
+      user: {
+        id: 'user-' + profile.id,
+        name: profile.name,
+        email: profile.email,
+        preferences: {
+          preferred_cabin: profile.preferredCabin,
+          policy_tier: profile.policyTier,
+        },
+      },
+      profile,
+      segments: profile.legs,
+    });
+  } else {
+    res.json(inMemoryGraphCache);
+  }
 });
 
 /**
@@ -370,15 +556,24 @@ app.get('/api/health', async (_req: Request, res: Response) => {
  */
 app.post('/api/disrupt', async (req: Request, res: Response) => {
   const {
+    itineraryId = 'itin-101',
     segmentReference = 'DL-1402',
     delayMinutes = 150,
     type = 'FLIGHT_DELAY',
     disruptionType = 'FLIGHT_DELAY',
     strategy = 'EXECUTIVE_SPEED',
+    costDelta,
   } = req.body;
+
+  const targetProfile = TRAVELER_PROFILES[itineraryId] || {
+    name: inMemoryGraphCache.user?.name || 'Sarah Jenkins',
+    originCode: 'SFO',
+    destinationCode: 'LHR',
+  };
 
   const actualDisruptionType = type || disruptionType;
   const parsedDelay = parseInt(String(delayMinutes), 10);
+  const customCost = typeof costDelta === 'number' ? costDelta : (strategy === 'HIGH_COST_GUARDRAIL' ? 450 : 0);
 
   // Update in-memory graph cache state instantly
   inMemoryGraphCache.segments[0].status = 'DELAYED';
@@ -390,18 +585,180 @@ app.post('/api/disrupt', async (req: Request, res: Response) => {
     inMemoryGraphCache.segments[0].id,
     parsedDelay,
     actualDisruptionType,
-    strategy
+    strategy,
+    customCost
   ).catch((err) => console.warn('Agent healing notice:', err.message));
+
+  const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
+
+  // Dispatch Enterprise Control Room Broadcast Alert
+  sendTelegramAlert({
+    travelerId: itineraryId,
+    travelerName: targetProfile.name || 'Executive Traveler',
+    origin: targetProfile.originCode || 'SFO',
+    destination: targetProfile.destinationCode || 'LHR',
+    newCarrier: 'Amtrak Acela Express (AMT-2158)',
+    transportType: 'Express Rail Re-route',
+    timeSaved: '4.5 Hours',
+    newArrivalTime: 'Jul 25, 07:30 PM',
+    costDeltaFormatted: customCost > 0 ? `+$${customCost}.00` : '$0.00 Net Delta',
+    approvalType: customCost > 300 ? 'HUMAN_APPROVAL_REQUIRED' : 'AUTO_APPROVED',
+    txHash,
+    resolutionSLA: 392,
+  }).catch((err) => console.warn('Telegram notice:', err.message));
 
   res.json({
     success: true,
     disruptionId: 'disc-evt-' + Date.now(),
-    itineraryId: inMemoryGraphCache.itinerary.id,
+    itineraryId,
+    travelerName: targetProfile.name,
     segmentReference,
     delayMinutes: parsedDelay,
     disruptionType: actualDisruptionType,
     strategy,
+    costDelta: customCost,
+    txHash,
   });
+});
+
+/**
+ * Enterprise Control Room Broadcast Test Endpoint
+ */
+app.post('/api/telegram/test', async (req: Request, res: Response) => {
+  const { travelerId = 'itin-101' } = req.body;
+  const targetProfile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
+
+  const result = await sendTelegramAlert({
+    travelerId: targetProfile.id,
+    travelerName: targetProfile.name,
+    origin: targetProfile.originCode,
+    destination: targetProfile.destinationCode,
+    newCarrier: 'Amtrak Acela Express (AMT-2158)',
+    transportType: 'Express Rail Re-route',
+    timeSaved: '4.5 Hours',
+    newArrivalTime: 'Jul 25, 07:30 PM',
+    costDeltaFormatted: '$0.00 Net Delta',
+    approvalType: 'AUTO_APPROVED',
+    txHash: '0x' + Math.random().toString(16).substring(2, 12),
+    resolutionSLA: 392,
+  });
+  res.json({ success: result.sent, result });
+});
+
+/**
+ * Feature 1: Human-in-the-Loop Rebooking Approval Endpoint
+ */
+app.post('/api/itinerary/approve', async (req: Request, res: Response) => {
+  const { itineraryId = 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22' } = req.body;
+  const result = agentEngine.approvePendingRebooking(itineraryId);
+  if (!result) {
+    return res.status(404).json({ success: false, error: 'No pending human approval found for itinerary.' });
+  }
+
+  // Update in-memory graph state
+  inMemoryGraphCache.segments[0].status = 'REBOOKED';
+  inMemoryGraphCache.segments[1].status = 'REBOOKED';
+  inMemoryGraphCache.itinerary.status = 'SELF_HEALED';
+
+  broadcastSSE('cascade_healed', result);
+  res.json({ success: true, result });
+});
+
+/**
+ * Feature 1: Human-in-the-Loop Rebooking Rejection / Timeout Fallback Endpoint
+ */
+app.post('/api/itinerary/reject', async (req: Request, res: Response) => {
+  const { itineraryId = 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22', reason } = req.body;
+  const result = agentEngine.rejectPendingRebooking(itineraryId, reason);
+  if (!result) {
+    return res.status(404).json({ success: false, error: 'No pending human approval found for itinerary.' });
+  }
+
+  inMemoryGraphCache.itinerary.status = 'FALLBACK_STANDARD_QUEUE';
+
+  broadcastSSE('agent_step', {
+    timestamp: new Date().toISOString(),
+    step: '11',
+    tag: 'HITL_REJECTED',
+    agent: 'POLICY_GUARDRAIL',
+    action: `[HITL REJECTED / TIMEOUT]: Rebooking request rejected (${reason || 'User rejected or 60s timeout expired'}). Fallback to standard queue.`,
+    details: { reason: reason || 'User clicked Reject & Keep Original' }
+  });
+
+  res.json({ success: true, result });
+});
+
+/**
+ * Feature 2: Post-Incident Executive Audit Report Generator Endpoint (JSON)
+ */
+app.get('/api/audit-report/:incidentId', async (req: Request, res: Response) => {
+  const incidentId = req.params.incidentId || 'PROOF-REC-994821';
+  const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || 'itin-101';
+  const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
+
+  const report = generateAuditReport({
+    incidentId,
+    travelerProfile: {
+      name: profile.name,
+      email: profile.email,
+      preferredCabin: profile.preferredCabin || 'Business Class',
+      seatPreference: 'Aisle (Quiet Car / Front Row)',
+      hnswVectorScore: 0.984,
+      vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
+    },
+    originalItinerary: {
+      tripTitle: `${profile.name} — ${profile.route}`,
+      origin: profile.originCode,
+      destination: profile.destinationCode,
+      segments: (profile.legs || []).map((leg: any, i: number) => ({
+        type: leg.type,
+        provider: leg.provider,
+        referenceCode: leg.referenceCode || `SEG-0${i + 1}`,
+        route: leg.route,
+        status: leg.status,
+      })),
+    },
+  });
+  res.json(report);
+});
+
+/**
+ * Feature 2: Post-Incident Executive Audit Report Generator Endpoint (Markdown Export)
+ */
+app.get('/api/audit-report/:incidentId/markdown', async (req: Request, res: Response) => {
+  const incidentId = req.params.incidentId || 'PROOF-REC-994821';
+  const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || 'itin-101';
+  const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
+
+  const report = generateAuditReport({
+    incidentId,
+    travelerProfile: {
+      name: profile.name,
+      email: profile.email,
+      preferredCabin: profile.preferredCabin || 'Business Class',
+      seatPreference: 'Aisle (Quiet Car / Front Row)',
+      hnswVectorScore: 0.984,
+      vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
+    },
+    originalItinerary: {
+      tripTitle: `${profile.name} — ${profile.route}`,
+      origin: profile.originCode,
+      destination: profile.destinationCode,
+      segments: (profile.legs || []).map((leg: any, i: number) => ({
+        type: leg.type,
+        provider: leg.provider,
+        referenceCode: leg.referenceCode || `SEG-0${i + 1}`,
+        route: leg.route,
+        status: leg.status,
+      })),
+    },
+  });
+
+  const markdown = exportAuditReportMarkdown(report);
+
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${incidentId}_audit_report.md"`);
+  res.send(markdown);
 });
 
 /**
