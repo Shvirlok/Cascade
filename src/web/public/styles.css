@@ -2809,3 +2809,130 @@ body.mobile-companion-mode .node-card {
 body.mobile-companion-mode .map-container {
   height: 280px;
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   FEATURE 3: LIVE SYSTEM TELEMETRY HEADER WIDGET
+───────────────────────────────────────────────────────────────── */
+.header-telemetry-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.telemetry-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.telemetry-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+.telemetry-val {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   FEATURE 2: BEDROCK CHAIN-OF-THOUGHT (CoT) VISUAL PIPELINE
+───────────────────────────────────────────────────────────────── */
+.cot-pipeline-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.cot-step-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 12px;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.cot-step-card.active {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.06);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.12);
+}
+
+.cot-step-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cot-step-num {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.cot-step-latency {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.cot-step-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.cot-step-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   FEATURE 1: MAP HAZARD PULSE MARKER (WHAT-IF SCENARIOS)
+───────────────────────────────────────────────────────────────── */
+.hazard-pulse-marker {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.4);
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+  animation: hazardPulse 1.4s infinite ease-in-out;
+}
+
+@keyframes hazardPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+}

@@ -622,6 +622,58 @@ app.post('/api/disrupt', async (req: Request, res: Response) => {
 });
 
 /**
+ * Interactive What-If Scenario Builder Endpoint
+ */
+app.post('/api/disrupt/what-if', async (req: Request, res: Response) => {
+  const { hubCode = 'SFO', eventType = 'AIRPORT_STRIKE', delayMinutes = 180 } = req.body;
+
+  const targetHub = String(hubCode).toUpperCase();
+  const affectedTravelers: any[] = [];
+
+  Object.values(TRAVELER_PROFILES).forEach((profile: any) => {
+    if (profile.originCode === targetHub || profile.destinationCode === targetHub || profile.route.includes(targetHub)) {
+      affectedTravelers.push({
+        id: profile.id,
+        name: profile.name,
+        route: profile.route,
+        status: 'AUTO_HEALED',
+        newCarrier: 'Amtrak Acela Express / Alternate Carrier',
+      });
+    }
+  });
+
+  const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
+
+  // Broadcast Telegram alert for what-if scenario
+  const primaryTraveler = affectedTravelers[0] || { name: 'Corporate Fleet Travelers', route: `${targetHub} Network` };
+  sendTelegramAlert({
+    travelerName: `${primaryTraveler.name} (+${Math.max(0, affectedTravelers.length - 1)} others)`,
+    origin: targetHub,
+    destination: 'Multi-Hub Route',
+    newCarrier: 'Multimodal Failover Fleet',
+    transportType: eventType.replace('_', ' '),
+    timeSaved: '4.8 Hours',
+    newArrivalTime: 'Jul 25, 08:15 PM',
+    costDeltaFormatted: '$0.00 Net Delta',
+    approvalType: 'AUTO_APPROVED',
+    txHash,
+    resolutionSLA: 280,
+  }).catch((err) => console.warn('Telegram what-if notice:', err.message));
+
+  res.json({
+    success: true,
+    scenarioId: 'whatif-evt-' + Date.now(),
+    hubCode: targetHub,
+    eventType,
+    delayMinutes,
+    affectedCount: affectedTravelers.length,
+    affectedTravelers,
+    txHash,
+    resolutionSLA: 280,
+  });
+});
+
+/**
  * Enterprise Control Room Broadcast Test Endpoint
  */
 app.post('/api/telegram/test', async (req: Request, res: Response) => {

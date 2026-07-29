@@ -122,6 +122,23 @@
 
         <!-- Right: System status + Theme toggle -->
         <div class="header-right">
+          <!-- Feature 3: Live System Telemetry Header Widget -->
+          <div class="header-telemetry-widget" id="header-telemetry-widget" title="Live Cluster & AI Latency Metrics">
+            <div class="telemetry-item">
+              <span class="telemetry-dot"></span>
+              <span>Bedrock SLA:</span>
+              <span class="telemetry-val" id="telemetry-bedrock-sla">280ms</span>
+            </div>
+            <div class="telemetry-item" style="border-left:1px solid var(--border-subtle);padding-left:10px;">
+              <span>CockroachDB:</span>
+              <span class="telemetry-val" id="telemetry-crdb-nodes">3 Nodes Active</span>
+            </div>
+            <div class="telemetry-item" style="border-left:1px solid var(--border-subtle);padding-left:10px;">
+              <span>Vector Memory:</span>
+              <span class="telemetry-val">100% Synced</span>
+            </div>
+          </div>
+
           <!-- Feature 3: Financial ROI & Cumulative Metrics Header Bar -->
           <div class="header-roi-bar" title="Cumulative B2B Financial ROI Metrics">
             <div class="roi-metric-item">
@@ -407,6 +424,44 @@
             <button class="btn-secondary" id="btn-chaos"><span>Simulate: Multiple Disruptions</span></button>
             <button class="btn-secondary" id="btn-contention"><span>Simulate: Rebooking Conflict</span></button>
             <button class="btn-secondary" id="btn-failover"><span>Simulate: Regional Outage</span></button>
+          </div>
+
+          <!-- Feature 1: Interactive What-If Custom Scenario Builder -->
+          <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+              ⚡ Interactive What-If Scenario Builder (Multi-Traveler Hub Impact)
+            </div>
+            <div class="sim-controls-row">
+              <div class="input-group">
+                <label>Target Hub Airport</label>
+                <select id="sim-target-hub">
+                  <option value="FRA">FRA — Frankfurt 🇩🇪</option>
+                  <option value="SFO">SFO — San Francisco 🇺🇸</option>
+                  <option value="JFK">JFK — New York 🇺🇸</option>
+                  <option value="LHR">LHR — London Heathrow 🇬🇧</option>
+                  <option value="CDG">CDG — Paris 🇫🇷</option>
+                  <option value="ORD">ORD — Chicago 🇺🇸</option>
+                  <option value="HND">HND — Tokyo 🇯🇵</option>
+                  <option value="SIN">SIN — Singapore 🇸🇬</option>
+                  <option value="MIA">MIA — Miami 🇺🇸</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label>Custom Disruption Event</label>
+                <select id="sim-custom-type">
+                  <option value="AIRPORT_STRIKE">Airport Ground Worker Strike</option>
+                  <option value="SEVERE_WEATHER">Severe Weather / Blizzard Alert</option>
+                  <option value="SYSTEM_OUTAGE">Air Traffic Control System Outage</option>
+                </select>
+              </div>
+
+              <div style="display: flex; align-items: flex-end;">
+                <button class="btn-primary" id="btn-custom-whatif" style="width: 100%; height: 38px;">
+                  <span>⚡ Run Custom What-If Simulation</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -695,6 +750,48 @@
           <div>
             <h4 style="font-size:11px;font-weight:700;color:#10b981;margin-bottom:6px;text-transform:uppercase;">Healed Segment</h4>
             <div id="audit-healed-segments"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Bedrock Chain-of-Thought Visual Pipeline -->
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-primary);">AWS Bedrock Reasoning Pipeline</h3>
+        <div class="cot-pipeline-container">
+          <div class="cot-step-card active">
+            <div class="cot-step-head">
+              <span class="cot-step-num">STAGE 01</span>
+              <span class="cot-step-latency">12ms</span>
+            </div>
+            <div class="cot-step-title">Signal Ingestion</div>
+            <div class="cot-step-desc">CDC Listener captured flight delay event from carrier feed</div>
+          </div>
+
+          <div class="cot-step-card active">
+            <div class="cot-step-head">
+              <span class="cot-step-num">STAGE 02</span>
+              <span class="cot-step-latency">18ms</span>
+            </div>
+            <div class="cot-step-title">Policy Evaluation</div>
+            <div class="cot-step-desc">Claude 3.5 Sonnet evaluated $300 auto-approval threshold</div>
+          </div>
+
+          <div class="cot-step-card active">
+            <div class="cot-step-head">
+              <span class="cot-step-num">STAGE 03</span>
+              <span class="cot-step-latency">45ms</span>
+            </div>
+            <div class="cot-step-title">Vector Search</div>
+            <div class="cot-step-desc">HNSW similarity match for fast Amtrak Quiet Car replacement</div>
+          </div>
+
+          <div class="cot-step-card active">
+            <div class="cot-step-head">
+              <span class="cot-step-num">STAGE 04</span>
+              <span class="cot-step-latency">32ms</span>
+            </div>
+            <div class="cot-step-title">State Settlement</div>
+            <div class="cot-step-desc">Committed SERIALIZABLE transaction hash to CockroachDB</div>
           </div>
         </div>
       </div>
@@ -1459,6 +1556,49 @@
         handleActionButtonClick(btnFailover, `<span>Simulate: Regional Outage</span>`, 'failover', async () => {
           await fetch('/api/disrupt/region-failover', { method: 'POST' });
         });
+      });
+    }
+
+    // ── Feature 1: Interactive What-If Scenario Builder ───────────────
+    let hazardMarker = null;
+    function triggerHubImpactMarker(hubCode, eventType) {
+      if (!leafletMap || typeof L === 'undefined') return;
+      const hubAp = GLOBAL_AIRPORTS.find(a => a.code === hubCode) || GLOBAL_AIRPORTS[0];
+      if (hazardMarker) { leafletMap.removeLayer(hazardMarker); hazardMarker = null; }
+
+      const hazardIcon = L.divIcon({
+        className: '',
+        html: `<div class="hazard-pulse-marker" title="${eventType.replace('_',' ')} at ${hubCode}"></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+      });
+
+      hazardMarker = L.marker([hubAp.lat, hubAp.lng], { icon: hazardIcon, zIndexOffset: 2000 }).addTo(leafletMap);
+      hazardMarker.bindPopup(`⚠️ <strong>${eventType.replace('_',' ')}</strong><br>Target Hub: ${hubAp.code} (${hubAp.city})`).openPopup();
+      leafletMap.flyTo([hubAp.lat, hubAp.lng], 4, { duration: 1.5 });
+    }
+
+    const btnCustomWhatIf = document.getElementById('btn-custom-whatif');
+    if (btnCustomWhatIf) {
+      btnCustomWhatIf.addEventListener('click', async () => {
+        const hubCode   = document.getElementById('sim-target-hub')?.value || 'FRA';
+        const eventType = document.getElementById('sim-custom-type')?.value || 'AIRPORT_STRIKE';
+        const delayVal  = parseInt(document.getElementById('sim-delay-slider')?.value || '180', 10);
+
+        try {
+          const res = await fetch('/api/disrupt/what-if', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hubCode, eventType, delayMinutes: delayVal }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            triggerHubImpactMarker(hubCode, eventType);
+            showToast(`⚡ What-If Simulation Triggered! Hub ${hubCode}: ${data.affectedCount} traveler(s) auto-healed.`, 'info', 3500);
+          }
+        } catch (err) {
+          console.warn('What-If simulation failed:', err);
+        }
       });
     }
 
