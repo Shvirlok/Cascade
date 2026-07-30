@@ -2936,3 +2936,99 @@ body.mobile-companion-mode .map-container {
     opacity: 0.9;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   SKILL: MAKE-INTERFACES-FEEL-BETTER DESIGN SYSTEM UPGRADE
+───────────────────────────────────────────────────────────────── */
+
+/* Principle 8 & 9: Font Smoothing & Tabular Numerals */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "tnum" 1;
+}
+
+.telemetry-val,
+.metric-box-val,
+.cot-step-latency,
+.node-badge,
+.roi-val,
+.slider-val-txt,
+.audit-val-cost,
+.audit-val-time,
+.footer-latency-val,
+.nav-badge,
+.status-tag,
+.cost-val,
+.pricing-badge {
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  -webkit-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
+/* Principle 10: Text Wrapping */
+h1, h2, h3, h4, h5, h6, .panel-title, .modal-header h2 {
+  text-wrap: balance;
+}
+
+p, .cot-step-desc, .modal-subtitle {
+  text-wrap: pretty;
+}
+
+/* Principle 12: Scale on Press (scale 0.96) for tactile press feedback */
+.btn-primary:active,
+.btn-secondary:active,
+.btn-audio-briefing:active,
+.btn-audit-export:active,
+.btn-audit-print:active,
+.node-card:active,
+.panel-card:active,
+.traveler-select-dropdown:active,
+.nav-item:active,
+tbody tr:active {
+  transform: scale(0.96) translateY(0px) !important;
+  transition-duration: 0.08s !important;
+}
+
+/* Principle 1: Concentric Radius & Elevation */
+.modal-content {
+  border-radius: 20px;
+}
+
+.audit-metric-box,
+.cot-step-card {
+  border-radius: 12px;
+}
+
+/* Enhanced Soft Glowing Status Badges */
+.status-tag-green {
+  background: rgba(34, 197, 94, 0.14) !important;
+  color: #22c55e !important;
+  border: 1px solid rgba(34, 197, 94, 0.35) !important;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.18) !important;
+}
+
+.status-tag-amber {
+  background: rgba(245, 158, 11, 0.14) !important;
+  color: #f59e0b !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.18) !important;
+}
+
+.status-tag-red {
+  background: rgba(239, 68, 68, 0.14) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.35) !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.18) !important;
+}
+
+/* Smooth Easing Overlay & Panel Motion */
+.modal-overlay {
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
