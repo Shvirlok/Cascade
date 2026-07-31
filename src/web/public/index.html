@@ -450,7 +450,7 @@
 
   <!-- Passenger Details Modal -->
   <div id="passengerDetailsModal" class="modal-backdrop">
-    <div class="modal-dialog" style="max-width: 620px;">
+    <div class="modal-dialog">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 20px;">👤</span>
@@ -459,7 +459,7 @@
             <div id="passenger-modal-email" style="font-size: 11px; color: var(--text-muted);">passenger@acme.com</div>
           </div>
         </div>
-        <button id="passenger-modal-close" class="modal-close">&times;</button>
+        <button id="passenger-modal-close" class="modal-close" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕ Close</button>
       </div>
       <div class="modal-body" id="passenger-modal-body">
         Loading passenger details...
@@ -778,9 +778,14 @@
         if (data.success && data.profile) {
           modal.classList.remove('active');
 
+          TRAVELER_PROFILES[data.profile.id] = data.profile;
+
           const optionHtml = `<option value="${data.profile.id}">${data.profile.name} (${data.profile.route})</option>`;
           document.getElementById('traveler-selector')?.insertAdjacentHTML('afterbegin', optionHtml);
           document.getElementById('tab2-traveler-selector')?.insertAdjacentHTML('afterbegin', optionHtml);
+          document.getElementById('simulator-traveler-select')?.insertAdjacentHTML('afterbegin', optionHtml);
+
+          document.getElementById('form-create-itinerary')?.reset();
 
           await loadDashboardData();
           await selectTraveler(data.profile.id);
@@ -992,16 +997,21 @@
           lineJoin: 'round',
         }).addTo(routeLayerGroup);
 
-        // Live plane marker placed on each active fleet flight route arc
+        // Live plane marker animated continuously along active fleet flight route arc
         if (arc.length > 5) {
-          const midIdx = Math.floor(arc.length * 0.45);
-          const posA = arc[midIdx];
-          const posB = arc[Math.min(midIdx + 1, arc.length - 1)];
+          const startProgress = (idx * 0.22) % 1;
+          const posA = arc[0];
+          const posB = arc[1];
           const bearing = calcBearing(posA, posB);
           const planeIcon = makePlaneIcon(bearing);
-          if (planeIcon) {
-            L.marker(posA, { icon: planeIcon, zIndexOffset: 1000, interactive: false }).addTo(routeLayerGroup);
-          }
+          const planeMkr = L.marker(posA, { icon: planeIcon, zIndexOffset: 1000, interactive: false }).addTo(routeLayerGroup);
+
+          fleetPlanesData.push({
+            marker: planeMkr,
+            arc: arc,
+            progress: startProgress,
+            speed: 0.0007 + (idx * 0.0001)
+          });
         }
 
         const popupHtml = `
@@ -1048,6 +1058,9 @@
       if (allCoords.length > 0) {
         leafletMap.fitBounds(L.latLngBounds(allCoords), { padding: [40, 40] });
       }
+      if (fleetPlanesData.length > 0) {
+        fleetAnimFrame = requestAnimationFrame(animateFleetPlanes);
+      }
     }
 
     // ── Render a specific traveler's route on the Leaflet map ─────────
@@ -1075,8 +1088,10 @@
       if (routeLayerGroup) routeLayerGroup.clearLayers();
       else routeLayerGroup = L.layerGroup().addTo(leafletMap);
 
-      // Stop any existing plane animation
+      // Stop any existing plane animations
+      if (fleetAnimFrame) { cancelAnimationFrame(fleetAnimFrame); fleetAnimFrame = null; }
       if (planeAnimFrame) { cancelAnimationFrame(planeAnimFrame); planeAnimFrame = null; }
+      fleetPlanesData = [];
 
       // Glow polyline
       L.polyline(arc, {
@@ -2298,6 +2313,30 @@
 
     function lerpLatLng(a, b, t) {
       return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    }
+
+    let fleetPlanesData = [];
+    let fleetAnimFrame = null;
+
+    function animateFleetPlanes() {
+      if (mapDisplayMode !== 'fleet' || fleetPlanesData.length === 0) return;
+
+      fleetPlanesData.forEach(p => {
+        if (!p.marker || !p.arc || p.arc.length < 2) return;
+        p.progress = (p.progress + p.speed) % 1;
+        const total = p.arc.length - 1;
+        const idx = Math.floor(p.progress * total);
+        const frac = (p.progress * total) - idx;
+        const posA = p.arc[idx];
+        const posB = p.arc[Math.min(idx + 1, total)];
+        const pos = lerpLatLng(posA, posB, frac);
+        const bearing = calcBearing(posA, posB);
+        p.marker.setLatLng(pos);
+        const icon = makePlaneIcon(bearing);
+        if (icon) p.marker.setIcon(icon);
+      });
+
+      fleetAnimFrame = requestAnimationFrame(animateFleetPlanes);
     }
 
     function animatePlane() {
