@@ -844,6 +844,11 @@ app.get('/api/stream', (req: Request, res: Response) => {
   });
 });
 
+// Wildcard fallback to serve index.html for Single Page Application navigation
+app.get('*', (_req: Request, res: Response) => {
+  res.sendFile(path.join(process.cwd(), 'src', 'web', 'public', 'index.html'));
+});
+
 // Port listener with fallback if occupied
 function startServer(portToTry: number) {
   const server = app.listen(portToTry, () => {
