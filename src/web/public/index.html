@@ -106,6 +106,7 @@
               <div class="map-mode-toggle-group">
                 <button id="map-btn-all-fleet" class="map-mode-btn">✈️ All Fleet Flights</button>
                 <button id="map-btn-active-route" class="map-mode-btn active">👤 Passenger Route</button>
+                <button id="map-btn-recenter" class="map-mode-btn" title="Recenter View">🎯 Recenter</button>
               </div>
             </div>
 
@@ -366,44 +367,68 @@
 
   <!-- Create Itinerary Modal -->
   <div id="createItineraryModal" class="modal-backdrop">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <span class="modal-title">+ Create New Executive Trip</span>
-        <button id="btn-close-modal" class="modal-close">&times;</button>
+    <div class="modal-dialog" style="max-width: 580px; padding: 0; overflow: hidden; border-radius: 16px; background: #141724; border: 1px solid rgba(99, 102, 241, 0.25); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);">
+      <div class="modal-header" style="background: linear-gradient(180deg, #1B1F32 0%, #141724 100%); padding: 20px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #818CF8;">✈️</div>
+          <div>
+            <h3 class="modal-title" style="font-size: 16px; font-weight: 700; color: #F8FAFC; margin: 0; letter-spacing: -0.01em;">Create Executive Flight Trip</h3>
+            <div style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Configure passenger travel itinerary, vector preferences & autonomous strategy</div>
+          </div>
+        </div>
+        <button id="btn-close-modal" class="modal-close" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #E2E8F0; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕ Close</button>
       </div>
-      <form id="form-create-itinerary">
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="modal-traveler-name">Executive Traveler Name</label>
-            <input id="modal-traveler-name" class="form-control" placeholder="e.g. Sarah Jenkins" required>
+
+      <form id="form-create-itinerary" style="padding: 24px;">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px; padding: 0;">
+          
+          <div class="form-group" style="margin: 0;">
+            <label for="modal-traveler-name" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <span>👤</span> Executive Traveler Name
+            </label>
+            <input id="modal-traveler-name" class="form-control" placeholder="e.g. Sarah Jenkins" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 11px 14px; color: #F8FAFC; font-size: 13px;">
           </div>
-          <div class="form-group">
-            <label for="modal-traveler-email">Corporate Email</label>
-            <input id="modal-traveler-email" class="form-control" type="email" placeholder="e.g. sarah.jenkins@acme.com" required>
+
+          <div class="form-group" style="margin: 0;">
+            <label for="modal-traveler-email" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <span>✉️</span> Corporate Email Address
+            </label>
+            <input id="modal-traveler-email" class="form-control" type="email" placeholder="e.g. sarah.jenkins@acme.com" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 11px 14px; color: #F8FAFC; font-size: 13px;">
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group" style="position: relative;">
-              <label for="modal-origin-input">Origin City / Hub</label>
-              <input id="modal-origin-input" class="form-control" placeholder="e.g. SFO (San Francisco)" autocomplete="off" required>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group" style="position: relative; margin: 0;">
+              <label for="modal-origin-input" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                <span>🛫</span> Origin City / Hub
+              </label>
+              <input id="modal-origin-input" class="form-control" placeholder="e.g. SFO (San Francisco)" autocomplete="off" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 11px 14px; color: #F8FAFC; font-size: 13px;">
               <div id="modal-origin-suggestions" class="autocomplete-dropdown"></div>
             </div>
-            <div class="form-group" style="position: relative;">
-              <label for="modal-dest-input">Destination City / Hub</label>
-              <input id="modal-dest-input" class="form-control" placeholder="e.g. LHR (London Heathrow)" autocomplete="off" required>
+
+            <div class="form-group" style="position: relative; margin: 0;">
+              <label for="modal-dest-input" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                <span>🛬</span> Destination Hub
+              </label>
+              <input id="modal-dest-input" class="form-control" placeholder="e.g. LHR (London Heathrow)" autocomplete="off" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 11px 14px; color: #F8FAFC; font-size: 13px;">
               <div id="modal-dest-suggestions" class="autocomplete-dropdown"></div>
             </div>
           </div>
-          <div class="form-group">
-            <label for="modal-strategy">Travel Policy Tier & Strategy</label>
-            <select id="modal-strategy" class="form-control">
-              <option value="EXECUTIVE_SPEED">Executive Tier ($300 Limit)</option>
-              <option value="COMFORT_BUSINESS">VIP Executive ($500 Limit)</option>
+
+          <div class="form-group" style="margin: 0;">
+            <label for="modal-strategy" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <span>🛡️</span> Travel Policy Tier & Healing Limit
+            </label>
+            <select id="modal-strategy" class="form-control" style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 11px 14px; color: #F8FAFC; font-size: 13px; cursor: pointer;">
+              <option value="EXECUTIVE_SPEED">Executive Tier ($300 Limit · Auto-Rebook Air + Rail)</option>
+              <option value="COMFORT_BUSINESS">VIP Executive ($500 Limit · Priority First Class & Suites)</option>
             </select>
           </div>
+
         </div>
-        <div class="modal-footer">
-          <button type="button" id="btn-cancel-modal" class="btn btn-outline">Cancel</button>
-          <button type="submit" class="btn btn-primary">Create Trip & Load Preferences</button>
+
+        <div class="modal-footer" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="button" id="btn-cancel-modal" class="btn" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #94A3B8; font-weight: 600; padding: 10px 18px; border-radius: 10px;">Cancel</button>
+          <button type="submit" class="btn" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFFFFF; font-weight: 700; padding: 10px 22px; border-radius: 10px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">⚡ Create Trip & Load Preferences</button>
         </div>
       </form>
     </div>
@@ -2102,7 +2127,7 @@
           renderItineraryNodes(newNodes);
         }
 
-        // 5. Leaflet map flyTo & camera animation & route arc rendering
+        // 5. Leaflet map camera animation & route arc rendering
         if (leafletMap) {
           if (profile.originLat && profile.destLat) {
             renderTravelerRoute({
@@ -2110,9 +2135,6 @@
               origin: { lat: profile.originLat, lng: profile.originLng, code: profile.originCode },
               dest: { lat: profile.destLat, lng: profile.destLng, code: profile.destinationCode },
             });
-          }
-          if (profile.centerLat && profile.centerLng) {
-            leafletMap.flyTo([profile.centerLat, profile.centerLng], profile.zoom || 3, { duration: 1.5 });
           }
         }
       } catch (err) { console.warn('selectTraveler error:', err); }
@@ -2371,6 +2393,11 @@
           dragging: true,
           touchZoom: true,
           doubleClickZoom: true,
+          worldCopyJump: true,
+          minZoom: 2,
+          maxZoom: 18,
+          maxBounds: [[-85, -210], [85, 210]],
+          maxBoundsViscosity: 1.0,
         });
 
         leafletTileLayer = L.tileLayer(isDark ? TILE_DARK : TILE_LIGHT, {
@@ -2821,12 +2848,23 @@
         observer.observe(telemLatVal, { childList: true, characterData: true, subtree: true });
       }
 
+      // 8. Window Resize & Display Scale Event Listener for Leaflet Map Redraw
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (typeof leafletMap !== 'undefined' && leafletMap) {
+            leafletMap.invalidateSize();
+          }
+        }, 150);
+      });
+
       // Populate initial AWS Bedrock Chain-of-Thought logs
       appendCotLog(`[BEDROCK_ENGINE_INIT] Initialized AWS Bedrock Claude 3.5 Sonnet Reasoning Loop.`);
       appendCotLog(`[CDC_CHANGEFEED_ACTIVE] CockroachDB Changefeed listening on table "itinerary_segments".`);
       appendCotLog(`[SYSTEM_READY] Standing by for carrier disruption signals...`);
 
-      // 8. Initial traveler selection to populate profile inspector card and route map
+      // 9. Initial traveler selection to populate profile inspector card and route map
       selectTraveler('itin-101');
     });
 
