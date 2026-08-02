@@ -853,17 +853,17 @@ app.get('*', (_req: Request, res: Response) => {
 function startServer(portToTry: number) {
   const server = app.listen(portToTry, () => {
     console.log(`=======================================================`);
-    console.log(`🚀 CASCADE Hackathon UI & API Server active on port ${portToTry}`);
-    console.log(`🌐 Dashboard URL: http://localhost:${portToTry}`);
+    console.log(`CASCADE Hackathon UI & API Server active on port ${portToTry}`);
+    console.log(`Dashboard URL: http://localhost:${portToTry}`);
     console.log(`=======================================================`);
   });
 
   server.on('error', (err: any) => {
     if (err.code === 'EADDRINUSE') {
-      console.warn(`⚠️ Port ${portToTry} occupied, attempting fallback port ${portToTry + 1}...`);
+      console.warn(`Port ${portToTry} occupied, attempting fallback port ${portToTry + 1}...`);
       startServer(portToTry + 1);
     } else {
-      console.error('❌ Server error:', err);
+      console.error('Server error:', err);
     }
   });
 }

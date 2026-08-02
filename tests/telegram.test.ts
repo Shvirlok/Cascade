@@ -51,7 +51,7 @@ describe('Enterprise Control Room Broadcast Telegram Unit Tests', () => {
 
     expect(result.sent).toBe(true);
     expect(capturedBody).not.toBeNull();
-    expect(capturedBody.text).toContain('🚨 <b>CASCADE Executive Control Room Alert</b>');
+    expect(capturedBody.text).toContain('<b>CASCADE Executive Control Room Alert</b>');
     expect(capturedBody.text).toContain('Marcus Vance');
     expect(capturedBody.text).toContain('JFK ➔ CDG');
     expect(capturedBody.text).toContain('Air France (AF-007)');

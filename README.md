@@ -2,7 +2,7 @@
 
 ![CASCADE Hero Banner](assets/readme/hero-banner.svg)
 
-# CASCADE ⚡
+# CASCADE
 ### Autonomous Executive Travel & Multi-Modal Logistics Recovery Engine
 *Built for the CockroachDB × AWS Hackathon on Devpost*
 
@@ -16,7 +16,7 @@
 
 ---
 
-## 🌟 Executive Summary & Enterprise Value Proposition
+## Executive Summary & Enterprise Value Proposition
 
 **CASCADE** is an autonomous, self-healing executive travel and multi-modal logistics recovery engine powered by **CockroachDB Cloud Change Data Capture (CDC)**, **1536-dimensional HNSW vector search**, and **AWS Bedrock Claude 3.5 Sonnet** multi-agent orchestration.
 
@@ -24,7 +24,7 @@ In real-world travel, a single flight delay sets off a catastrophic domino effec
 
 ---
 
-## ⚡ Key Capabilities & Verified Performance
+## Key Capabilities & Verified Performance
 
 | Feature Layer | Core Mechanism | Verified Tech & Specification |
 | :--- | :--- | :--- |
@@ -37,7 +37,7 @@ In real-world travel, a single flight delay sets off a catastrophic domino effec
 
 ---
 
-## 🎯 What & Why: The Autonomous Self-Healing Mechanism
+## What & Why: The Autonomous Self-Healing Mechanism
 
 ### The Problem: Travel Disruption Cascade
 When a flight leg (`DL-1402`) experiences a 2.5-hour delay:
@@ -47,7 +47,7 @@ When a flight leg (`DL-1402`) experiences a 2.5-hour delay:
 4. **Legacy Failure**: Traditional systems require manual human rebooking, resulting in hours of delay.
 
 ```
-[ Flight DL-1402 Delay (+150m) ] ➔ 💥 [ Missed Amtrak Train 2150 ] ➔ 💥 [ Cancelled Hotel Window ]
+[ Flight DL-1402 Delay (+150m) ] ➔ [ Missed Amtrak Train 2150 ] ➔ [ Cancelled Hotel Window ]
 ```
 
 ### The Solution: CASCADE Autonomous Self-Healing
@@ -63,7 +63,7 @@ CASCADE turns passive itineraries into active, reactive state graphs:
 
 ---
 
-## 🏗️ End-to-End System Architecture
+## End-to-End System Architecture
 
 <div align="center">
 
@@ -108,7 +108,7 @@ Express streams Server-Sent Events (SSE) to the glassmorphism frontend. Leaflet.
 
 ---
 
-## 💻 Quickstart Setup & Execution Guide
+## Quickstart Setup & Execution Guide
 
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher
@@ -171,7 +171,7 @@ npm test
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```
 cascade/
@@ -208,7 +208,7 @@ cascade/
 
 ---
 
-## 🧪 Automated Test Suite
+## Automated Test Suite
 
 Run the full integration and unit test suite:
 ```bash
@@ -220,7 +220,7 @@ The test suite verifies:
 
 ---
 
-## 🏆 Hackathon Submission Checklist
+## Hackathon Submission Checklist
 
 - [x] **CockroachDB Cloud Integration**: Full serverless SQL schema with graph relationships.
 - [x] **Vector Search Engine**: `VECTOR(1536)` types, HNSW index (`idx_users_preference_embedding`), and cosine similarity (`vector_cosine_ops`).
@@ -235,6 +235,6 @@ The test suite verifies:
 
 <div align="center">
 
-*Built with ❤️ for the CockroachDB × AWS Hackathon*
+*Built for the CockroachDB × AWS Hackathon*
 
 </div>

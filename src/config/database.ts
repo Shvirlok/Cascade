@@ -31,7 +31,7 @@ pool.on('error', (_err) => {
 function logOfflineNotice() {
   if (!hasLoggedOfflineWarning) {
     hasLoggedOfflineWarning = true;
-    console.warn('⚠️ CockroachDB Cloud connection restricted. Operating in Resilient Local State Mode.');
+    console.warn('CockroachDB Cloud connection restricted. Operating in Resilient Local State Mode.');
   }
 }
 

@@ -25,11 +25,11 @@ function generateDummyVector(seedStr: string): number[] {
 }
 
 export async function runSeed(): Promise<void> {
-  console.log('🌱 Starting CockroachDB CASCADE Database Migration and Seed...');
+  console.log('Starting CockroachDB CASCADE Database Migration and Seed...');
 
   const isAlive = await checkDatabaseConnection();
   if (!isAlive) {
-    console.error('❌ Cannot connect to CockroachDB. Please check your DATABASE_URL environment variable.');
+    console.error('Cannot connect to CockroachDB. Please check your DATABASE_URL environment variable.');
     process.exit(1);
   }
 
@@ -37,18 +37,18 @@ export async function runSeed(): Promise<void> {
     const schemaSqlPath = path.join(process.cwd(), 'src', 'db', 'schema.sql');
     const seedSqlPath = path.join(process.cwd(), 'src', 'db', 'seed.sql');
 
-    console.log('📜 Executing DDL Schema (`schema.sql`)...');
+    console.log('Executing DDL Schema (`schema.sql`)...');
     const schemaSql = fs.readFileSync(schemaSqlPath, 'utf8');
     await pool.query(schemaSql);
-    console.log('✅ CockroachDB tables and vector indices created.');
+    console.log('CockroachDB tables and vector indices created.');
 
-    console.log('📦 Executing Seed SQL (`seed.sql`)...');
+    console.log('Executing Seed SQL (`seed.sql`)...');
     const seedSql = fs.readFileSync(seedSqlPath, 'utf8');
     await pool.query(seedSql);
-    console.log('✅ Base user and itinerary records seeded.');
+    console.log('Base user and itinerary records seeded.');
 
     // Inject Vector Embeddings for Vector Search demonstration
-    console.log('🧠 Injecting 1536-dim vector embeddings into user and segment records...');
+    console.log('Injecting 1536-dim vector embeddings into user and segment records...');
     
     // User preference embedding (Executive traveler profile vector)
     const userVector = generateDummyVector('executive_traveler_preference');
@@ -67,9 +67,9 @@ export async function runSeed(): Promise<void> {
       );
     }
 
-    console.log('✨ Seed completed successfully! CASCADE engine ready for disruptions.');
+    console.log('Seed completed successfully! CASCADE engine ready for disruptions.');
   } catch (err: any) {
-    console.error('❌ Migration and seed failed:', err);
+    console.error('Migration and seed failed:', err);
     throw err;
   } finally {
     await pool.end();

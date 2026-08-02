@@ -17,7 +17,7 @@ export async function simulateFlightDisruption(
   segmentReference: string = 'DL-1402',
   delayMinutes: number = 150
 ): Promise<DisruptionSimulationResult> {
-  console.log(`✈️ Emulating Flight Disruption: Flight ${segmentReference} delayed by ${delayMinutes} minutes...`);
+  console.log(`Emulating Flight Disruption: Flight ${segmentReference} delayed by ${delayMinutes} minutes...`);
 
   return await withTransaction(async (client) => {
     // 1. Fetch targeted segment
@@ -67,7 +67,7 @@ export async function simulateFlightDisruption(
 
     const disruptionId = eventRes.rows[0].id;
 
-    console.log(`⚡ CockroachDB CDC Event Emitted! Disruption ID: ${disruptionId}`);
+    console.log(`CockroachDB CDC Event Emitted! Disruption ID: ${disruptionId}`);
 
     return {
       disruptionId,
@@ -85,7 +85,7 @@ if (process.argv[1]?.includes('disruption_emulator')) {
   (async () => {
     const isAlive = await checkDatabaseConnection();
     if (!isAlive) {
-      console.error('❌ Database not reachable.');
+      console.error('Database not reachable.');
       process.exit(1);
     }
     const flightRef = process.argv[2] || 'DL-1402';

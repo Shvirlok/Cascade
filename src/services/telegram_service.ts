@@ -35,17 +35,17 @@ export async function sendTelegramAlert(data: TelegramBroadcastPayload): Promise
   const slaMs = data.resolutionSLA || 392;
 
   const message =
-    `🚨 <b>CASCADE Executive Control Room Alert</b>\n` +
+    `<b>CASCADE Executive Control Room Alert</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `👤 <b>Passenger:</b> ${data.travelerName}\n` +
-    `✈️ <b>Disrupted Segment:</b> ${data.origin} ➔ ${data.destination}\n` +
-    `⚡ <b>Resolution Action:</b> ${data.newCarrier} (${transportType})\n\n` +
-    `⏱ <b>Time Saved:</b> ${timeSaved} (New Arrival: ${newArrivalTime})\n` +
-    `💰 <b>Financial Impact:</b> ${costDelta} [${approvalType}]\n` +
-    `🔒 <b>CockroachDB Proof:</b> <code>${data.txHash}</code>\n` +
+    `<b>Passenger:</b> ${data.travelerName}\n` +
+    `<b>Disrupted Segment:</b> ${data.origin} ➔ ${data.destination}\n` +
+    `<b>Resolution Action:</b> ${data.newCarrier} (${transportType})\n\n` +
+    `<b>Time Saved:</b> ${timeSaved} (New Arrival: ${newArrivalTime})\n` +
+    `<b>Financial Impact:</b> ${costDelta} [${approvalType}]\n` +
+    `<b>CockroachDB Proof:</b> <code>${data.txHash}</code>\n` +
     `━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `🟢 <i>Autonomous Self-Healing Completed in ${slaMs}ms</i>\n` +
-    `🌐 <a href="${dashboardUrl}">Open System Dashboard</a>`;
+    `<i>Autonomous Self-Healing Completed in ${slaMs}ms</i>\n` +
+    `<a href="${dashboardUrl}">Open System Dashboard</a>`;
 
   try {
     const url = `https://api.telegram.org/bot${token}/sendMessage`;

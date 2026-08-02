@@ -225,7 +225,7 @@ export class CDCListenerService {
           step: '9',
           tag: 'CASCADE_COMPLETE',
           agent: 'ORCHESTRATOR',
-          action: `🎉 CASCADE Route Graph self-healed in 392ms! Strategy ${strategy} executed under <1000ms SLA.`,
+          action: `CASCADE Route Graph self-healed in 392ms! Strategy ${strategy} executed under <1000ms SLA.`,
           details: { executionTimeMs: 392, status: 'SELF_HEALED' },
         },
       ];

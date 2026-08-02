@@ -216,12 +216,12 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
 export async function startMcpServer() {
   const transport = new StdioServerTransport();
   await mcpServer.connect(transport);
-  console.error('🚀 CASCADE MCP Server started over Stdio transport.');
+  console.error('CASCADE MCP Server started over Stdio transport.');
 }
 
 if (process.argv[1]?.includes('server')) {
   startMcpServer().catch((err) => {
-    console.error('❌ MCP Server failure:', err);
+    console.error('MCP Server failure:', err);
     process.exit(1);
   });
 }

@@ -207,7 +207,7 @@ export class CascadeAgentEngine {
       }
     };
 
-    logStep('1', 'REGION_CHAOS', 'CHAOS_ENGINE', '⚡ [MULTI-REGION CHAOS]: Injected simulated outage in CockroachDB primary locality region (us-east-1)', {
+    logStep('1', 'REGION_CHAOS', 'CHAOS_ENGINE', '[MULTI-REGION CHAOS]: Injected simulated outage in CockroachDB primary locality region (us-east-1)', {
       crashedRegion: 'us-east-1',
     });
 
@@ -339,7 +339,7 @@ export class CascadeAgentEngine {
 
     // Pillar 6: Graceful Degradation / Manual Concierge Fallback check for extreme edge-cases (> 600m delay)
     if (delayMinutes >= 600) {
-      logStep('3', 'CONCIERGE_FALLBACK', 'ORCHESTRATOR', `⚠️ Automated Rebooking Threshold Exceeded (Delay > 10 Hours). Presenting 2 Human Concierge Options for Manual Selection.`, {
+      logStep('3', 'CONCIERGE_FALLBACK', 'ORCHESTRATOR', `Automated Rebooking Threshold Exceeded (Delay > 10 Hours). Presenting 2 Human Concierge Options for Manual Selection.`, {
         delayMinutes,
         status: 'CONCIERGE_FALLBACK',
       });
@@ -466,7 +466,7 @@ export class CascadeAgentEngine {
 
     // FEATURE 1: Human-in-the-Loop & Policy Guardrail Check ($300 Limit)
     if (rebookingCost > POLICY_AUTO_APPROVAL_LIMIT_USD) {
-      logStep('5b', 'HITL_GUARDRAIL', 'POLICY_GUARDRAIL', `⚠️ Corporate Policy Threshold Exceeded: Proposed rebooking cost delta ($${rebookingCost}.00) exceeds $300 auto-approval limit. Halting autonomous commit for Human-in-the-Loop Approval.`, {
+      logStep('5b', 'HITL_GUARDRAIL', 'POLICY_GUARDRAIL', `Corporate Policy Threshold Exceeded: Proposed rebooking cost delta ($${rebookingCost}.00) exceeds $300 auto-approval limit. Halting autonomous commit for Human-in-the-Loop Approval.`, {
         rebookingCost,
         policyLimit: POLICY_AUTO_APPROVAL_LIMIT_USD,
         status: 'HUMAN_APPROVAL_REQUIRED',
@@ -585,7 +585,7 @@ export class CascadeAgentEngine {
 
     const executionTimeMs = Date.now() - startTime;
 
-    logStep('10', 'CASCADE_COMPLETE', 'ORCHESTRATOR', `🎉 CASCADE Route Graph self-healed in ${executionTimeMs}ms! Winning Branch: ${winningBranch.name} (${winningBranch.score} HNSW Match Score). Policy Check: PASS (Cost <= $300).`, {
+    logStep('10', 'CASCADE_COMPLETE', 'ORCHESTRATOR', `CASCADE Route Graph self-healed in ${executionTimeMs}ms! Winning Branch: ${winningBranch.name} (${winningBranch.score} HNSW Match Score). Policy Check: PASS (Cost <= $300).`, {
       executionTimeMs,
       usedFallback,
       strategy,
@@ -658,7 +658,7 @@ export class CascadeAgentEngine {
       }
     };
 
-    logStep('1', 'CASCADE_CHAOS', 'CHAOS_ENGINE', '🔥 [CASCADE CHAOS MODE]: Triggered 3 simultaneous failures (Flight Delay + Train Cancel + Hotel Overbook)', {
+    logStep('1', 'CASCADE_CHAOS', 'CHAOS_ENGINE', '[CASCADE CHAOS MODE]: Triggered 3 simultaneous failures (Flight Delay + Train Cancel + Hotel Overbook)', {
       failures: ['FLIGHT_DELAY (+180m)', 'TRAIN_CANCEL', 'HOTEL_OVERBOOK'],
     });
 
