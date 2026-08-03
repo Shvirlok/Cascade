@@ -27,9 +27,18 @@
         </div>
         <div class="header-divider"></div>
         <div class="nav-tabs-group">
-          <button id="tab-mode-operations" class="tab-btn active" data-tab="operations">Operations</button>
-          <button id="tab-mode-simulator" class="tab-btn" data-tab="simulator">Simulator</button>
-          <button id="tab-mode-audit" class="tab-btn" data-tab="audit">Audit & Proofs</button>
+          <button id="tab-mode-operations" class="tab-btn active" data-tab="operations">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Operations
+          </button>
+          <button id="tab-mode-simulator" class="tab-btn" data-tab="simulator">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Simulator
+          </button>
+          <button id="tab-mode-audit" class="tab-btn" data-tab="audit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Audit & Proofs
+          </button>
           <button id="tab-mode-traveler" style="display:none;"></button>
           <button id="tab-mode-internals" style="display:none;"></button>
         </div>
@@ -47,7 +56,10 @@
         <div class="telemetry-item">
           <span>CDC Changefeed: <strong>ACTIVE</strong></span>
         </div>
-        <button id="btn-new-trip" class="btn btn-primary">+ New Trip</button>
+        <button id="btn-new-trip" class="btn btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Trip
+        </button>
         <button id="btn-open-create-modal" style="display:none;"></button>
         <button id="theme-toggle-btn" class="btn btn-outline" title="Toggle Theme">
           <span id="theme-icon-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
@@ -104,9 +116,18 @@
                 <div id="itin-subtitle" style="display:none;"></div>
               </div>
               <div class="map-mode-toggle-group">
-                <button id="map-btn-all-fleet" class="map-mode-btn">All Fleet Flights</button>
-                <button id="map-btn-active-route" class="map-mode-btn active">Passenger Route</button>
-                <button id="map-btn-recenter" class="map-mode-btn" title="Recenter View">Recenter</button>
+                <button id="map-btn-all-fleet" class="map-mode-btn">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z"/></svg>
+                  All Fleet Flights
+                </button>
+                <button id="map-btn-active-route" class="map-mode-btn active">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  Passenger Route
+                </button>
+                <button id="map-btn-recenter" class="map-mode-btn" title="Recenter View">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+                  Recenter
+                </button>
               </div>
             </div>
 
@@ -200,13 +221,31 @@
               </div>
 
               <div class="btn-group" style="margin-top: 16px;">
-                <button id="btn-trigger-disruption" class="btn btn-danger">Trigger Disruption</button>
+                <button id="btn-trigger-disruption" class="btn btn-danger">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span>Trigger Disruption</span>
+                </button>
                 <button id="btn-disrupt" style="display:none;"></button>
-                <button id="btn-chaos" class="btn btn-outline">Chaos Engine</button>
-                <button id="btn-contention" class="btn btn-outline">Contention</button>
-                <button id="btn-failover" class="btn btn-outline">Region Failover</button>
-                <button id="btn-custom-whatif" class="btn btn-outline">What-If</button>
-                <button id="btn-policy-hitl" class="btn btn-outline">Test HITL</button>
+                <button id="btn-chaos" class="btn btn-outline">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                  <span>Chaos Engine</span>
+                </button>
+                <button id="btn-contention" class="btn btn-outline">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                  <span>Contention</span>
+                </button>
+                <button id="btn-failover" class="btn btn-outline">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                  <span>Region Failover</span>
+                </button>
+                <button id="btn-custom-whatif" class="btn btn-outline">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                  <span>What-If</span>
+                </button>
+                <button id="btn-policy-hitl" class="btn btn-outline">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                  <span>Test HITL</span>
+                </button>
               </div>
 
               <!-- Active System Guardrails Telemetry Card -->
@@ -324,8 +363,14 @@
               </div>
 
               <div style="display: flex; gap: 10px; margin-bottom: 30px;">
-                <button id="btn-export-pdf" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px;">Export PDF Audit Report</button>
-                <button id="btn-proof-artifact" class="btn btn-outline" style="padding: 8px 16px; font-size: 12px;">View CockroachDB Proof Hash</button>
+                <button id="btn-export-pdf" class="btn btn-primary" style="padding: 9px 18px; font-size: 12px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  Export PDF Audit Report
+                </button>
+                <button id="btn-proof-artifact" class="btn btn-outline" style="padding: 9px 18px; font-size: 12px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  View CockroachDB Proof Hash
+                </button>
                 <button id="btn-audit-export-pdf" style="display:none;"></button>
                 <button id="btn-generate-audit-report" style="display:none;"></button>
               </div>
@@ -450,7 +495,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button id="btn-audit-print-pdf" class="btn btn-outline">Print Report</button>
+        <button id="btn-audit-close-modal" class="btn btn-outline" onclick="document.getElementById('modal-audit-report')?.classList.remove('active');">Close</button>
       </div>
     </div>
   </div>
@@ -833,10 +878,23 @@
       return `+${h}h ${m}m`;
     }
 
+    function updateSliderTrack() {
+      if (!slider) return;
+      const val = parseInt(slider.value, 10);
+      const min = parseInt(slider.min || '15', 10);
+      const max = parseInt(slider.max || '360', 10);
+      const pct = ((val - min) / (max - min)) * 100;
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const bgEmpty = isLight ? '#E2E8F0' : '#1B1F2E';
+      slider.style.background = `linear-gradient(to right, #10B981 0%, #06B6D4 ${pct}%, ${bgEmpty} ${pct}%, ${bgEmpty} 100%)`;
+    }
+
     if (slider) {
+      updateSliderTrack();
       slider.addEventListener('input', () => {
         const mins = parseInt(slider.value, 10);
         sliderTxt.innerText = `Selected Delay: +${mins} mins (${getDurationStr(mins)})`;
+        updateSliderTrack();
       });
     }
 
@@ -1447,7 +1505,7 @@
     const btnChaos = document.getElementById('btn-chaos');
     if (btnChaos) {
       btnChaos.addEventListener('click', () => {
-        handleActionButtonClick(btnChaos, `<span>Simulate: Multiple Disruptions</span>`, 'chaos', async () => {
+        handleActionButtonClick(btnChaos, `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span>Chaos Engine</span>`, 'chaos', async () => {
           await fetch('/api/disrupt/chaos', { method: 'POST' });
         });
       });
@@ -1456,7 +1514,7 @@
     const btnContention = document.getElementById('btn-contention');
     if (btnContention) {
       btnContention.addEventListener('click', () => {
-        handleActionButtonClick(btnContention, `<span>Simulate: Rebooking Conflict</span>`, 'contention', async () => {
+        handleActionButtonClick(btnContention, `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg><span>Contention</span>`, 'contention', async () => {
           await fetch('/api/disrupt/contention', { method: 'POST' });
         });
       });
@@ -1465,7 +1523,7 @@
     const btnFailover = document.getElementById('btn-failover');
     if (btnFailover) {
       btnFailover.addEventListener('click', () => {
-        handleActionButtonClick(btnFailover, `<span>Simulate: Regional Outage</span>`, 'failover', async () => {
+        handleActionButtonClick(btnFailover, `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><span>Region Failover</span>`, 'failover', async () => {
           await fetch('/api/disrupt/region-failover', { method: 'POST' });
         });
       });
@@ -1517,7 +1575,7 @@
     const btnPolicyHitl = document.getElementById('btn-policy-hitl');
     if (btnPolicyHitl) {
       btnPolicyHitl.addEventListener('click', () => {
-        handleActionButtonClick(btnPolicyHitl, `<span>Simulate: Policy Guardrail (&gt;$300)</span>`, 'disrupt', async () => {
+        handleActionButtonClick(btnPolicyHitl, `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Test HITL</span>`, 'disrupt', async () => {
           const typeVal     = document.getElementById('sim-disrupt-type')?.value || 'FLIGHT_DELAY';
           const strategyVal = 'HIGH_COST_GUARDRAIL';
           const delayVal    = parseInt(document.getElementById('sim-delay-slider')?.value || '150', 10);
@@ -1880,22 +1938,15 @@
           showToast('Executive B2B PDF Audit downloaded successfully!', 'success', 3000);
           return;
         } catch (err) {
-          console.warn('html2pdf fallback trigger:', err);
+          console.warn('html2pdf PDF generation failed:', err);
+          showToast('Failed to generate PDF audit report.', 'error');
         }
       }
-
-      window.print();
-    }
-
-    function printAuditPdf() {
-      showToast('Opening PDF Print Preview...', 'info');
-      window.print();
     }
 
     document.getElementById('btn-generate-audit-report')?.addEventListener('click', () => openAuditReportModal('PROOF-REC-994821'));
     document.getElementById('audit-modal-close')?.addEventListener('click', () => document.getElementById('modal-audit-report')?.classList.remove('active'));
     document.getElementById('btn-audit-export-pdf')?.addEventListener('click', downloadAuditPdf);
-    document.getElementById('btn-audit-print-pdf')?.addEventListener('click', printAuditPdf);
 
     // Download Confirmation (.md file) Button Listener
     document.getElementById('btn-proof-artifact')?.addEventListener('click', (e) => {
@@ -2790,7 +2841,7 @@
       const btnTriggerDisrupt = document.getElementById('btn-trigger-disruption');
       if (btnTriggerDisrupt) {
         btnTriggerDisrupt.addEventListener('click', () => {
-          handleActionButtonClick(btnTriggerDisrupt, `<span>Trigger Disruption</span>`, 'disrupt', async () => {
+          handleActionButtonClick(btnTriggerDisrupt, `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Trigger Disruption</span>`, 'disrupt', async () => {
             const typeVal     = document.getElementById('sim-disrupt-type')?.value || 'FLIGHT_DELAY';
             const strategyVal = document.getElementById('sim-strategy')?.value || 'EXECUTIVE_SPEED';
             const delayVal    = parseInt(document.getElementById('sim-delay-slider')?.value || '150', 10);
