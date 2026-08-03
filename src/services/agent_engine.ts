@@ -630,7 +630,7 @@ export class CascadeAgentEngine {
         originalCost: '$2,850.00',
         rebookingFee: '$0.00',
         carrierCoverage: '$450.00 (Carrier Covered)',
-        totalCostDelta: '$0.00 (Net Zero Corporate Delta)',
+        totalCostDelta: '$0.00 (No cost impact)',
         policyStatus: 'AUTO_APPROVED',
         policyLimit: '$300.00 Auto-Approval Limit',
       },

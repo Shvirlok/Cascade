@@ -104,12 +104,13 @@ export class CDCListenerService {
   ): Promise<void> {
     const defaultItinId = itineraryId || 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22';
     const defaultSegId = segmentId || 'c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33';
+    const safeDelayMinutes = (typeof delayMinutes === 'number' && !isNaN(delayMinutes)) ? delayMinutes : 150;
 
     try {
       const report = await this.agentEngine.processDisruption(
         defaultItinId,
         defaultSegId,
-        delayMinutes,
+        safeDelayMinutes,
         disruptionType,
         strategy,
         (actionLog: AgentActionLog) => {
@@ -133,7 +134,7 @@ export class CDCListenerService {
           itineraryId: defaultItinId,
           segmentId: defaultSegId,
           executionTimeMs: report.executionTimeMs,
-          delayMinutes,
+          delayMinutes: safeDelayMinutes,
           disruptionType,
           strategy,
           rebookedSegments: report.rebookedSegments,
@@ -142,8 +143,8 @@ export class CDCListenerService {
       }
     } catch (_err) {
       // Dynamic CoT step generator based on severity and strategy
-      const isMinor = delayMinutes < 60 && disruptionType === 'FLIGHT_DELAY';
-      const isMajor = delayMinutes > 180 || disruptionType === 'TRAIN_CANCEL' || disruptionType === 'HOTEL_OVERBOOK';
+      const isMinor = safeDelayMinutes < 60 && disruptionType === 'FLIGHT_DELAY';
+      const isMajor = safeDelayMinutes > 180 || disruptionType === 'TRAIN_CANCEL' || disruptionType === 'HOTEL_OVERBOOK';
 
       const simulatedSteps: AgentActionLog[] = [
         {
@@ -151,8 +152,8 @@ export class CDCListenerService {
           step: '1',
           tag: 'CDC_EVENT',
           agent: 'CDC_LISTENER',
-          action: `CockroachDB Changefeed captured: Type=${disruptionType}, Delay=+${delayMinutes}m, Strategy=${strategy}`,
-          details: { delayMinutes, disruptionType, strategy },
+          action: `CockroachDB Changefeed captured: Type=${disruptionType}, Delay=+${safeDelayMinutes}m, Strategy=${strategy}`,
+          details: { delayMinutes: safeDelayMinutes, disruptionType, strategy },
         },
         {
           timestamp: new Date().toISOString(),
@@ -184,11 +185,11 @@ export class CDCListenerService {
           tag: 'BEDROCK_AGENT',
           agent: 'CASCADE_ANALYZER',
           action: isMinor
-            ? `Evaluating slack (+${delayMinutes}m delay): Minor buffer adjustment. Layover window preserved (+45m slack)`
+            ? `Evaluating slack (+${safeDelayMinutes}m delay): Minor buffer adjustment. Layover window preserved (+45m slack)`
             : isMajor
-            ? `CRITICAL CASCADE FAILURE (+${delayMinutes}m delay / ${disruptionType}): Overlap -195m! Emergency re-route required.`
-            : `Evaluating slack (+${delayMinutes}m delay): Overlap -60m detected on Amtrak Train 2150.`,
-          details: { delayMinutes, isMinor, isMajor },
+            ? `CRITICAL CASCADE FAILURE (+${safeDelayMinutes}m delay / ${disruptionType}): Overlap -195m! Emergency re-route required.`
+            : `Evaluating slack (+${safeDelayMinutes}m delay): Overlap -60m detected on Amtrak Train 2150.`,
+          details: { delayMinutes: safeDelayMinutes, isMinor, isMajor },
         },
         {
           timestamp: new Date().toISOString(),
@@ -210,7 +211,7 @@ export class CDCListenerService {
             : isMajor
             ? 'AWS Bedrock (Claude 3.5 Sonnet): Executed Emergency Re-route DL-1990 + Ritz-Carlton Executive Suite Upgrade.'
             : 'AWS Bedrock (Claude 3.5 Sonnet): Rebooked Amtrak Express Train 2158 at 18:30 (+90m buffer restored).',
-          details: { strategy, delayMinutes },
+          details: { strategy, delayMinutes: safeDelayMinutes },
         },
         {
           timestamp: new Date().toISOString(),
@@ -242,7 +243,7 @@ export class CDCListenerService {
         itineraryId: defaultItinId,
         segmentId: defaultSegId,
         executionTimeMs: 392,
-        delayMinutes,
+        delayMinutes: safeDelayMinutes,
         disruptionType,
         strategy,
         timestamp: new Date().toISOString(),
