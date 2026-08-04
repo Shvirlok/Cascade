@@ -948,21 +948,50 @@
       });
     });
 
-    // ── Modal ─────────────────────────────────────────────────────────
+    // ── Modal Handlers ─────────────────────────────────────────────────────────
     const modal = document.getElementById('createItineraryModal');
     document.getElementById('btn-open-create-modal')?.addEventListener('click', () => modal?.classList.add('active'));
     document.getElementById('btn-close-modal')?.addEventListener('click',  () => modal?.classList.remove('active'));
     document.getElementById('btn-cancel-modal')?.addEventListener('click', () => modal?.classList.remove('active'));
-    // Click on backdrop (outside card) also closes
     modal?.addEventListener('click', (e) => { if (e.target === modal) modal?.classList.remove('active'); });
+
+    // Mode Selector Buttons click listener
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.mode-select-btn');
+      if (!btn) return;
+      e.preventDefault();
+      
+      document.querySelectorAll('.mode-select-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'rgba(255, 255, 255, 0.05)';
+        b.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+        b.style.color = '#94a3b8';
+      });
+
+      btn.classList.add('active');
+      btn.style.background = 'rgba(99, 102, 241, 0.25)';
+      btn.style.borderColor = '#6366f1';
+      btn.style.color = '#ffffff';
+
+      const mode = btn.getAttribute('data-mode') || 'FLIGHT';
+      const modeInput = document.getElementById('modal-travel-mode');
+      if (modeInput) modeInput.value = mode;
+    });
 
     document.getElementById('form-create-itinerary')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name   = document.getElementById('modal-traveler-name')?.value;
-      const email  = document.getElementById('modal-traveler-email')?.value;
+      const name = document.getElementById('modal-traveler-name')?.value;
+      const email = document.getElementById('modal-traveler-email')?.value;
+      const primaryMode = document.getElementById('modal-travel-mode')?.value || 'FLIGHT';
       const originInputVal = document.getElementById('modal-origin-input')?.value;
-      const destInputVal   = document.getElementById('modal-dest-input')?.value;
-      const strat  = document.getElementById('modal-strategy')?.value;
+      const destInputVal = document.getElementById('modal-dest-input')?.value;
+      const depDate = document.getElementById('modal-dep-date')?.value || '2026-08-10';
+      const depTime = document.getElementById('modal-dep-time')?.value || '09:00';
+      const arrDate = document.getElementById('modal-arr-date')?.value || '2026-08-10';
+      const arrTime = document.getElementById('modal-arr-time')?.value || '17:30';
+      const transferMode = document.getElementById('modal-transfer-mode')?.value || 'RAIL_TRANSFER';
+      const cabinPref = document.getElementById('modal-cabin-pref')?.value || 'Business Class Quiet Car';
+      const strat = document.getElementById('modal-strategy')?.value || 'EXECUTIVE_SPEED';
 
       let origAp = selectedOriginAp;
       if (!origAp && originInputVal) {
@@ -991,8 +1020,15 @@
           body: JSON.stringify({
             travelerName: name,
             travelerEmail: email,
+            primaryMode: primaryMode,
             origin: originStr,
             destination: destStr,
+            depDate: depDate,
+            depTime: depTime,
+            arrDate: arrDate,
+            arrTime: arrTime,
+            transferMode: transferMode,
+            cabinPref: cabinPref,
             strategy: strat,
             originLat: origAp?.lat || 37.6213,
             originLng: origAp?.lng || -122.3790,
@@ -1002,7 +1038,7 @@
         });
         const data = await res.json();
         if (data.success && data.profile) {
-          modal.classList.remove('active');
+          modal?.classList.remove('active');
 
           TRAVELER_PROFILES[data.profile.id] = data.profile;
 
