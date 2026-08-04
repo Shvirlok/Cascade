@@ -330,14 +330,21 @@ header.app-header {
 }
 
 /* Tab 3: Audit Layout & Timeline Heights */
-#tab-pane-audit,
-#tab-audit {
-  overflow-y: auto !important;
-  height: 100% !important;
-  max-height: 100% !important;
+#tab-pane-audit {
+  overflow-x: hidden;
+  overflow-y: auto;
   position: absolute;
   inset: 0;
-  box-sizing: border-box !important;
+  height: 100%;
+  box-sizing: border-box;
+  display: block !important;
+  scroll-behavior: smooth;
+}
+
+#tab-pane-audit.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .audit-layout {
@@ -347,11 +354,10 @@ header.app-header {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  padding: 20px 24px 80px 24px !important;
+  padding: 20px 24px 80px 24px;
   gap: 18px;
-  min-height: auto !important;
-  height: auto !important;
-  box-sizing: border-box !important;
+  min-height: auto;
+  box-sizing: border-box;
 }
 
 .audit-kpi-banner {

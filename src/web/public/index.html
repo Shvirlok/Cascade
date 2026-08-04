@@ -3792,6 +3792,9 @@
             }
           }, 100);
         }
+        if (tabName === 'audit' && paneAudit) {
+          requestAnimationFrame(() => { paneAudit.scrollTop = 0; });
+        }
       }
 
       // ── Robust Fleet Table & Traveler Profile Renderer ────────────────
