@@ -108,9 +108,12 @@
         <aside class="ops-sidebar">
           <!-- Active Executive Travelers List -->
           <div class="card table-container">
-            <div class="card-header">
-              <span class="card-title">Executive Travelers</span>
-              <span id="metric-active-count" class="badge status-tag-green">4 ACTIVE</span>
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="card-title">Executive Travelers / Users</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <button onclick="deleteUser(currentActiveTravelerId);" title="Delete Currently Selected User" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;">🗑️ Delete User</button>
+                <span id="metric-active-count" class="badge status-tag-green">4 ACTIVE</span>
+              </div>
             </div>
             <div class="table-wrapper">
               <table class="travelers-table">
@@ -253,7 +256,10 @@
             </div>
             <div id="simulator-controls-panel" class="card-body">
               <div class="form-group">
-                <label for="simulator-traveler-select">Executive Traveler Profile</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label for="simulator-traveler-select" style="margin-bottom: 0;">Executive Traveler Profile / User</label>
+                  <button id="btn-delete-sim-user" type="button" onclick="const id = document.getElementById('simulator-traveler-select').value; deleteUser(id);" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px;">🗑️ Delete User</button>
+                </div>
                 <select id="simulator-traveler-select" class="form-control">
                   <option value="itin-101">Sarah Jenkins (San Francisco [SFO] ➔ London Heathrow [LHR] | $300 Policy Limit)</option>
                   <option value="itin-102">Marcus Vance (New York [JFK] ➔ Paris [CDG] | $500 Policy Limit)</option>
@@ -3690,9 +3696,11 @@
 
       function openPassengerDetailsModal(travelerId) {
         const targetId = travelerId || currentActiveTravelerId || 'itin-101';
+        currentActiveTravelerId = targetId;
         const profile = TRAVELER_PROFILES[targetId] || TRAVELER_PROFILES['itin-101'];
         const modal = document.getElementById('passengerDetailsModal');
         if (!modal) return;
+        modal.dataset.travelerId = targetId;
 
         const loyaltyTier = profile.loyaltyTier || (profile.name && profile.name.includes('Sarah') ? 'Delta Diamond Medallion · SkyTeam Elite Plus' : (profile.name && profile.name.includes('Marcus') ? 'Air France Flying Blue Platinum' : 'Executive Club Gold'));
         const seatPref = profile.seatPref || (profile.preferredCabin || 'Business Class Quiet Car') + ' · No Middle Seats · Bulkhead Preferred';
@@ -3769,7 +3777,7 @@
         const profile = TRAVELER_PROFILES[travelerId];
         const name = profile ? profile.name : travelerId;
 
-        if (!confirm(`Are you sure you want to delete passenger "${name}"?`)) return;
+        if (!confirm(`Are you sure you want to delete user/passenger "${name}"?`)) return;
 
         try {
           await fetch('/api/traveler/' + travelerId, { method: 'DELETE' });
@@ -3805,8 +3813,11 @@
           await selectTraveler(remainingIds[0]);
         }
 
-        showToast(`Passenger "${name}" deleted successfully.`, 'success');
+        showToast(`User/Passenger "${name}" deleted successfully.`, 'success');
       }
+
+      window.deleteUser = deleteTraveler;
+      window.deletePassenger = deleteTraveler;
 
       function renderTravelerInspector(profile) {
         const container = document.getElementById('inspector-rendered-content');
@@ -3906,10 +3917,14 @@
           document.getElementById('passengerDetailsModal')?.classList.remove('active');
         });
         document.getElementById('passenger-modal-delete-btn')?.addEventListener('click', () => {
-          deleteTraveler(currentActiveTravelerId);
+          const modal = document.getElementById('passengerDetailsModal');
+          const targetId = (modal && modal.dataset && modal.dataset.travelerId) ? modal.dataset.travelerId : currentActiveTravelerId;
+          deleteTraveler(targetId);
         });
         document.getElementById('passenger-modal-delete-btn-header')?.addEventListener('click', () => {
-          deleteTraveler(currentActiveTravelerId);
+          const modal = document.getElementById('passengerDetailsModal');
+          const targetId = (modal && modal.dataset && modal.dataset.travelerId) ? modal.dataset.travelerId : currentActiveTravelerId;
+          deleteTraveler(targetId);
         });
         document.getElementById('passengerDetailsModal')?.addEventListener('click', (e) => {
           if (e.target === document.getElementById('passengerDetailsModal')) {

@@ -321,9 +321,11 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     route: routeStr,
     status: 'SCHEDULED',
     legs: legs.map(l => l.mode || l.type).join(' · '),
+    last_event: 'SCHEDULED',
+    region: 'North America / EU',
     riskScore: 0.05,
   };
-  activeFleetData.unshift(newTrip);
+  activeFleetData.unshift(newTrip as any);
 
   res.json({
     success: true,
