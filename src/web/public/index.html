@@ -180,30 +180,64 @@
             </div>
 
             <div id="map-telemetry-badge" class="map-telemetry-badge">
-              <span>⚡ OSRM Highway API & Geodesic Flight Arcs Active</span>
+              <span>OSRM Highway API &amp; Geodesic Flight Arcs Active</span>
             </div>
 
             <!-- Multi-Modal Sequence Builder & Transport Mode Bar -->
-            <div class="map-filter-subbar">
-              <div style="display: flex; align-items: center; gap: 6px; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 5px; margin-bottom: 4px; flex-wrap: wrap;">
-                <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">🚗✈️🚆 Choose Journey Sequence:</span>
-                <button id="seq-btn-car-plane" class="mode-filter-btn active" onclick="applyJourneySequence('CAR_PLANE')">🚗 Car ➔ ✈️ Plane</button>
-                <button id="seq-btn-car-plane-car" class="mode-filter-btn" onclick="applyJourneySequence('CAR_PLANE_CAR')">🚗 Car ➔ ✈️ Plane ➔ 🚗 Car</button>
-                <button id="seq-btn-car-plane-rail" class="mode-filter-btn" onclick="applyJourneySequence('CAR_PLANE_RAIL')">🚗 Car ➔ ✈️ Plane ➔ 🚆 Train</button>
-                <button id="seq-btn-rail-plane-car" class="mode-filter-btn" onclick="applyJourneySequence('RAIL_PLANE_CAR')">🚆 Train ➔ ✈️ Plane ➔ 🚗 Car</button>
-                <button id="seq-btn-plane-rail" class="mode-filter-btn" onclick="applyJourneySequence('PLANE_RAIL')">✈️ Plane ➔ 🚆 Train</button>
-                <button id="seq-btn-plane-only" class="mode-filter-btn" onclick="applyJourneySequence('PLANE_ONLY')">✈️ Plane Direct</button>
+            <div class="map-filter-subbar" style="flex-direction: column; align-items: stretch; padding: 10px 14px; gap: 8px;">
+              <!-- Row 1: Journey Sequence -->
+              <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 5px; margin-right: 4px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 12l4-4m-4 4 4 4"/></svg>
+                  <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">Journey Sequence</span>
+                </div>
+                <button id="seq-btn-car-plane" class="mode-filter-btn active" onclick="applyJourneySequence('CAR_PLANE')">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="13" width="22" height="8" rx="2"/><path d="m9 13-4-8h12l2 8"/><circle cx="7" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>
+                  Car &rarr; Flight
+                </button>
+                <button id="seq-btn-car-plane-car" class="mode-filter-btn" onclick="applyJourneySequence('CAR_PLANE_CAR')">
+                  Car &rarr; Flight &rarr; Car
+                </button>
+                <button id="seq-btn-car-plane-rail" class="mode-filter-btn" onclick="applyJourneySequence('CAR_PLANE_RAIL')">
+                  Car &rarr; Flight &rarr; Rail
+                </button>
+                <button id="seq-btn-rail-plane-car" class="mode-filter-btn" onclick="applyJourneySequence('RAIL_PLANE_CAR')">
+                  Rail &rarr; Flight &rarr; Car
+                </button>
+                <button id="seq-btn-plane-rail" class="mode-filter-btn" onclick="applyJourneySequence('PLANE_RAIL')">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z"/></svg>
+                  Flight &rarr; Rail
+                </button>
+                <button id="seq-btn-plane-only" class="mode-filter-btn" onclick="applyJourneySequence('PLANE_ONLY')">
+                  Direct Flight
+                </button>
               </div>
 
-              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 2px;">Filter Visible Modes:</span>
-                <button id="mode-btn-all" class="mode-filter-btn active" onclick="setTransportModeFilter('ALL')">🌐 All Modes</button>
-                <button id="mode-btn-flight" class="mode-filter-btn" onclick="setTransportModeFilter('FLIGHT')">✈️ Plane Only</button>
-                <button id="mode-btn-rail" class="mode-filter-btn" onclick="setTransportModeFilter('RAIL')">🚆 Train Only</button>
-                <button id="mode-btn-road" class="mode-filter-btn" onclick="setTransportModeFilter('ROAD')">🚗 Car / Taxi</button>
-                <button id="mode-btn-plane-train" class="mode-filter-btn" onclick="setTransportModeFilter('PLANE_TRAIN')">✈️🚆 Plane + Train</button>
-                <button id="mode-btn-plane-car" class="mode-filter-btn" onclick="setTransportModeFilter('PLANE_CAR')">✈️🚗 Plane + Car</button>
-                <button id="mode-btn-train-car" class="mode-filter-btn" onclick="setTransportModeFilter('TRAIN_CAR')">🚆🚗 Train + Car</button>
+              <!-- Divider -->
+              <div style="height: 1px; background: rgba(255,255,255,0.07); margin: 0 -2px;"></div>
+
+              <!-- Row 2: Mode Filter -->
+              <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 5px; margin-right: 4px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                  <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">Filter Modes</span>
+                </div>
+                <button id="mode-btn-all" class="mode-filter-btn active" onclick="setTransportModeFilter('ALL')">All Modes</button>
+                <button id="mode-btn-flight" class="mode-filter-btn" onclick="setTransportModeFilter('FLIGHT')">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z"/></svg>
+                  Flight
+                </button>
+                <button id="mode-btn-rail" class="mode-filter-btn" onclick="setTransportModeFilter('RAIL')">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h0"/><path d="M16 15h0"/></svg>
+                  Rail
+                </button>
+                <button id="mode-btn-road" class="mode-filter-btn" onclick="setTransportModeFilter('ROAD')">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="13" width="22" height="8" rx="2"/><path d="m9 13-4-8h12l2 8"/><circle cx="7" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>
+                  Car / Taxi
+                </button>
+                <button id="mode-btn-plane-train" class="mode-filter-btn" onclick="setTransportModeFilter('PLANE_TRAIN')">Flight + Rail</button>
+                <button id="mode-btn-plane-car" class="mode-filter-btn" onclick="setTransportModeFilter('PLANE_CAR')">Flight + Car</button>
+                <button id="mode-btn-train-car" class="mode-filter-btn" onclick="setTransportModeFilter('TRAIN_CAR')">Rail + Car</button>
               </div>
             </div>
 
@@ -540,7 +574,7 @@
           </div>
 
           <!-- Bottom Row: Full-Width Autonomous Healing Transaction Stream Table -->
-          <div class="card" style="grid-column: 1 / -1;">
+          <div class="card" style="grid-column: 1 / -1; margin-top: 24px;">
             <div class="card-header">
               <span class="card-title">Autonomous Executive Recovery Transaction Ledger & Immutable History</span>
               <span class="badge status-tag-purple">VERIFIED LEDGER</span>
@@ -676,31 +710,31 @@
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
               <button type="button" class="preset-btn active" data-preset="FLIGHT_ONLY"
                 style="padding: 10px 8px; background: rgba(99,102,241,0.25); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                ✈️ Plane Only
+                Flight Only
               </button>
               <button type="button" class="preset-btn" data-preset="TRAIN_ONLY"
                 style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                🚆 Train Only
+                Train Only
               </button>
               <button type="button" class="preset-btn" data-preset="CAR_ONLY"
                 style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                🚗 Car / Drive Only
+                Car / Drive Only
               </button>
               <button type="button" class="preset-btn" data-preset="CAR_FLIGHT"
                 style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                🚗 + ✈️ Car to Airport + Plane
+                Car &rarr; Flight
               </button>
               <button type="button" class="preset-btn" data-preset="FLIGHT_CAR"
                 style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                ✈️ + 🚗 Plane + Car
+                Flight &rarr; Car
               </button>
               <button type="button" class="preset-btn" data-preset="TRAIN_FLIGHT"
                 style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                🚆 + ✈️ Train + Plane
+                Rail &rarr; Flight
               </button>
               <button type="button" class="preset-btn" data-preset="FULL_MULTIMODAL"
                 style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                🚗 + ✈️ + 🚗 Car + Plane + Car
+                Car &rarr; Flight &rarr; Car
               </button>
             </div>
           </div>
@@ -714,20 +748,24 @@
             <input type="hidden" id="modal-travel-mode" value="FLIGHT">
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
               <button type="button" class="mode-select-btn active" data-mode="FLIGHT"
-                style="padding: 10px; background: rgba(99,102,241,0.2); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                <span style="font-size: 16px;">✈️</span> Flight
+                style="padding: 10px; background: rgba(99,102,241,0.2); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z"/></svg>
+                Flight
               </button>
               <button type="button" class="mode-select-btn" data-mode="RAIL"
-                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                <span style="font-size: 16px;">🚆</span> Train / Rail
+                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h0"/><path d="M16 15h0"/></svg>
+                Train / Rail
               </button>
               <button type="button" class="mode-select-btn" data-mode="CAR"
-                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                <span style="font-size: 16px;">🚗</span> Car / Drive
+                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="13" width="22" height="8" rx="2"/><path d="m9 13-4-8h12l2 8"/><circle cx="7" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>
+                Car / Drive
               </button>
               <button type="button" class="mode-select-btn" data-mode="BUS"
-                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                <span style="font-size: 16px;">🚌</span> Bus Express
+                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
+                Bus Express
               </button>
             </div>
           </div>
@@ -768,10 +806,10 @@
                   Transport</label>
                 <select id="modal-first-mile-mode"
                   style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
-                  <option value="RAIL">🚆 Regional Train (Small Town to Hub)</option>
-                  <option value="CAR">🚗 Driving / Private Car Transfer</option>
-                  <option value="BUS">🚌 Airport Shuttle / Express Bus</option>
-                  <option value="NONE">⚡ Direct (Start at Main Hub)</option>
+                  <option value="RAIL">Regional Train (Small Town to Hub)</option>
+                  <option value="CAR">Driving / Private Car Transfer</option>
+                  <option value="BUS">Airport Shuttle / Express Bus</option>
+                  <option value="NONE">Direct (Start at Main Hub)</option>
                 </select>
               </div>
               <div>
@@ -815,7 +853,7 @@
             <div>
               <label
                 style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38BDF8; margin-bottom: 4px; display: block;">
-                🗓️ Departure Schedule (When)
+                 Departure Schedule
               </label>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                 <input id="modal-dep-date" type="date" value="2026-08-10"
@@ -828,7 +866,7 @@
             <div>
               <label
                 style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #10B981; margin-bottom: 4px; display: block;">
-                🏁 Arrival Schedule (When)
+                 Arrival Schedule
               </label>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                 <input id="modal-arr-date" type="date" value="2026-08-10"
@@ -853,10 +891,10 @@
                   Transport</label>
                 <select id="modal-transfer-mode"
                   style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
-                  <option value="CAR_TRANSFER">🚗 Private Executive Sedan / Chauffeur</option>
-                  <option value="BUS_TRANSFER">🚌 Airport Express Shuttle</option>
-                  <option value="RAIL_TRANSFER">🚆 City Metro / High-Speed Rail Transfer</option>
-                  <option value="DIRECT">⚡ Direct Hotel Check-In</option>
+                  <option value="CAR_TRANSFER">Private Executive Sedan / Chauffeur</option>
+                  <option value="BUS_TRANSFER">Airport Express Shuttle</option>
+                  <option value="RAIL_TRANSFER">City Metro / High-Speed Rail Transfer</option>
+                  <option value="DIRECT">Direct Hotel Check-In</option>
                 </select>
               </div>
               <div>
@@ -2800,7 +2838,7 @@
 
     async function downloadAuditPdf() {
       const incidentId = latestAuditData?.incidentId || 'PROOF-REC-994821';
-      showToast('📄 Generating Executive B2B Audit PDF...', 'info', 2500);
+      showToast('Generating Executive Audit PDF Report...', 'info', 2500);
 
       const travelerName = latestAuditData?.travelerProfile?.name || document.getElementById('itin-subtitle')?.textContent?.split('—')[0]?.trim() || 'Sarah Jenkins';
       const travelerEmail = latestAuditData?.travelerProfile?.email || 'sarah.jenkins@acme.com';
@@ -2808,67 +2846,126 @@
       const destination = latestAuditData?.originalItinerary?.destination || 'LHR';
       const txHash = latestAuditData?.cockroachDbTelemetry?.txHash || '0x8f4b2c1e9a' + Math.random().toString(16).substring(2, 8);
       const timestamp = latestAuditData?.timestamp ? new Date(latestAuditData.timestamp).toUTCString() : new Date().toUTCString();
+      const preferredCabin = latestAuditData?.travelerProfile?.preferredCabin || 'Business Class Quiet Car';
+      const vectorScore = latestAuditData?.travelerProfile?.hnswVectorScore || 0.984;
 
       const pdfWrapper = document.createElement('div');
-      pdfWrapper.style.padding = '28px';
-      pdfWrapper.style.background = '#0f172a';
+      pdfWrapper.style.padding = '32px';
+      pdfWrapper.style.background = '#0a0d1a';
       pdfWrapper.style.color = '#f8fafc';
-      pdfWrapper.style.fontFamily = 'Inter, -apple-system, sans-serif';
-      pdfWrapper.style.width = '780px';
-      pdfWrapper.style.borderRadius = '12px';
+      pdfWrapper.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+      pdfWrapper.style.width = '760px';
+      pdfWrapper.style.lineHeight = '1.4';
 
       pdfWrapper.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #6366f1; padding-bottom:14px; margin-bottom:20px;">
+        <!-- ═══ COVER HEADER ═══ -->
+        <div style="background:linear-gradient(135deg,rgba(99,102,241,0.18) 0%,rgba(16,185,129,0.08) 100%); border:1px solid rgba(99,102,241,0.35); border-radius:14px; padding:20px 24px; margin-bottom:22px; display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:30px; height:30px; background:#6366f1; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:16px;">C</div>
-              <h1 style="margin:0; font-size:20px; font-weight:700; color:#fff; letter-spacing:-0.02em;">CASCADE</h1>
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
+              <div style="width:36px; height:36px; background:linear-gradient(135deg,#6366f1,#818cf8); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:18px; letter-spacing:-0.05em;">C</div>
+              <div>
+                <div style="font-size:22px; font-weight:800; color:#fff; letter-spacing:-0.04em; line-height:1;">CASCADE</div>
+                <div style="font-size:10px; color:#818cf8; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;">Autonomous Executive Travel Recovery Engine</div>
+              </div>
             </div>
-            <p style="margin:4px 0 0 0; font-size:11px; color:#94a3b8;">Autonomous Executive Travel Recovery Engine — B2B Post-Incident Audit Summary</p>
+            <div style="font-size:11.5px; color:#94a3b8; margin-top:4px;">Post-Incident B2B Audit Report — Enterprise Compliance Export</div>
           </div>
           <div style="text-align:right;">
-            <span style="background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.4); padding:3px 8px; border-radius:10px; font-size:10px; font-weight:600;">VERIFIED AUDIT PROOF</span>
-            <p style="margin:4px 0 0 0; font-size:10px; color:#94a3b8; font-family:monospace;">${incidentId}</p>
+            <div style="background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.4); padding:5px 12px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:0.06em; display:inline-block; margin-bottom:6px;">VERIFIED AUDIT PROOF</div>
+            <div style="font-size:12px; font-weight:700; color:#f8fafc; font-family:monospace;">${incidentId}</div>
+            <div style="font-size:9px; color:#64748b; margin-top:2px;">${timestamp}</div>
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:20px;">
-          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:8px;">
-            <div style="font-size:9px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Incident ID</div>
-            <div style="font-size:12px; font-weight:700; color:#fff; font-family:monospace; margin-top:3px;">${incidentId}</div>
+        <!-- ═══ KPI DASHBOARD ROW ═══ -->
+        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:20px;">
+          <div style="background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.25); padding:11px; border-radius:10px; text-align:center;">
+            <div style="font-size:8.5px; color:#818cf8; text-transform:uppercase; font-weight:700; letter-spacing:0.06em; margin-bottom:4px;">Resolution SLA</div>
+            <div style="font-size:18px; font-weight:800; color:#818cf8; font-family:monospace;">392ms</div>
+            <div style="font-size:8px; color:#64748b; margin-top:2px;">Sub-500ms target</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:8px;">
-            <div style="font-size:9px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Time Restored</div>
-            <div style="font-size:13px; font-weight:700; color:#38bdf8; margin-top:3px;">4.5 Hours</div>
+          <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); padding:11px; border-radius:10px; text-align:center;">
+            <div style="font-size:8.5px; color:#10b981; text-transform:uppercase; font-weight:700; letter-spacing:0.06em; margin-bottom:4px;">Time Restored</div>
+            <div style="font-size:18px; font-weight:800; color:#10b981;">4.5h</div>
+            <div style="font-size:8px; color:#64748b; margin-top:2px;">Productivity saved</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:8px;">
-            <div style="font-size:9px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Financial Delta</div>
-            <div style="font-size:13px; font-weight:700; color:#22c55e; margin-top:3px;">$0.00 Net</div>
+          <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); padding:11px; border-radius:10px; text-align:center;">
+            <div style="font-size:8.5px; color:#22c55e; text-transform:uppercase; font-weight:700; letter-spacing:0.06em; margin-bottom:4px;">Cost Delta</div>
+            <div style="font-size:18px; font-weight:800; color:#22c55e;">$0.00</div>
+            <div style="font-size:8px; color:#64748b; margin-top:2px;">Zero liability</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:8px;">
-            <div style="font-size:9px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Policy Tier</div>
-            <div style="font-size:11px; font-weight:700; color:#818cf8; margin-top:3px;">Executive Tier ($300 Limit)</div>
+          <div style="background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.25); padding:11px; border-radius:10px; text-align:center;">
+            <div style="font-size:8.5px; color:#38bdf8; text-transform:uppercase; font-weight:700; letter-spacing:0.06em; margin-bottom:4px;">Vector Match</div>
+            <div style="font-size:18px; font-weight:800; color:#38bdf8;">${Math.round(vectorScore * 1000) / 10}%</div>
+            <div style="font-size:8px; color:#64748b; margin-top:2px;">HNSW cosine sim.</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); padding:11px; border-radius:10px; text-align:center;">
+            <div style="font-size:8.5px; color:#f59e0b; text-transform:uppercase; font-weight:700; letter-spacing:0.06em; margin-bottom:4px;">Disruption Type</div>
+            <div style="font-size:11px; font-weight:800; color:#f59e0b; line-height:1.2;">FLIGHT<br>DELAY</div>
+            <div style="font-size:8px; color:#64748b; margin-top:2px;">+150 min</div>
           </div>
         </div>
 
-        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:10px; margin-bottom:20px;">
-          <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#f8fafc;">Executive Traveler & Context</h3>
-          <div style="font-size:11px; color:#cbd5e1; line-height:1.5;">
-            <div>● <strong>Passenger:</strong> ${travelerName} (<span style="font-family:monospace; color:#818cf8;">${travelerEmail}</span>)</div>
-            <div>● <strong>Active Route Segment:</strong> ${origin} ➔ ${destination}</div>
-            <div>● <strong>Preference Alignment Vector:</strong> HNSW Cosine Similarity 98.4% Match</div>
-          </div>
-        </div>
-
-        <div style="margin-bottom:20px;">
-          <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#f8fafc;">AWS Bedrock Claude 3.5 Chain-of-Thought Reasoning Pipeline</h3>
-          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;">
-            <div style="background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.3); padding:8px; border-radius:6px;">
-              <div style="font-size:9px; font-weight:700; color:#818cf8;">STAGE 01 (12ms)</div>
-              <div style="font-size:10px; font-weight:700; color:#fff; margin-top:2px;">Signal Ingestion</div>
-              <div style="font-size:9px; color:#94a3b8; margin-top:2px;">CDC Listener captured delay</div>
+        <!-- ═══ TRAVELER & ITINERARY CONTEXT ═══ -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:14px;">
+            <div style="font-size:9px; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; border-bottom:1px solid rgba(99,102,241,0.2); padding-bottom:6px;">Executive Traveler Profile</div>
+            <div style="display:flex; flex-direction:column; gap:6px; font-size:10.5px; color:#cbd5e1;">
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Passenger</span><span style="font-weight:600; color:#fff;">${travelerName}</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Email</span><span style="font-family:monospace; color:#818cf8; font-size:9.5px;">${travelerEmail}</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Route</span><span style="font-family:monospace; color:#38bdf8; font-weight:700;">${origin} &#x2794; ${destination}</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Preferred Cabin</span><span style="font-weight:600;">${preferredCabin}</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Policy Tier</span><span style="color:#818cf8; font-weight:700;">Executive ($300 Limit)</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Auto-Rebook Threshold</span><span style="font-family:monospace;">30 min</span></div>
             </div>
-            <div style="background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.3); padding:8px; border-radius:6px;">
+          </div>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:14px;">
+            <div style="font-size:9px; font-weight:700; color:#10b981; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; border-bottom:1px solid rgba(16,185,129,0.2); padding-bottom:6px;">HNSW Vector Preference Match</div>
+            <div style="display:flex; flex-direction:column; gap:6px; font-size:10.5px; color:#cbd5e1;">
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Vector Index</span><span style="font-family:monospace; font-size:9px; color:#10b981;">idx_users_preference_embedding</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Embedding Dim</span><span style="font-family:monospace;">1536-dim (HNSW)</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Top Match</span><span style="color:#10b981; font-weight:700;">Amtrak Acela Express (0.984)</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Match Category</span><span style="color:#10b981; font-weight:700;">EXACT_PREFERENCE_MATCH</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Seat Preference</span><span>Aisle — Quiet Car / Front Row</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Hotel Min Stars</span><span>4-star minimum</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ BEDROCK PIPELINE ═══ -->
+        <div style="background:rgba(99,102,241,0.05); border:1px solid rgba(99,102,241,0.2); border-radius:10px; padding:14px; margin-bottom:20px;">
+          <div style="font-size:9px; font-weight:700; color:#818cf8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">AWS Bedrock Claude 3.5 Sonnet — Chain-of-Thought Reasoning Pipeline</div>
+          <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px;">
+            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(99,102,241,0.3); padding:8px; border-radius:7px;">
+              <div style="font-size:8px; font-weight:700; color:#818cf8;">01 — 12ms</div>
+              <div style="font-size:10px; font-weight:700; color:#fff; margin-top:3px;">Signal Ingestion</div>
+              <div style="font-size:8.5px; color:#64748b; margin-top:2px; line-height:1.3;">CDC Listener captured DL-1402 delay event (+150min)</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(99,102,241,0.3); padding:8px; border-radius:7px;">
+              <div style="font-size:8px; font-weight:700; color:#818cf8;">02 — 18ms</div>
+              <div style="font-size:10px; font-weight:700; color:#fff; margin-top:3px;">Policy Evaluation</div>
+              <div style="font-size:8.5px; color:#64748b; margin-top:2px; line-height:1.3;">Guardrail check: $0 cost delta — within $300 exec limit</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(99,102,241,0.3); padding:8px; border-radius:7px;">
+              <div style="font-size:8px; font-weight:700; color:#818cf8;">03 — 45ms</div>
+              <div style="font-size:10px; font-weight:700; color:#fff; margin-top:3px;">Vector Search</div>
+              <div style="font-size:8.5px; color:#64748b; margin-top:2px; line-height:1.3;">HNSW 1536-dim cosine ranked Acela Express #1 (0.984)</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(99,102,241,0.3); padding:8px; border-radius:7px;">
+              <div style="font-size:8px; font-weight:700; color:#818cf8;">04 — 32ms</div>
+              <div style="font-size:10px; font-weight:700; color:#fff; margin-top:3px;">State Settlement</div>
+              <div style="font-size:8.5px; color:#64748b; margin-top:2px; line-height:1.3;">CockroachDB SERIALIZABLE commit across 3 regions</div>
+            </div>
+            <div style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.4); padding:8px; border-radius:7px;">
+              <div style="font-size:8px; font-weight:700; color:#10b981;">TOTAL — 392ms</div>
+              <div style="font-size:10px; font-weight:700; color:#10b981; margin-top:3px;">Saga Completed</div>
+              <div style="font-size:8.5px; color:#64748b; margin-top:2px; line-height:1.3;">Traveler push alert dispatched. Zero human intervention.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ITINERARY TIMELINE TABLE ═══ -->
+        <div style="margin-bottom:20px;">
               <div style="font-size:9px; font-weight:700; color:#818cf8;">STAGE 02 (18ms)</div>
               <div style="font-size:10px; font-weight:700; color:#fff; margin-top:2px;">Policy Evaluation</div>
               <div style="font-size:9px; color:#94a3b8; margin-top:2px;">Claude 3.5 auto-approved</div>

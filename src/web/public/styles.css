@@ -1731,20 +1731,21 @@ footer.app-footer {
 /* 7. Multi-Modal Transport Filter Bar & Geographic City Pin Badges */
 .map-filter-subbar {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 6px 12px;
-  border-radius: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  background: rgba(10, 13, 26, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  border-radius: 10px;
   position: absolute;
-  bottom: 12px;
-  left: 12px;
+  bottom: 14px;
+  left: 14px;
   z-index: 400;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  flex-wrap: wrap;
-  max-width: calc(100% - 24px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.08);
+  max-width: calc(100% - 28px);
 }
 
 [data-theme="light"] .map-filter-subbar {
