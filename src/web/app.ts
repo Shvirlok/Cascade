@@ -169,6 +169,7 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     email: travelerEmail || 'executive@acme.com',
     route: routeStr,
     originCode: origCode,
+    destCode: destCode,
     destinationCode: destCode,
     originLat: resolvedOrigLat,
     originLng: resolvedOrigLng,
@@ -183,10 +184,15 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     centerLng: cLng,
     zoom: 3,
     legs: [
-      { type: 'FLIGHT', provider: `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`, route: `${origCode} → ${destCode}`, status: 'SCHEDULED' },
-      { type: 'TRAIN', provider: 'Express Rail Connection', route: `${destCode} Central Station`, status: 'SCHEDULED' },
-      { type: 'HOTEL', provider: 'Luxury Five-Star Executive Hotel', route: `${destCode} Downtown`, status: 'CONFIRMED' },
+      { type: 'FLIGHT', provider: `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`, route: `${origCode} → ${destCode}`, status: 'SCHEDULED', mode: 'FLIGHT' },
+      { type: 'TRAIN', provider: 'Express Rail Connection', route: `${destCode} Central Station`, status: 'SCHEDULED', mode: 'RAIL' },
+      { type: 'HOTEL', provider: 'Luxury Five-Star Executive Hotel', route: `${destCode} Downtown`, status: 'CONFIRMED', mode: 'HOTEL' },
     ],
+    multiModalWaypoints: [
+      { mode: 'FLIGHT', provider: `Executive Air (${origCode})`, from: { code: origCode, label: `${origCode} Origin Int'l`, lat: resolvedOrigLat, lng: resolvedOrigLng }, to: { code: destCode, label: `${destCode} Destination Airport`, lat: resolvedDestLat, lng: resolvedDestLng }, color: '#6366f1' },
+      { mode: 'RAIL', provider: 'Express Rail Connection', from: { code: destCode, label: `${destCode} Rail Hub`, lat: resolvedDestLat, lng: resolvedDestLng }, to: { code: `${destCode}-CENTRAL`, label: `${destCode} Central Station`, lat: resolvedDestLat + 0.04, lng: resolvedDestLng + 0.04 }, color: '#10b981' },
+      { mode: 'BUS', provider: 'Executive Transfer Shuttle', from: { code: `${destCode}-CENTRAL`, label: `${destCode} Central Station`, lat: resolvedDestLat + 0.04, lng: resolvedDestLng + 0.04 }, to: { code: `${destCode}-CITY`, label: `${destCode} Hotel District`, lat: resolvedDestLat + 0.07, lng: resolvedDestLng + 0.07 }, color: '#f59e0b' }
+    ]
   };
 
   TRAVELER_PROFILES[newId] = newProfile;

@@ -606,13 +606,18 @@
         policyLimitUsd: 300,
         riskScore: 'Low Risk (Score: 0.12)',
         originCode: 'SFO', originLat: 37.6213, originLng: -122.3790,
-        destCode: 'LHR', destLat: 51.4700, destLng: -0.4543,
+        destCode: 'LHR', destinationCode: 'LHR', destLat: 51.4700, destLng: -0.4543,
         centerLat: 44.5, centerLng: -61.4, zoom: 3,
         legs: [
-          { provider: 'Delta Air Lines (DL-1402)', route: 'SFO → JFK', status: 'DELAYED' },
-          { provider: 'Amtrak Acela Express (AMT-2158)', route: 'NY Moynihan → PHL 30th St', status: 'REBOOKED' },
-          { provider: 'Ritz-Carlton Executive Suite', route: 'Philadelphia Downtown', status: 'CONFIRMED' },
-          { provider: 'British Airways (BA-178)', route: 'PHL → LHR', status: 'SCHEDULED' }
+          { provider: 'Delta Air Lines (DL-1402)', route: 'SFO → JFK', status: 'DELAYED', mode: 'FLIGHT' },
+          { provider: 'Amtrak Acela Express (AMT-2158)', route: 'NY Moynihan → PHL 30th St', status: 'REBOOKED', mode: 'RAIL' },
+          { provider: 'Ritz-Carlton Executive Suite', route: 'Philadelphia Downtown', status: 'CONFIRMED', mode: 'HOTEL' },
+          { provider: 'British Airways (BA-178)', route: 'PHL → LHR', status: 'SCHEDULED', mode: 'FLIGHT' }
+        ],
+        multiModalWaypoints: [
+          { mode: 'FLIGHT', provider: 'Delta Air Lines (DL-1402)', from: { code: 'SFO', label: 'SFO — San Francisco Int\'l', lat: 37.6213, lng: -122.3790 }, to: { code: 'JFK', label: 'JFK — New York JFK', lat: 40.6413, lng: -73.7781 }, color: '#6366f1' },
+          { mode: 'RAIL', provider: 'Amtrak Acela Express (AMT-2158)', from: { code: 'JFK', label: 'JFK — NY Moynihan Rail', lat: 40.6413, lng: -73.7781 }, to: { code: 'PHL', label: 'PHL — Philadelphia 30th St', lat: 39.8729, lng: -75.2437 }, color: '#10b981' },
+          { mode: 'FLIGHT', provider: 'British Airways (BA-178)', from: { code: 'PHL', label: 'PHL — Philadelphia Int\'l', lat: 39.8729, lng: -75.2437 }, to: { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 }, color: '#6366f1' }
         ]
       },
       'itin-102': {
@@ -628,12 +633,17 @@
         policyLimitUsd: 300,
         riskScore: 'Low Risk (Score: 0.08)',
         originCode: 'JFK', originLat: 40.6413, originLng: -73.7781,
-        destCode: 'CDG', destLat: 49.0097, destLng: 2.5479,
+        destCode: 'CDG', destinationCode: 'CDG', destLat: 49.0097, destLng: 2.5479,
         centerLat: 44.8, centerLng: -35.6, zoom: 3,
         legs: [
-          { provider: 'Air France (AF-023)', route: 'JFK → CDG', status: 'SCHEDULED' },
-          { provider: 'TGV InOui (TGV-6821)', route: 'Paris CDG → Lyon Part-Dieu', status: 'SCHEDULED' },
-          { provider: 'Four Seasons Hotel George V', route: 'Paris Eighth Arrondissement', status: 'CONFIRMED' }
+          { provider: 'Air France (AF-023)', route: 'JFK → CDG', status: 'SCHEDULED', mode: 'FLIGHT' },
+          { provider: 'TGV InOui (TGV-6821)', route: 'Paris CDG → Lyon Part-Dieu', status: 'SCHEDULED', mode: 'RAIL' },
+          { provider: 'Four Seasons Hotel George V', route: 'Paris Eighth Arrondissement', status: 'CONFIRMED', mode: 'HOTEL' }
+        ],
+        multiModalWaypoints: [
+          { mode: 'FLIGHT', provider: 'Air France (AF-023)', from: { code: 'JFK', label: 'JFK — New York JFK', lat: 40.6413, lng: -73.7781 }, to: { code: 'CDG', label: 'CDG — Paris Charles de Gaulle', lat: 49.0097, lng: 2.5479 }, color: '#6366f1' },
+          { mode: 'RAIL', provider: 'TGV InOui High-Speed Rail', from: { code: 'CDG', label: 'CDG — Paris CDG Rail', lat: 49.0097, lng: 2.5479 }, to: { code: 'LYS', label: 'LYS — Lyon Part-Dieu Rail', lat: 45.7602, lng: 4.8597 }, color: '#10b981' },
+          { mode: 'BUS', provider: 'Executive Transfer Shuttle', from: { code: 'LYS', label: 'LYS — Lyon Station', lat: 45.7602, lng: 4.8597 }, to: { code: 'PAR', label: 'PAR — Paris Eighth Arr.', lat: 48.8688, lng: 2.3005 }, color: '#f59e0b' }
         ]
       },
       'itin-103': {
@@ -649,12 +659,17 @@
         policyLimitUsd: 300,
         riskScore: 'Low Risk (Score: 0.15)',
         originCode: 'ORD', originLat: 41.9742, originLng: -87.9073,
-        destCode: 'HND', destLat: 35.5494, destLng: 139.7798,
+        destCode: 'HND', destinationCode: 'HND', destLat: 35.5494, destLng: 139.7798,
         centerLat: 45.0, centerLng: -170.0, zoom: 2,
         legs: [
-          { provider: 'ANA All Nippon Airways (NH-111)', route: 'ORD → HND', status: 'IN_TRANSIT' },
-          { provider: 'Shinkansen Nozomi (NK-309)', route: 'Tokyo → Kyoto', status: 'SCHEDULED' },
-          { provider: 'Park Hyatt Tokyo', route: 'Shinjuku Tokyo', status: 'CONFIRMED' }
+          { provider: 'ANA All Nippon Airways (NH-111)', route: 'ORD → HND', status: 'IN_TRANSIT', mode: 'FLIGHT' },
+          { provider: 'Shinkansen Nozomi (NK-309)', route: 'Tokyo → Kyoto', status: 'SCHEDULED', mode: 'RAIL' },
+          { provider: 'Park Hyatt Tokyo', route: 'Shinjuku Tokyo', status: 'CONFIRMED', mode: 'HOTEL' }
+        ],
+        multiModalWaypoints: [
+          { mode: 'FLIGHT', provider: 'ANA All Nippon Airways (NH-111)', from: { code: 'ORD', label: 'ORD — Chicago O\'Hare', lat: 41.9742, lng: -87.9073 }, to: { code: 'HND', label: 'HND — Tokyo Haneda', lat: 35.5494, lng: 139.7798 }, color: '#6366f1' },
+          { mode: 'RAIL', provider: 'Shinkansen Bullet Train (NK-309)', from: { code: 'HND', label: 'HND — Tokyo Station', lat: 35.5494, lng: 139.7798 }, to: { code: 'KYT', label: 'KYT — Kyoto Station', lat: 34.9858, lng: 135.7588 }, color: '#10b981' },
+          { mode: 'BUS', provider: 'Executive Airport Bus Express', from: { code: 'KYT', label: 'KYT — Kyoto Transfer', lat: 34.9858, lng: 135.7588 }, to: { code: 'TYO', label: 'TYO — Shinjuku Tokyo', lat: 35.6905, lng: 139.6995 }, color: '#f59e0b' }
         ]
       },
       'itin-104': {
@@ -670,11 +685,15 @@
         policyLimitUsd: 300,
         riskScore: 'Low Risk (Score: 0.10)',
         originCode: 'MIA', originLat: 25.7959, originLng: -80.2870,
-        destCode: 'LHR', destLat: 51.4700, destLng: -0.4543,
+        destCode: 'LHR', destinationCode: 'LHR', destLat: 51.4700, destLng: -0.4543,
         centerLat: 40.0, centerLng: -40.0, zoom: 3,
         legs: [
-          { provider: 'American Airlines (AA-038)', route: 'MIA → LHR', status: 'SELF_HEALED' },
-          { provider: 'Executive Taxi Transfer', route: 'LHR → London Hotel', status: 'CONFIRMED' }
+          { provider: 'American Airlines (AA-038)', route: 'MIA → LHR', status: 'SELF_HEALED', mode: 'FLIGHT' },
+          { provider: 'Executive Taxi Transfer', route: 'LHR → London Hotel', status: 'CONFIRMED', mode: 'BUS' }
+        ],
+        multiModalWaypoints: [
+          { mode: 'FLIGHT', provider: 'American Airlines (AA-038)', from: { code: 'MIA', label: 'MIA — Miami Int\'l', lat: 25.7959, lng: -80.2870 }, to: { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 }, color: '#6366f1' },
+          { mode: 'BUS', provider: 'Executive Taxi / Shuttle Transfer', from: { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 }, to: { code: 'LON', label: 'LON — Central London Hotel', lat: 51.5074, lng: -0.1278 }, color: '#f59e0b' }
         ]
       }
     };
@@ -723,6 +742,64 @@
       if (t.includes('HOTEL') || t.includes('STAY') || t.includes('RITZ') || t.includes('SUITE')) return ICONS.HOTEL;
       if (t.includes('TAXI') || t.includes('CAB') || t.includes('UBER') || t.includes('LYFT')) return ICONS.TAXI;
       return ICONS.FLIGHT;
+    }
+
+    // ── Multi-Modal Mode Badge Helper ───────────────────────────────────
+    function getModalBadgeHtml(seg) {
+      // Derive mode from explicit `mode` field, then fall back to segment_type
+      const raw = (seg && (seg.mode || seg.segment_type || '')) || '';
+      const m = String(raw).toUpperCase();
+      if (m === 'RAIL' || m === 'TRAIN' || m.includes('TRAIN') || m.includes('RAIL')) {
+        return '<span style="display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;letter-spacing:0.04em;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.28);">[RAIL]</span>';
+      }
+      if (m === 'BUS' || m.includes('BUS') || m === 'PRIVATE_TRANSFER' || m.includes('SHUTTLE') || m.includes('TAXI')) {
+        return '<span style="display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;letter-spacing:0.04em;padding:2px 6px;border-radius:4px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.28);">[SHUTTLE]</span>';
+      }
+      if (m === 'FLIGHT' || m.includes('FLIGHT')) {
+        return '<span style="display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;letter-spacing:0.04em;padding:2px 6px;border-radius:4px;background:rgba(99,102,241,0.12);color:#818cf8;border:1px solid rgba(99,102,241,0.28);">[FLIGHT]</span>';
+      }
+      if (m === 'HOTEL' || m.includes('HOTEL')) {
+        return '';
+      }
+      return '';
+    }
+
+    // ── First-Mile Switch Callout Banner ────────────────────────────────
+    function renderFirstMileSwitchCallout(containerIdOrEl) {
+      const existingId = 'first-mile-callout-banner';
+      // Remove any stale callout first
+      document.getElementById(existingId)?.remove();
+
+      const banner = document.createElement('div');
+      banner.id = existingId;
+      banner.style.cssText = [
+        'display:flex', 'align-items:center', 'gap:10px',
+        'padding:10px 14px', 'margin-bottom:10px',
+        'background:linear-gradient(90deg,rgba(16,185,129,0.08) 0%,rgba(6,182,212,0.06) 100%)',
+        'border:1px solid rgba(16,185,129,0.3)', 'border-radius:8px',
+        'animation:fadeSlideIn 0.35s ease',
+      ].join(';');
+
+      banner.innerHTML = `
+        <div style="width:28px;height:28px;border-radius:6px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/>
+            <path d="M6 17h12"/>
+            <path d="M6 3h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+            <path d="m8 19-2 3"/><path d="m18 22-2-3"/>
+          </svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:11.5px;font-weight:700;color:#10b981;margin-bottom:1px;">First-Mile Optimization Applied</div>
+          <div style="font-size:11px;color:var(--text-secondary);line-height:1.4;">Regional air segment converted to High-Speed Rail to prevent missed international connection. Hub buffer preserved.</div>
+        </div>
+        <span style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:4px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);white-space:nowrap;">SMART SWITCH</span>
+      `;
+
+      const target = typeof containerIdOrEl === 'string'
+        ? document.getElementById(containerIdOrEl)
+        : containerIdOrEl;
+      if (target) target.insertBefore(banner, target.firstChild);
     }
 
     // ── Mode Switcher (Traveler View vs System Internals) ─────────────
@@ -919,10 +996,10 @@
 
     // ── Itinerary data ────────────────────────────────────────────────
     let graphNodes = [
-      { id: '1', provider: 'Delta Air Lines',       reference_code: 'DL-1402',  origin: 'SFO', destination: 'JFK', scheduled_departure: '2026-07-25T12:00:00.000Z', scheduled_arrival: '2026-07-25T17:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', pricing: 'Business Class · Direct · No change fee' },
-      { id: '2', provider: 'Amtrak Acela Express',  reference_code: 'AMT-2150', origin: 'NY Moynihan', destination: 'PHL 30th St', scheduled_departure: '2026-07-25T18:30:00.000Z', scheduled_arrival: '2026-07-25T19:45:00.000Z', status: 'SCHEDULED', segment_type: 'TRAIN', pricing: 'First Class Quiet Car · Wi-Fi Included · No change fee' },
-      { id: '3', provider: 'Ritz-Carlton Philadelphia', reference_code: 'HTL-9921', origin: 'Philadelphia', destination: 'Philadelphia', scheduled_departure: '2026-07-25T20:15:00.000Z', scheduled_arrival: '2026-07-26T12:00:00.000Z', status: 'SCHEDULED', segment_type: 'HOTEL', pricing: 'Executive Suite · Late Check-in Guaranteed · No change fee' },
-      { id: '4', provider: 'British Airways',        reference_code: 'BA-178',   origin: 'PHL', destination: 'LHR', scheduled_departure: '2026-07-26T15:00:00.000Z', scheduled_arrival: '2026-07-26T22:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', pricing: 'Club World Cabin · Direct Transatlantic · No change fee' }
+      { id: '1', provider: 'Delta Air Lines',       reference_code: 'DL-1402',  origin: 'SFO', destination: 'JFK', scheduled_departure: '2026-07-25T12:00:00.000Z', scheduled_arrival: '2026-07-25T17:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', mode: 'FLIGHT', pricing: 'Business Class · Direct · No change fee' },
+      { id: '2', provider: 'Amtrak Acela Express',  reference_code: 'AMT-2150', origin: 'NY Moynihan', destination: 'PHL 30th St', scheduled_departure: '2026-07-25T18:30:00.000Z', scheduled_arrival: '2026-07-25T19:45:00.000Z', status: 'SCHEDULED', segment_type: 'TRAIN', mode: 'RAIL', pricing: 'First Class Quiet Car · Wi-Fi Included · No change fee' },
+      { id: '3', provider: 'Ritz-Carlton Philadelphia', reference_code: 'HTL-9921', origin: 'Philadelphia', destination: 'Philadelphia', scheduled_departure: '2026-07-25T20:15:00.000Z', scheduled_arrival: '2026-07-26T12:00:00.000Z', status: 'SCHEDULED', segment_type: 'HOTEL', mode: null, pricing: 'Executive Suite · Late Check-in Guaranteed · No change fee' },
+      { id: '4', provider: 'British Airways',        reference_code: 'BA-178',   origin: 'PHL', destination: 'LHR', scheduled_departure: '2026-07-26T15:00:00.000Z', scheduled_arrival: '2026-07-26T22:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', mode: 'FLIGHT', pricing: 'Club World Cabin · Direct Transatlantic · No change fee' }
     ];
 
     function renderItineraryNodes(segments, containerId = 'nodes-container') {
@@ -951,7 +1028,7 @@
           <div class="node-left">
             <div class="node-icon-box">${iconHtml}</div>
             <div>
-              <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">${seg.provider} <code class="font-mono" style="font-size:12px; color:var(--text-muted);">${seg.reference_code}</code></div>
+              <div style="font-weight: 600; font-size: 14px; color: var(--text-primary); display:flex; align-items:center; gap:6px; flex-wrap:wrap;">${seg.provider} <code class="font-mono" style="font-size:12px; color:var(--text-muted);">${seg.reference_code}</code> ${getModalBadgeHtml(seg)}</div>
               <div style="color: var(--text-secondary); font-size: 13px; margin-top: 2px;">${seg.origin} → ${seg.destination} &nbsp;·&nbsp; ${dep} – ${arr}</div>
               <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">${seg.pricing}</div>
             </div>
@@ -1035,8 +1112,8 @@
       if (!leafletMap) return;
       mapDisplayMode = 'fleet';
 
-      setElText('map-route-title', 'All Active Fleet Flights');
-      setElText('map-route-subtitle', `${Object.keys(TRAVELER_PROFILES).length} Passengers Tracked`);
+      setElText('map-route-title', 'All Active Fleet & Multi-Modal Routes');
+      setElText('map-route-subtitle', `${Object.keys(TRAVELER_PROFILES).length} Multi-Modal Passengers Tracked`);
 
       const btnAll = document.getElementById('map-btn-all-fleet');
       const btnActive = document.getElementById('map-btn-active-route');
@@ -1046,7 +1123,9 @@
       if (routeLayerGroup) routeLayerGroup.clearLayers();
       else routeLayerGroup = L.layerGroup().addTo(leafletMap);
 
+      if (fleetAnimFrame) { cancelAnimationFrame(fleetAnimFrame); fleetAnimFrame = null; }
       if (planeAnimFrame) { cancelAnimationFrame(planeAnimFrame); planeAnimFrame = null; }
+      fleetPlanesData = [];
 
       const colors = ['#6366f1', '#10b981', '#06b6d4', '#f59e0b', '#ec4899', '#8b5cf6'];
       const allCoords = [];
@@ -1055,86 +1134,96 @@
       profiles.forEach((profile, idx) => {
         if (!profile.originLat || !profile.destLat) return;
 
-        const color = colors[idx % colors.length];
-        const origin = { lat: profile.originLat, lng: profile.originLng, code: profile.originCode };
-        const dest = { lat: profile.destLat, lng: profile.destLng, code: profile.destinationCode };
-        const arc = buildGreatCircleArc(origin, dest, 60);
+        const waypoints = profile.multiModalWaypoints || [
+          {
+            mode: 'FLIGHT',
+            provider: profile.name + ' Primary Flight',
+            from: { code: profile.originCode || 'ORIG', label: profile.originCode, lat: profile.originLat, lng: profile.originLng },
+            to: { code: profile.destCode || profile.destinationCode || 'DEST', label: profile.destCode || profile.destinationCode, lat: profile.destLat, lng: profile.destLng },
+            color: colors[idx % colors.length]
+          }
+        ];
 
-        allCoords.push(...arc);
+        waypoints.forEach((seg, sIdx) => {
+          const segColor = seg.color || (seg.mode === 'RAIL' ? '#10b981' : (seg.mode === 'BUS' ? '#f59e0b' : '#6366f1'));
+          const arc = buildGreatCircleArc(seg.from, seg.to, 50);
+          allCoords.push(...arc);
 
-        // Glow polyline
-        L.polyline(arc, {
-          color: color,
-          weight: 7,
-          opacity: 0.25,
-          lineCap: 'round',
-          lineJoin: 'round',
-        }).addTo(routeLayerGroup);
+          // Glow polyline
+          L.polyline(arc, {
+            color: segColor,
+            weight: 6,
+            opacity: 0.22,
+            lineCap: 'round',
+            lineJoin: 'round',
+          }).addTo(routeLayerGroup);
 
-        // Main polyline
-        const polyline = L.polyline(arc, {
-          color: color,
-          weight: 2.5,
-          opacity: 0.95,
-          lineCap: 'round',
-          lineJoin: 'round',
-        }).addTo(routeLayerGroup);
+          // Main polyline
+          const polyline = L.polyline(arc, {
+            color: segColor,
+            weight: 2.5,
+            opacity: 0.9,
+            lineCap: 'round',
+            lineJoin: 'round',
+          }).addTo(routeLayerGroup);
 
-        // Live plane marker animated continuously along active fleet flight route arc
-        if (arc.length > 5) {
-          const startProgress = (idx * 0.22) % 1;
-          const posA = arc[0];
-          const posB = arc[1];
-          const bearing = calcBearing(posA, posB);
-          const planeIcon = makePlaneIcon(bearing);
-          const planeMkr = L.marker(posA, { icon: planeIcon, zIndexOffset: 1000, interactive: false }).addTo(routeLayerGroup);
-
-          fleetPlanesData.push({
-            marker: planeMkr,
-            arc: arc,
-            progress: startProgress,
-            speed: 0.0007 + (idx * 0.0001)
-          });
-        }
-
-        const popupHtml = `
-          <div style="font-family:Inter,sans-serif; padding:4px; min-width:200px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; margin-bottom:6px;">
-              <strong style="font-size:13px; color:#f8fafc;">${profile.name}</strong>
-              <span style="font-size:10px; background:rgba(99,102,241,0.2); color:#818cf8; padding:2px 6px; border-radius:4px; font-weight:700;">${profile.status}</span>
+          const popupHtml = `
+            <div style="font-family:Inter,sans-serif; padding:4px; min-width:210px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; margin-bottom:6px;">
+                <strong style="font-size:13px; color:#f8fafc;">${profile.name}</strong>
+                <span style="font-size:10px; background:rgba(99,102,241,0.2); color:${segColor}; padding:2px 6px; border-radius:4px; font-weight:700;">[${seg.mode}]</span>
+              </div>
+              <div style="font-size:11px; color:#94a3b8; line-height:1.6;">
+                <div><strong>Segment:</strong> <span style="color:#f8fafc; font-weight:600;">${seg.provider}</span></div>
+                <div><strong>Route:</strong> <span style="color:#38bdf8; font-family:monospace; font-weight:700;">${seg.from.code} ➔ ${seg.to.code}</span></div>
+                <div><strong>Full Itinerary:</strong> ${profile.route}</div>
+              </div>
+              <button onclick="selectTraveler('${profile.id}'); openPassengerDetailsModal('${profile.id}');" style="margin-top:8px; width:100%; padding:6px; background:${segColor}; color:#fff; border:none; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer;">
+                Inspect Passenger Profile
+              </button>
             </div>
-            <div style="font-size:11px; color:#94a3b8; line-height:1.6;">
-              <div><strong>Flight Route:</strong> <span style="color:#38bdf8; font-family:monospace; font-weight:700;">${profile.route}</span></div>
-              <div><strong>Passenger:</strong> ${profile.email}</div>
-              <div><strong>Cabin:</strong> ${profile.preferredCabin || 'Business Class'}</div>
-              <div><strong>Policy Tier:</strong> ${profile.policyTier || 'Executive Tier'}</div>
-            </div>
-            <button onclick="selectTraveler('${profile.id}'); openPassengerDetailsModal('${profile.id}');" style="margin-top:8px; width:100%; padding:6px; background:#6366f1; color:#fff; border:none; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer;">
-              Inspect Passenger Profile
-            </button>
-          </div>
-        `;
+          `;
+          polyline.bindPopup(popupHtml, { maxWidth: 260 });
 
-        polyline.bindPopup(popupHtml, { maxWidth: 260 });
+          // Vehicle animation
+          if (arc.length > 5) {
+            const startProgress = (sIdx * 0.3 + idx * 0.2) % 1;
+            const posA = arc[0];
+            const posB = arc[1];
+            const bearing = calcBearing(posA, posB);
+            const vIcon = makeVehicleIcon(seg.mode, bearing);
+            const vMkr = L.marker(posA, { icon: vIcon, zIndexOffset: 1000, interactive: false }).addTo(routeLayerGroup);
 
-        // Airport Markers
-        [{ wp: origin, isDest: false }, { wp: dest, isDest: true }].forEach(({ wp, isDest }) => {
-          const dotIcon = L.divIcon({
-            className: '',
-            html: `<div style="
-              width:12px;height:12px;
-              border-radius:50%;
-              background:${isDest ? '#22c55e' : color};
-              border:2.5px solid ${isDest ? 'rgba(34,197,94,0.4)' : 'rgba(99,102,241,0.4)'};
-              box-shadow: 0 0 10px ${color};
-            "></div>`,
-            iconSize: [12, 12],
-            iconAnchor: [6, 6],
+            fleetPlanesData.push({
+              marker: vMkr,
+              arc: arc,
+              mode: seg.mode,
+              progress: startProgress,
+              speed: 0.0007 + (idx * 0.0001)
+            });
+          }
+
+          // Hub Station Markers
+          [seg.from, seg.to].forEach((node, nIdx) => {
+            const nodeCode = node.code || 'HUB';
+            const nodeLabel = node.label || nodeCode;
+            const dotIcon = L.divIcon({
+              className: '',
+              html: `<div style="
+                width:11px;height:11px;
+                border-radius:50%;
+                background:${segColor};
+                border:2px solid #ffffff;
+                box-shadow:0 0 8px ${segColor};
+              "></div>`,
+              iconSize: [11, 11],
+              iconAnchor: [5.5, 5.5],
+            });
+
+            L.marker([node.lat, node.lng], { icon: dotIcon })
+              .addTo(routeLayerGroup)
+              .bindPopup(`<strong>${nodeCode}</strong> — ${nodeLabel}<br/>Passenger: ${profile.name} (${profile.route})`);
           });
-
-          L.marker([wp.lat, wp.lng], { icon: dotIcon })
-            .addTo(routeLayerGroup)
-            .bindPopup(`<strong>${wp.code}</strong> — Passenger: ${profile.name} (${profile.route})`);
         });
       });
 
@@ -1158,103 +1247,139 @@
       if (btnAll) btnAll.classList.remove('active');
       if (btnActive) btnActive.classList.add('active');
 
+      const activeProfile = TRAVELER_PROFILES[currentActiveTravelerId || 'itin-101'] || TRAVELER_PROFILES['itin-101'];
+
       // Update map title elements
-      const nameStr = route.label.includes('—') ? route.label.split('—')[0].trim() : route.label;
-      const routeStr = route.label.includes('—') ? route.label.split('—')[1].trim() : route.label;
+      const nameStr = activeProfile.name || (route.label.includes('—') ? route.label.split('—')[0].trim() : route.label);
+      const routeStr = activeProfile.route || (route.label.includes('—') ? route.label.split('—')[1].trim() : route.label);
       setElText('map-route-title', routeStr);
-      setElText('map-route-subtitle', nameStr);
+      setElText('map-route-subtitle', `${nameStr} (Multi-Modal Itinerary)`);
 
-      // Build great-circle arc between origin and destination
-      const arc = buildGreatCircleArc(route.origin, route.dest, 80);
-
-      // Clear all existing route layers (but keep tile layer)
+      // Clear all existing route layers
       if (routeLayerGroup) routeLayerGroup.clearLayers();
       else routeLayerGroup = L.layerGroup().addTo(leafletMap);
 
-      // Stop any existing plane animations
       if (fleetAnimFrame) { cancelAnimationFrame(fleetAnimFrame); fleetAnimFrame = null; }
       if (planeAnimFrame) { cancelAnimationFrame(planeAnimFrame); planeAnimFrame = null; }
       fleetPlanesData = [];
 
-      // Glow polyline
-      L.polyline(arc, {
-        color: 'rgba(99,102,241,0.18)',
-        weight: 10,
-        lineCap: 'round',
-        lineJoin: 'round',
-        smoothFactor: 1,
-      }).addTo(routeLayerGroup);
+      const waypoints = activeProfile.multiModalWaypoints || [
+        {
+          mode: 'FLIGHT',
+          provider: 'Primary Flight',
+          from: { code: activeProfile.originCode || 'SFO', label: 'Origin Airport', lat: activeProfile.originLat || route.origin.lat, lng: activeProfile.originLng || route.origin.lng },
+          to: { code: activeProfile.destCode || activeProfile.destinationCode || 'LHR', label: 'Destination Airport', lat: activeProfile.destLat || route.dest.lat, lng: activeProfile.destLng || route.dest.lng },
+          color: '#6366f1'
+        }
+      ];
 
-      // Main route line
-      L.polyline(arc, {
-        color: '#6366f1',
-        weight: 2.5,
-        lineCap: 'round',
-        lineJoin: 'round',
-        smoothFactor: 1,
-        opacity: 0.9,
-      }).addTo(routeLayerGroup);
+      const allCoords = [];
 
-      // Add origin & destination markers
-      [{ wp: route.origin, type: 'origin' }, { wp: route.dest, type: 'destination' }].forEach(({ wp, type }) => {
-        const isDest  = type === 'destination';
-        const color   = isDest ? '#22c55e' : '#6366f1';
-        const size    = 12;
-        const border  = 2.5;
+      waypoints.forEach((seg, sIdx) => {
+        const segColor = seg.color || (seg.mode === 'RAIL' ? '#10b981' : (seg.mode === 'BUS' ? '#f59e0b' : '#6366f1'));
+        const arc = buildGreatCircleArc(seg.from, seg.to, 60);
+        allCoords.push(...arc);
 
-        const dotIcon = L.divIcon({
-          className: '',
-          html: `<div style="
-            width:${size}px;height:${size}px;
-            border-radius:50%;
-            background:${color};
-            border:${border}px solid ${isDest ? 'rgba(34,197,94,0.35)' : 'rgba(99,102,241,0.35)'};
-            box-shadow: 0 0 0 ${border + 1}px ${isDest ? 'rgba(34,197,94,0.15)' : 'rgba(99,102,241,0.15)'};
-          "></div>`,
-          iconSize:   [size, size],
-          iconAnchor: [size / 2, size / 2],
-        });
+        // Glow polyline
+        L.polyline(arc, {
+          color: segColor,
+          weight: 8,
+          opacity: 0.22,
+          lineCap: 'round',
+          lineJoin: 'round',
+          smoothFactor: 1,
+        }).addTo(routeLayerGroup);
 
-        L.marker([wp.lat, wp.lng], { icon: dotIcon })
-          .addTo(routeLayerGroup)
-          .bindPopup(wp.label, { closeButton: false, maxWidth: 180 });
+        // Main route line
+        const polyline = L.polyline(arc, {
+          color: segColor,
+          weight: 3,
+          lineCap: 'round',
+          lineJoin: 'round',
+          smoothFactor: 1,
+          opacity: 0.95,
+        }).addTo(routeLayerGroup);
 
-        // Code label
-        L.marker([wp.lat, wp.lng], {
-          icon: L.divIcon({
+        polyline.bindPopup(`
+          <div style="padding:4px; font-family:Inter,sans-serif;">
+            <div style="font-size:10px; font-weight:700; color:${segColor}; text-transform:uppercase;">[${seg.mode}] Segment</div>
+            <div style="font-size:13px; font-weight:700; color:#f8fafc; margin-top:2px;">${seg.provider}</div>
+            <div style="font-size:11px; color:#94a3b8; margin-top:3px;">Route: <span style="color:#38bdf8; font-family:monospace;">${seg.from.code} ➔ ${seg.to.code}</span></div>
+          </div>
+        `, { maxWidth: 220 });
+
+        // Add Station / Hub Markers
+        [seg.from, seg.to].forEach((node, nIdx) => {
+          const isFinalDest = (sIdx === waypoints.length - 1 && nIdx === 1);
+          const isOrigin = (sIdx === 0 && nIdx === 0);
+          const nodeCode = node.code || (isFinalDest ? (activeProfile.destCode || activeProfile.destinationCode || 'DEST') : (activeProfile.originCode || 'ORIG'));
+          const dotColor = isFinalDest ? '#22c55e' : (isOrigin ? '#6366f1' : segColor);
+
+          const dotIcon = L.divIcon({
             className: '',
             html: `<div style="
-              color:rgba(255,255,255,0.88);
-              font-size:11px;
-              font-weight:600;
-              font-family:Inter,sans-serif;
-              white-space:nowrap;
-              pointer-events:none;
-              text-shadow:0 1px 3px rgba(0,0,0,0.8);
-              padding-left:${!isDest ? '14px' : '0'};
-              padding-right:${isDest ? '14px' : '0'};
-              margin-top:2px;
-            ">${wp.code}</div>`,
-            iconSize:   [40, 16],
-            iconAnchor: !isDest ? [-2, 8] : [42, 8],
-          }),
-          interactive: false,
-          zIndexOffset: -1,
-        }).addTo(routeLayerGroup);
+              width:12px;height:12px;
+              border-radius:50%;
+              background:${dotColor};
+              border:2.5px solid #ffffff;
+              box-shadow: 0 0 10px ${dotColor};
+            "></div>`,
+            iconSize: [12, 12],
+            iconAnchor: [6, 6],
+          });
+
+          L.marker([node.lat, node.lng], { icon: dotIcon })
+            .addTo(routeLayerGroup)
+            .bindPopup(`<strong>${nodeCode}</strong> — ${node.label || nodeCode}`);
+
+          // Label text
+          L.marker([node.lat, node.lng], {
+            icon: L.divIcon({
+              className: '',
+              html: `<div style="
+                color:rgba(255,255,255,0.9);
+                font-size:11px;
+                font-weight:700;
+                font-family:Inter,sans-serif;
+                white-space:nowrap;
+                pointer-events:none;
+                text-shadow:0 1px 3px rgba(0,0,0,0.9);
+                padding-left:14px;
+                margin-top:2px;
+              ">${nodeCode}</div>`,
+              iconSize: [50, 16],
+              iconAnchor: [-2, 8],
+            }),
+            interactive: false,
+            zIndexOffset: -1,
+          }).addTo(routeLayerGroup);
+        });
+
+        // Vehicle marker for this leg
+        if (arc.length > 2) {
+          const vIcon = makeVehicleIcon(seg.mode, 90);
+          const vMkr = L.marker(arc[0], {
+            icon: vIcon,
+            zIndexOffset: 1000,
+            interactive: false,
+          }).addTo(routeLayerGroup);
+
+          fleetPlanesData.push({
+            marker: vMkr,
+            arc: arc,
+            mode: seg.mode,
+            progress: (sIdx * 0.25) % 1,
+            speed: 0.0008
+          });
+        }
       });
 
-      // Animated plane
-      routeArcCoords = arc;
-      planeProgress  = 0;
-      planeMarker = L.marker(arc[0], {
-        icon: makePlaneIcon(90),
-        zIndexOffset: 1000,
-        interactive: false,
-      }).addTo(routeLayerGroup);
-
-      // Fit map view to route
-      leafletMap.fitBounds(L.latLngBounds(arc), { padding: [32, 48] });
-      planeAnimFrame = requestAnimationFrame(animatePlane);
+      if (allCoords.length > 0) {
+        leafletMap.fitBounds(L.latLngBounds(allCoords), { padding: [36, 48] });
+      }
+      if (fleetPlanesData.length > 0) {
+        fleetAnimFrame = requestAnimationFrame(animateFleetPlanes);
+      }
     }
 
     // ── Health data fetch ─────────────────────────────────────────────
@@ -1281,14 +1406,17 @@
         buffer:      '+90 minutes',
         logLines: [
           '[TRIGGER] Carrier delay signal received: DL-1402 +150m',
-          '[AGENT::RecoveryAgent] Scanning for Amtrak Acela alternatives...',
+          '[MODAL EVALUATION] First-mile flight delay: 150m. Connection risk at hub: HIGH.',
+          '[MODAL SCORING] Air +240m | Rail +15m | Shuttle +50m. Winner: RAIL.',
+          '[SMART SWITCH APPLIED] Bypassing Air Leg -> Amtrak Acela Express (#2150).',
+          '[BUFFER RESTORED] Hub buffer preserved. Risk score: 0.86 -> 0.05.',
           '[PREF-GUARD] Preference match: Quiet Car + Executive Suite → APPROVED',
           '[COMMIT] Segment 2 rebooked: AMT-2158. Latency: 32ms.',
           '[SYSTEM] Traveler notified. Total resolution time: 392ms ✓',
         ],
         nodes: () => [
           { ...graphNodes[0], status: 'DELAYED' },
-          { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' },
+          { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)', mode: 'RAIL' },
           { ...graphNodes[2], status: 'SCHEDULED' },
           { ...graphNodes[3], status: 'SCHEDULED' },
         ],
@@ -1401,6 +1529,13 @@
 
       // 5. Route node highlighting
       renderItineraryNodes(cfg.nodes());
+
+      // 5b. First-Mile callout — show when the 'disrupt' scenario fires (150m > 45m threshold)
+      if (key === 'disrupt') {
+        setTimeout(() => renderFirstMileSwitchCallout('nodes-container'), 80);
+      } else {
+        document.getElementById('first-mile-callout-banner')?.remove();
+      }
 
       // 6. Inject log lines with staggered timing
       const box = document.getElementById('terminal-stream');
@@ -1738,6 +1873,10 @@
           cotContainer.innerHTML = (report.cotExecutionSteps || []).map(step =>
             '<div class="audit-cot-line"><span style="color:var(--accent);">[' + step.tag + ']</span> <span style="color:var(--text-secondary);">(' + step.agent + ')</span> ' + step.action + '</div>'
           ).join('');
+          // If this report includes a First-Mile switch, prepend the callout inside the CoT section
+          if (report.firstMileSwitchOccurred || (report.cotExecutionSteps || []).some(s => s.tag === 'SMART_SWITCH')) {
+            renderFirstMileSwitchCallout(cotContainer);
+          }
         }
 
         document.getElementById('modal-audit-report')?.classList.add('active');
@@ -2296,6 +2435,10 @@
         if (data.report && data.report.auditReport) {
           latestAuditData = data.report.auditReport;
         }
+        // If the engine triggered a First-Mile switch, surface the callout banner
+        if (data.report && data.report.firstMileSwitchOccurred) {
+          renderFirstMileSwitchCallout('nodes-container');
+        }
       });
     }
 
@@ -2357,16 +2500,45 @@
       return coords;
     }
 
-    function makePlaneIcon(bearing) {
+    function makeVehicleIcon(mode, bearing) {
       if (typeof L === 'undefined') return null;
+      const m = String(mode || 'FLIGHT').toUpperCase();
+      if (m === 'RAIL' || m === 'TRAIN') {
+        return L.divIcon({
+          className: 'vehicle-marker train-marker',
+          html: `<div style="transform:rotate(${bearing}deg); background:#10b981; border:2px solid #ffffff; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(16,185,129,0.8);">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/><path d="M6 17h12"/><path d="M6 3h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/>
+            </svg>
+          </div>`,
+          iconSize:   [26, 26],
+          iconAnchor: [13, 13],
+        });
+      }
+      if (m === 'BUS' || m === 'SHUTTLE' || m === 'TAXI') {
+        return L.divIcon({
+          className: 'vehicle-marker bus-marker',
+          html: `<div style="transform:rotate(${bearing}deg); background:#f59e0b; border:2px solid #ffffff; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(245,158,11,0.8);">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="8" rx="2"/><path d="M6 11L9 5h6l3 6"/><circle cx="7" cy="16" r="1.5"/><circle cx="17" cy="16" r="1.5"/>
+            </svg>
+          </div>`,
+          iconSize:   [26, 26],
+          iconAnchor: [13, 13],
+        });
+      }
       return L.divIcon({
-        className: 'plane-marker',
+        className: 'vehicle-marker plane-marker',
         html: `<svg style="transform:rotate(${bearing}deg)" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
           <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
         </svg>`,
         iconSize:   [28, 28],
         iconAnchor: [14, 14],
       });
+    }
+
+    function makePlaneIcon(bearing) {
+      return makeVehicleIcon('FLIGHT', bearing);
     }
 
     function calcBearing(from, to) {
@@ -2387,7 +2559,7 @@
     let fleetAnimFrame = null;
 
     function animateFleetPlanes() {
-      if (mapDisplayMode !== 'fleet' || fleetPlanesData.length === 0) return;
+      if (fleetPlanesData.length === 0) return;
 
       fleetPlanesData.forEach(p => {
         if (!p.marker || !p.arc || p.arc.length < 2) return;
@@ -2400,7 +2572,7 @@
         const pos = lerpLatLng(posA, posB, frac);
         const bearing = calcBearing(posA, posB);
         p.marker.setLatLng(pos);
-        const icon = makePlaneIcon(bearing);
+        const icon = makeVehicleIcon(p.mode, bearing);
         if (icon) p.marker.setIcon(icon);
       });
 
@@ -2418,7 +2590,7 @@
       const pos    = lerpLatLng(posA, posB, frac);
       const bearing = calcBearing(posA, posB);
       planeMarker.setLatLng(pos);
-      const icon = makePlaneIcon(bearing);
+      const icon = makeVehicleIcon('FLIGHT', bearing);
       if (icon) planeMarker.setIcon(icon);
       planeAnimFrame = requestAnimationFrame(animatePlane);
     }
