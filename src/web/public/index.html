@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CASCADE | Autonomous Executive Travel Recovery</title>
-  <meta name="description" content="CASCADE intelligently monitors executive travel itineraries and automatically resolves disruptions — rerouting flights, trains, and hotel stays in seconds.">
+  <meta name="description"
+    content="CASCADE intelligently monitors executive travel itineraries and automatically resolves disruptions — rerouting flights, trains, and hotel stays in seconds.">
   <link rel="stylesheet" href="styles.css">
   <!-- Leaflet map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -14,6 +16,7 @@
   <!-- html2pdf.js for Executive B2B PDF Audit Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
+
 <body>
 
   <div class="app-container">
@@ -28,15 +31,26 @@
         <div class="header-divider"></div>
         <div class="nav-tabs-group">
           <button id="tab-mode-operations" class="tab-btn active" data-tab="operations">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
             Operations
           </button>
           <button id="tab-mode-simulator" class="tab-btn" data-tab="simulator">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
             Simulator
           </button>
           <button id="tab-mode-audit" class="tab-btn" data-tab="audit">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
             Audit & Proofs
           </button>
           <button id="tab-mode-traveler" style="display:none;"></button>
@@ -57,13 +71,31 @@
           <span>CDC Changefeed: <strong>ACTIVE</strong></span>
         </div>
         <button id="btn-new-trip" class="btn btn-primary">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
           New Trip
         </button>
         <button id="btn-open-create-modal" style="display:none;"></button>
         <button id="theme-toggle-btn" class="btn btn-outline" title="Toggle Theme">
-          <span id="theme-icon-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
-          <span id="theme-icon-moon" style="display:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+          <span id="theme-icon-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg></span>
+          <span id="theme-icon-moon" style="display:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg></span>
         </button>
       </div>
     </header>
@@ -99,7 +131,8 @@
             <div class="card-header">
               <span id="inspector-title" class="card-title">Traveler Profile & Preferences</span>
             </div>
-            <div id="inspector-rendered-content" class="card-body" style="font-size: 13px; color: var(--text-secondary);">
+            <div id="inspector-rendered-content" class="card-body"
+              style="font-size: 13px; color: var(--text-secondary);">
               Loading traveler profile...
             </div>
           </div>
@@ -111,27 +144,71 @@
             <div class="map-header-overlay">
               <div class="floating-glass-badge">
                 <span style="color: var(--accent); font-weight: 700;">Active Route:</span>
-                <span id="map-route-title">SFO → LHR</span>
+                <span id="map-route-title">San Francisco (SFO) ➔ London (LHR)</span>
                 (<span id="map-route-subtitle">Sarah Jenkins</span>)
                 <div id="itin-subtitle" style="display:none;"></div>
               </div>
               <div class="map-mode-toggle-group">
                 <button id="map-btn-all-fleet" class="map-mode-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z"/></svg>
-                  All Fleet Flights
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z" />
+                  </svg>
+                  All Fleet
                 </button>
                 <button id="map-btn-active-route" class="map-mode-btn active">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
                   Passenger Route
                 </button>
                 <button id="map-btn-recenter" class="map-mode-btn" title="Recenter View">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="2" x2="12" y2="6" />
+                    <line x1="12" y1="18" x2="12" y2="22" />
+                    <line x1="2" y1="12" x2="6" y2="12" />
+                    <line x1="18" y1="12" x2="22" y2="12" />
+                  </svg>
                   Recenter
                 </button>
               </div>
             </div>
 
-            <div id="map" style="width: 100%; height: 100%; min-height: 380px; display: block; position: relative; z-index: 1;">
+            <div id="map-telemetry-badge" class="map-telemetry-badge">
+              <span>⚡ OSRM Highway API & Geodesic Flight Arcs Active</span>
+            </div>
+
+            <!-- Multi-Modal Sequence Builder & Transport Mode Bar -->
+            <div class="map-filter-subbar">
+              <div style="display: flex; align-items: center; gap: 6px; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 5px; margin-bottom: 4px; flex-wrap: wrap;">
+                <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">🚗✈️🚆 Choose Journey Sequence:</span>
+                <button id="seq-btn-car-plane" class="mode-filter-btn active" onclick="applyJourneySequence('CAR_PLANE')">🚗 Car ➔ ✈️ Plane</button>
+                <button id="seq-btn-car-plane-car" class="mode-filter-btn" onclick="applyJourneySequence('CAR_PLANE_CAR')">🚗 Car ➔ ✈️ Plane ➔ 🚗 Car</button>
+                <button id="seq-btn-car-plane-rail" class="mode-filter-btn" onclick="applyJourneySequence('CAR_PLANE_RAIL')">🚗 Car ➔ ✈️ Plane ➔ 🚆 Train</button>
+                <button id="seq-btn-rail-plane-car" class="mode-filter-btn" onclick="applyJourneySequence('RAIL_PLANE_CAR')">🚆 Train ➔ ✈️ Plane ➔ 🚗 Car</button>
+                <button id="seq-btn-plane-rail" class="mode-filter-btn" onclick="applyJourneySequence('PLANE_RAIL')">✈️ Plane ➔ 🚆 Train</button>
+                <button id="seq-btn-plane-only" class="mode-filter-btn" onclick="applyJourneySequence('PLANE_ONLY')">✈️ Plane Direct</button>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 2px;">Filter Visible Modes:</span>
+                <button id="mode-btn-all" class="mode-filter-btn active" onclick="setTransportModeFilter('ALL')">🌐 All Modes</button>
+                <button id="mode-btn-flight" class="mode-filter-btn" onclick="setTransportModeFilter('FLIGHT')">✈️ Plane Only</button>
+                <button id="mode-btn-rail" class="mode-filter-btn" onclick="setTransportModeFilter('RAIL')">🚆 Train Only</button>
+                <button id="mode-btn-road" class="mode-filter-btn" onclick="setTransportModeFilter('ROAD')">🚗 Car / Taxi</button>
+                <button id="mode-btn-plane-train" class="mode-filter-btn" onclick="setTransportModeFilter('PLANE_TRAIN')">✈️🚆 Plane + Train</button>
+                <button id="mode-btn-plane-car" class="mode-filter-btn" onclick="setTransportModeFilter('PLANE_CAR')">✈️🚗 Plane + Car</button>
+                <button id="mode-btn-train-car" class="mode-filter-btn" onclick="setTransportModeFilter('TRAIN_CAR')">🚆🚗 Train + Car</button>
+              </div>
+            </div>
+
+            <div id="map"
+              style="width: 100%; height: 100%; min-height: 380px; display: block; position: relative; z-index: 1;">
               <div id="leaflet-route-map" style="width: 100%; height: 100%; min-height: 380px;"></div>
             </div>
           </div>
@@ -147,14 +224,16 @@
               </div>
               <div style="display: flex; gap: 8px; align-items: center;">
                 <span id="hitl-confidence-score" class="badge status-tag-amber">98.4% Match</span>
-                <span id="hitl-cost-delta-val" class="font-mono" style="font-size: 13px; font-weight: 700; color: var(--color-rose);">+$450.00</span>
+                <span id="hitl-cost-delta-val" class="font-mono"
+                  style="font-size: 13px; font-weight: 700; color: var(--color-rose);">+$450.00</span>
               </div>
             </div>
             <div class="progress-bar-container">
               <div id="hitl-timer-progress" class="progress-bar-fill"></div>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 11px; color: var(--text-muted);">Auto-timeout in: <strong id="hitl-timer-countdown" class="font-mono">60s</strong></span>
+              <span style="font-size: 11px; color: var(--text-muted);">Auto-timeout in: <strong
+                  id="hitl-timer-countdown" class="font-mono">60s</strong></span>
               <div class="hitl-actions">
                 <button id="btn-hitl-approve" class="btn btn-primary">Approve & Execute</button>
                 <button id="btn-hitl-reject" class="btn btn-danger">Reject</button>
@@ -176,10 +255,10 @@
               <div class="form-group">
                 <label for="simulator-traveler-select">Executive Traveler Profile</label>
                 <select id="simulator-traveler-select" class="form-control">
-                  <option value="itin-101">Sarah Jenkins (SFO ➔ LHR | $300 Policy Limit)</option>
-                  <option value="itin-102">Marcus Vance (JFK ➔ CDG | $500 Policy Limit)</option>
-                  <option value="itin-103">Elena Rostova (ORD ➔ HND | $300 Policy Limit)</option>
-                  <option value="itin-104">David Chen (MIA ➔ LHR | $300 Policy Limit)</option>
+                  <option value="itin-101">Sarah Jenkins (San Francisco [SFO] ➔ London Heathrow [LHR] | $300 Policy Limit)</option>
+                  <option value="itin-102">Marcus Vance (New York [JFK] ➔ Paris [CDG] | $500 Policy Limit)</option>
+                  <option value="itin-103">Elena Rostova (Chicago [ORD] ➔ Tokyo Haneda [HND] | $300 Policy Limit)</option>
+                  <option value="itin-104">David Chen (Miami [MIA] ➔ London Heathrow [LHR] | $300 Policy Limit)</option>
                 </select>
               </div>
 
@@ -202,13 +281,15 @@
                   <option value="WEATHER_CANCELLATION">Weather Ground Stop</option>
                   <option value="RAIL_DISRUPTION">Amtrak / Rail Network Outage</option>
                 </select>
-                <input id="sim-custom-type" class="form-control" placeholder="Custom disruption name..." style="display:none; margin-top: 8px;">
+                <input id="sim-custom-type" class="form-control" placeholder="Custom disruption name..."
+                  style="display:none; margin-top: 8px;">
               </div>
 
               <div class="form-group">
                 <label for="sim-delay-slider">Simulated Delay (Minutes)</label>
                 <input type="range" id="sim-delay-slider" min="15" max="360" value="150" step="15">
-                <span id="slider-val-txt" class="font-mono" style="font-size: 12px; color: var(--color-amber);">Selected Delay: +150 mins (+2h 30m)</span>
+                <span id="slider-val-txt" class="font-mono" style="font-size: 12px; color: var(--color-amber);">Selected
+                  Delay: +150 mins (+2h 30m)</span>
               </div>
 
               <div class="form-group">
@@ -222,54 +303,99 @@
 
               <div class="btn-group" style="margin-top: 16px;">
                 <button id="btn-trigger-disruption" class="btn btn-danger">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
                   <span>Trigger Disruption</span>
                 </button>
                 <button id="btn-disrupt" style="display:none;"></button>
                 <button id="btn-chaos" class="btn btn-outline">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                  </svg>
                   <span>Chaos Engine</span>
                 </button>
                 <button id="btn-contention" class="btn btn-outline">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3" />
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                  </svg>
                   <span>Contention</span>
                 </button>
                 <button id="btn-failover" class="btn btn-outline">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                    <path d="M2 12h20" />
+                  </svg>
                   <span>Region Failover</span>
                 </button>
                 <button id="btn-custom-whatif" class="btn btn-outline">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                    <path d="M5 3v4" />
+                    <path d="M19 17v4" />
+                    <path d="M3 5h4" />
+                    <path d="M17 19h4" />
+                  </svg>
                   <span>What-If</span>
                 </button>
                 <button id="btn-policy-hitl" class="btn btn-outline">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
                   <span>Test HITL</span>
                 </button>
               </div>
 
               <!-- Active System Guardrails Telemetry Card -->
-              <div style="margin-top: 20px; background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                  <span style="font-size: 12px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px;">Active System Guardrails</span>
+              <div
+                style="margin-top: 20px; background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
+                <div
+                  style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                  <span
+                    style="font-size: 12px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px;">Active
+                    System Guardrails</span>
                   <span class="badge status-tag-green" style="font-size: 10px;">OPERATIONAL</span>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
-                  <div style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Max Auto-Approval Limit</div>
-                    <div style="font-size: 13px; font-weight: 700; color: var(--color-emerald); margin-top: 2px;">$300.00 USD</div>
+                  <div
+                    style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Max Auto-Approval
+                      Limit</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--color-emerald); margin-top: 2px;">
+                      $300.00 USD</div>
                   </div>
-                  <div style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Max Latency SLA</div>
-                    <div style="font-size: 13px; font-weight: 700; color: var(--accent); margin-top: 2px;">&lt;500ms</div>
+                  <div
+                    style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Max Latency SLA
+                    </div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--accent); margin-top: 2px;">&lt;500ms
+                    </div>
                   </div>
-                  <div style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Multi-Modal Engine</div>
-                    <div style="font-size: 11.5px; font-weight: 600; color: var(--text-primary); margin-top: 2px;">Active (Air + Rail + Hotel)</div>
+                  <div
+                    style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Multi-Modal
+                      Engine</div>
+                    <div style="font-size: 11.5px; font-weight: 600; color: var(--text-primary); margin-top: 2px;">
+                      Active (Air + Rail + Hotel)</div>
                   </div>
-                  <div style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Bedrock Guardrails</div>
-                    <div style="font-size: 11.5px; font-weight: 600; color: var(--color-emerald); margin-top: 2px;">Zero Hallucination Filter ENABLED</div>
+                  <div
+                    style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Bedrock
+                      Guardrails</div>
+                    <div style="font-size: 11.5px; font-weight: 600; color: var(--color-emerald); margin-top: 2px;">Zero
+                      Hallucination Filter ENABLED</div>
                   </div>
                 </div>
               </div>
@@ -282,11 +408,13 @@
               <span class="card-title">AWS Bedrock Chain-of-Thought & Reasoning Logs</span>
             </div>
             <div class="card-body" style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
-              <div id="audit-cot-timeline" style="background:#07080D; padding:14px; border-radius:8px; font-family:var(--font-mono); font-size:12px; color:#A7F3D0; flex: 1; overflow-y:auto; max-height: 500px; min-height: 240px;">
+              <div id="audit-cot-timeline"
+                style="background:#07080D; padding:14px; border-radius:8px; font-family:var(--font-mono); font-size:12px; color:#A7F3D0; flex: 1; overflow-y:auto; max-height: 500px; min-height: 240px;">
                 Initializing AWS Bedrock Reasoning Engine & CDC Changefeed Stream...
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-surface-elevated); padding: 12px; border-radius: 8px;">
+              <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-surface-elevated); padding: 12px; border-radius: 8px;">
                 <div>
                   <div style="font-size: 11px; color: var(--text-muted);">Risk Index</div>
                   <span id="risk-index-badge" class="badge status-tag-green">LOW RISK</span>
@@ -297,11 +425,13 @@
                 </div>
                 <div>
                   <div style="font-size: 11px; color: var(--text-muted);">Rebooking Fees Avoided</div>
-                  <div id="roi-fees-avoided" class="font-mono" style="font-size: 16px; font-weight: 700; color: var(--color-emerald);">$1,850</div>
+                  <div id="roi-fees-avoided" class="font-mono"
+                    style="font-size: 16px; font-weight: 700; color: var(--color-emerald);">$1,850</div>
                 </div>
                 <div>
                   <div style="font-size: 11px; color: var(--text-muted);">Hours Saved</div>
-                  <div id="roi-hours-saved" class="font-mono" style="font-size: 16px; font-weight: 700; color: var(--color-emerald);">14.5 hrs</div>
+                  <div id="roi-hours-saved" class="font-mono"
+                    style="font-size: 16px; font-weight: 700; color: var(--color-emerald);">14.5 hrs</div>
                 </div>
               </div>
             </div>
@@ -310,7 +440,8 @@
       </div>
 
       <!-- TAB 3: Audit & Proofs (Enterprise Compliance & Reports) -->
-      <div id="tab-pane-audit" class="tab-view-pane hidden" style="overflow-y: auto !important; max-height: calc(100vh - 80px) !important; padding-bottom: 60px !important;">
+      <div id="tab-pane-audit" class="tab-view-pane hidden"
+        style="overflow-y: auto !important; max-height: calc(100vh - 80px) !important; padding-bottom: 60px !important;">
         <div class="audit-layout" style="padding-bottom: 60px;">
           <!-- Timeline & Comparison Card -->
           <div class="card">
@@ -328,11 +459,13 @@
               <div id="split-view-container" class="view-container" style="display: none;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                   <div>
-                    <div style="font-size: 12px; font-weight: 600; color: var(--color-rose); margin-bottom: 8px;">Original / Delayed Schedule</div>
+                    <div style="font-size: 12px; font-weight: 600; color: var(--color-rose); margin-bottom: 8px;">
+                      Original / Delayed Schedule</div>
                     <div id="split-broken-nodes" class="timeline-container"></div>
                   </div>
                   <div>
-                    <div style="font-size: 12px; font-weight: 600; color: var(--color-emerald); margin-bottom: 8px;">Autonomous Rebooked Schedule</div>
+                    <div style="font-size: 12px; font-weight: 600; color: var(--color-emerald); margin-bottom: 8px;">
+                      Autonomous Rebooked Schedule</div>
                     <div id="split-healed-nodes" class="timeline-container"></div>
                   </div>
                 </div>
@@ -346,8 +479,10 @@
               <span class="card-title">CockroachDB SERIALIZABLE Immutable Proof Artifact</span>
             </div>
             <div class="card-body" style="font-size: 13px; padding: 18px; padding-bottom: 24px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: var(--bg-surface-elevated); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <div><strong>Incident ID:</strong> <span id="audit-val-id" class="font-mono">PROOF-REC-994821</span></div>
+              <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: var(--bg-surface-elevated); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div><strong>Incident ID:</strong> <span id="audit-val-id" class="font-mono">PROOF-REC-994821</span>
+                </div>
                 <div><strong>Traveler Name:</strong> <span id="audit-profile-name">Sarah Jenkins</span></div>
                 <div><strong>Preferred Cabin:</strong> <span id="audit-profile-cabin">Business Class</span></div>
                 <div><strong>Policy Limit:</strong> <span id="audit-profile-limit">$300 USD</span></div>
@@ -359,16 +494,28 @@
 
               <div style="margin-top: 16px;">
                 <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Signature Proof:</div>
-                <code id="audit-proof-sig" class="font-mono" style="display:block; background:#090a0f; padding:12px; margin:16px 0; border-radius:8px; font-size:12px; color:#A7F3D0; border: 1px solid var(--border-color); word-break: break-all; user-select: all;">sha256-cockroach-bedrock-0x8f4b2c1e9a3d7b4c8e</code>
+                <code id="audit-proof-sig" class="font-mono"
+                  style="display:block; background:#090a0f; padding:12px; margin:16px 0; border-radius:8px; font-size:12px; color:#A7F3D0; border: 1px solid var(--border-color); word-break: break-all; user-select: all;">sha256-cockroach-bedrock-0x8f4b2c1e9a3d7b4c8e</code>
               </div>
 
               <div style="display: flex; gap: 10px; margin-bottom: 30px;">
                 <button id="btn-export-pdf" class="btn btn-primary" style="padding: 9px 18px; font-size: 12px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                    <polyline points="10 9 9 9 8 9" />
+                  </svg>
                   Export PDF Audit Report
                 </button>
                 <button id="btn-proof-artifact" class="btn btn-outline" style="padding: 9px 18px; font-size: 12px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg>
                   View CockroachDB Proof Hash
                 </button>
                 <button id="btn-audit-export-pdf" style="display:none;"></button>
@@ -399,7 +546,9 @@
 
   <!-- Hidden elements for backward compatibility with secondary JS handlers -->
   <div style="display:none;">
-    <select id="traveler-selector"><option value="itin-101">Sarah</option></select>
+    <select id="traveler-selector">
+      <option value="itin-101">Sarah</option>
+    </select>
     <select id="tab2-traveler-selector"></select>
     <span id="analytics-delay-badge">+150m</span>
     <span id="analytics-slack-val">45m</span>
@@ -412,67 +561,94 @@
 
   <!-- Create Itinerary Modal -->
   <div id="createItineraryModal" class="modal-backdrop">
-    <div class="modal-dialog" style="max-width: 640px; padding: 0; overflow: hidden; border-radius: 16px; background: #141724; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);">
-      <div class="modal-header" style="background: linear-gradient(180deg, #1B1F32 0%, #141724 100%); padding: 20px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
+    <div class="modal-dialog"
+      style="max-width: 640px; padding: 0; overflow: hidden; border-radius: 16px; background: #141724; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);">
+      <div class="modal-header"
+        style="background: linear-gradient(180deg, #1B1F32 0%, #141724 100%); padding: 20px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35); display: flex; align-items: center; justify-content: center; color: #818CF8;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <div
+            style="width: 38px; height: 38px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35); display: flex; align-items: center; justify-content: center; color: #818CF8;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
           </div>
           <div>
-            <h3 class="modal-title" style="font-size: 16.5px; font-weight: 700; color: #F8FAFC; margin: 0; letter-spacing: -0.01em;">Create Multi-Modal Executive Trip</h3>
-            <div style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Configure passenger, mode (Flight, Rail, Car, Bus), schedule & ground transfers</div>
+            <h3 class="modal-title"
+              style="font-size: 16.5px; font-weight: 700; color: #F8FAFC; margin: 0; letter-spacing: -0.01em;">Create
+              Multi-Modal Executive Trip</h3>
+            <div style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Configure passenger, mode (Flight, Rail, Car,
+              Bus), schedule & ground transfers</div>
           </div>
         </div>
-        <button id="btn-close-modal" class="modal-close" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #E2E8F0; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕ Close</button>
+        <button id="btn-close-modal" class="modal-close"
+          style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #E2E8F0; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕
+          Close</button>
       </div>
 
       <form id="form-create-itinerary" style="padding: 24px; max-height: 82vh; overflow-y: auto;">
         <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px; padding: 0;">
-          
+
           <!-- Preset Combination Buttons -->
           <div>
-            <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
+            <label
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
               Select Travel Mode Combination Preset
             </label>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
-              <button type="button" class="preset-btn active" data-preset="FLIGHT_ONLY" style="padding: 10px 8px; background: rgba(99,102,241,0.25); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <button type="button" class="preset-btn active" data-preset="FLIGHT_ONLY"
+                style="padding: 10px 8px; background: rgba(99,102,241,0.25); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 ✈️ Plane Only
               </button>
-              <button type="button" class="preset-btn" data-preset="TRAIN_ONLY" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <button type="button" class="preset-btn" data-preset="TRAIN_ONLY"
+                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 🚆 Train Only
               </button>
-              <button type="button" class="preset-btn" data-preset="CAR_ONLY" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <button type="button" class="preset-btn" data-preset="CAR_ONLY"
+                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 🚗 Car / Drive Only
               </button>
-              <button type="button" class="preset-btn" data-preset="FLIGHT_CAR" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <button type="button" class="preset-btn" data-preset="CAR_FLIGHT"
+                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                🚗 + ✈️ Car to Airport + Plane
+              </button>
+              <button type="button" class="preset-btn" data-preset="FLIGHT_CAR"
+                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 ✈️ + 🚗 Plane + Car
               </button>
-              <button type="button" class="preset-btn" data-preset="TRAIN_FLIGHT" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <button type="button" class="preset-btn" data-preset="TRAIN_FLIGHT"
+                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 🚆 + ✈️ Train + Plane
               </button>
-              <button type="button" class="preset-btn" data-preset="FULL_MULTIMODAL" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                🚆 + ✈️ + 🚗 Train + Plane + Car
+              <button type="button" class="preset-btn" data-preset="FULL_MULTIMODAL"
+                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                🚗 + ✈️ + 🚗 Car + Plane + Car
               </button>
             </div>
           </div>
 
           <!-- Mode Selector Buttons -->
           <div>
-            <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
+            <label
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
               Main Travel Mode (Hub ➔ Hub)
             </label>
             <input type="hidden" id="modal-travel-mode" value="FLIGHT">
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
-              <button type="button" class="mode-select-btn active" data-mode="FLIGHT" style="padding: 10px; background: rgba(99,102,241,0.2); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <button type="button" class="mode-select-btn active" data-mode="FLIGHT"
+                style="padding: 10px; background: rgba(99,102,241,0.2); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
                 <span style="font-size: 16px;">✈️</span> Flight
               </button>
-              <button type="button" class="mode-select-btn" data-mode="RAIL" style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <button type="button" class="mode-select-btn" data-mode="RAIL"
+                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
                 <span style="font-size: 16px;">🚆</span> Train / Rail
               </button>
-              <button type="button" class="mode-select-btn" data-mode="CAR" style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <button type="button" class="mode-select-btn" data-mode="CAR"
+                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
                 <span style="font-size: 16px;">🚗</span> Car / Drive
               </button>
-              <button type="button" class="mode-select-btn" data-mode="BUS" style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <button type="button" class="mode-select-btn" data-mode="BUS"
+                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
                 <span style="font-size: 16px;">🚌</span> Bus Express
               </button>
             </div>
@@ -481,29 +657,39 @@
           <!-- Traveler Details -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="form-group" style="margin: 0;">
-              <label for="modal-traveler-name" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
+              <label for="modal-traveler-name"
+                style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
                 Executive Traveler Name
               </label>
-              <input id="modal-traveler-name" class="form-control" placeholder="e.g. Sarah Jenkins" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
+              <input id="modal-traveler-name" class="form-control" placeholder="e.g. Sarah Jenkins" required
+                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
             </div>
 
             <div class="form-group" style="margin: 0;">
-              <label for="modal-traveler-email" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
+              <label for="modal-traveler-email"
+                style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
                 Corporate Email Address
               </label>
-              <input id="modal-traveler-email" class="form-control" type="email" placeholder="e.g. sarah.jenkins@acme.com" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
+              <input id="modal-traveler-email" class="form-control" type="email"
+                placeholder="e.g. sarah.jenkins@acme.com" required
+                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
             </div>
           </div>
 
           <!-- First-Mile Connection Section (Small Town / Home Station -> Main Hub) -->
-          <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 12px;">
-            <div style="font-size: 11px; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+          <div
+            style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 12px;">
+            <div
+              style="font-size: 11px; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
               Step 1: First Mile (Small Town / Local Station ➔ Main Hub)
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
-                <label style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">First-Mile Transport</label>
-                <select id="modal-first-mile-mode" style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+                <label
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">First-Mile
+                  Transport</label>
+                <select id="modal-first-mile-mode"
+                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
                   <option value="RAIL">🚆 Regional Train (Small Town to Hub)</option>
                   <option value="CAR">🚗 Driving / Private Car Transfer</option>
                   <option value="BUS">🚌 Airport Shuttle / Express Bus</option>
@@ -511,8 +697,11 @@
                 </select>
               </div>
               <div>
-                <label style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Local Small Town / Origin Station</label>
-                <input id="modal-first-mile-origin" placeholder="e.g. San Jose Station / Reading / Versailles" style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+                <label
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Local
+                  Small Town / Origin Station</label>
+                <input id="modal-first-mile-origin" placeholder="e.g. San Jose Station / Reading / Versailles"
+                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
               </div>
             </div>
           </div>
@@ -520,54 +709,72 @@
           <!-- Where: Main Origin & Destination Hubs -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="form-group" style="position: relative; margin: 0;">
-              <label for="modal-origin-input" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
+              <label for="modal-origin-input"
+                style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
                 Step 2: Main Origin Hub
               </label>
-              <input id="modal-origin-input" class="form-control" placeholder="e.g. SFO (San Francisco)" autocomplete="off" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
+              <input id="modal-origin-input" class="form-control" placeholder="e.g. SFO (San Francisco)"
+                autocomplete="off" required
+                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
               <div id="modal-origin-suggestions" class="autocomplete-dropdown"></div>
             </div>
 
             <div class="form-group" style="position: relative; margin: 0;">
-              <label for="modal-dest-input" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
+              <label for="modal-dest-input"
+                style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
                 Step 2: Main Destination Hub
               </label>
-              <input id="modal-dest-input" class="form-control" placeholder="e.g. LHR (London Heathrow)" autocomplete="off" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
+              <input id="modal-dest-input" class="form-control" placeholder="e.g. LHR (London Heathrow)"
+                autocomplete="off" required
+                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
               <div id="modal-dest-suggestions" class="autocomplete-dropdown"></div>
             </div>
           </div>
 
           <!-- When: Schedule Departure & Arrival -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
             <div>
-              <label style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38BDF8; margin-bottom: 4px; display: block;">
+              <label
+                style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38BDF8; margin-bottom: 4px; display: block;">
                 🗓️ Departure Schedule (When)
               </label>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                <input id="modal-dep-date" type="date" value="2026-08-10" style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
-                <input id="modal-dep-time" type="time" value="09:00" style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
+                <input id="modal-dep-date" type="date" value="2026-08-10"
+                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
+                <input id="modal-dep-time" type="time" value="09:00"
+                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
               </div>
             </div>
 
             <div>
-              <label style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #10B981; margin-bottom: 4px; display: block;">
+              <label
+                style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #10B981; margin-bottom: 4px; display: block;">
                 🏁 Arrival Schedule (When)
               </label>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                <input id="modal-arr-date" type="date" value="2026-08-10" style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
-                <input id="modal-arr-time" type="time" value="17:30" style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
+                <input id="modal-arr-date" type="date" value="2026-08-10"
+                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
+                <input id="modal-arr-time" type="time" value="17:30"
+                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
               </div>
             </div>
           </div>
 
           <!-- Last-Mile Connection Section (Destination Hub -> Hotel/Office) -->
-          <div style="background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 10px; padding: 12px;">
-            <div style="font-size: 11px; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+          <div
+            style="background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 10px; padding: 12px;">
+            <div
+              style="font-size: 11px; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
               Step 3: Last Mile (Destination Hub ➔ Final Hotel / Office)
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
-                <label style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Last-Mile Transport</label>
-                <select id="modal-transfer-mode" style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+                <label
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Last-Mile
+                  Transport</label>
+                <select id="modal-transfer-mode"
+                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
                   <option value="CAR_TRANSFER">🚗 Private Executive Sedan / Chauffeur</option>
                   <option value="BUS_TRANSFER">🚌 Airport Express Shuttle</option>
                   <option value="RAIL_TRANSFER">🚆 City Metro / High-Speed Rail Transfer</option>
@@ -575,44 +782,56 @@
                 </select>
               </div>
               <div>
-                <label style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Destination Hotel / Office Name</label>
-                <input id="modal-last-mile-dest" placeholder="e.g. Ritz-Carlton Downtown / Four Seasons" style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+                <label
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Destination
+                  Hotel / Office Name</label>
+                <input id="modal-last-mile-dest" placeholder="e.g. Ritz-Carlton Downtown / Four Seasons"
+                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
               </div>
             </div>
           </div>
 
-            <div class="form-group" style="margin: 0;">
-              <label for="modal-cabin-pref" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-                Cabin / Vehicle Comfort Preference
-              </label>
-              <select id="modal-cabin-pref" class="form-control" style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px; cursor: pointer;">
-                <option value="Business Class Quiet Car">Quiet Car / Business Class (Window)</option>
-                <option value="First Class Gran Class">First Class / Gran Class Suite</option>
-                <option value="Private Executive Sedan">Private Executive Sedan</option>
-                <option value="Luxury Suite Guarantee">Luxury Executive Suite Stay</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Strategy & Limit -->
           <div class="form-group" style="margin: 0;">
-            <label for="modal-strategy" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-              Travel Policy Tier & Autonomous Recovery Limit
+            <label for="modal-cabin-pref"
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
+              Cabin / Vehicle Comfort Preference
             </label>
-            <select id="modal-strategy" class="form-control" style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px; cursor: pointer;">
-              <option value="EXECUTIVE_SPEED">Executive Tier ($300 Limit · Auto-Rebook Flight, Rail & Car)</option>
-              <option value="COMFORT_BUSINESS">VIP Executive ($500 Limit · Priority First Class & Executive Chauffeur)</option>
+            <select id="modal-cabin-pref" class="form-control"
+              style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px; cursor: pointer;">
+              <option value="Business Class Quiet Car">Quiet Car / Business Class (Window)</option>
+              <option value="First Class Gran Class">First Class / Gran Class Suite</option>
+              <option value="Private Executive Sedan">Private Executive Sedan</option>
+              <option value="Luxury Suite Guarantee">Luxury Executive Suite Stay</option>
             </select>
           </div>
-
         </div>
 
-        <div class="modal-footer" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end; gap: 12px;">
-          <button type="button" id="btn-cancel-modal" class="btn" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #94A3B8; font-weight: 600; padding: 10px 18px; border-radius: 10px;">Cancel</button>
-          <button type="submit" class="btn" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFFFFF; font-weight: 700; padding: 10px 22px; border-radius: 10px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">Create Multi-Modal Trip & Load Route</button>
+        <!-- Strategy & Limit -->
+        <div class="form-group" style="margin: 0;">
+          <label for="modal-strategy"
+            style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
+            Travel Policy Tier & Autonomous Recovery Limit
+          </label>
+          <select id="modal-strategy" class="form-control"
+            style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px; cursor: pointer;">
+            <option value="EXECUTIVE_SPEED">Executive Tier ($300 Limit · Auto-Rebook Flight, Rail & Car)</option>
+            <option value="COMFORT_BUSINESS">VIP Executive ($500 Limit · Priority First Class & Executive Chauffeur)
+            </option>
+          </select>
         </div>
-      </form>
+
     </div>
+
+    <div class="modal-footer"
+      style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end; gap: 12px;">
+      <button type="button" id="btn-cancel-modal" class="btn"
+        style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #94A3B8; font-weight: 600; padding: 10px 18px; border-radius: 10px;">Cancel</button>
+      <button type="submit" class="btn"
+        style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFFFFF; font-weight: 700; padding: 10px 22px; border-radius: 10px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">Create
+        Multi-Modal Trip & Load Route</button>
+    </div>
+    </form>
+  </div>
   </div>
 
   <!-- Audit Report Modal -->
@@ -623,7 +842,8 @@
         <button id="audit-modal-close" class="modal-close">&times;</button>
       </div>
       <div class="modal-body" style="font-size: 13px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: var(--bg-surface-elevated); padding: 12px; border-radius: 8px;">
+        <div
+          style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: var(--bg-surface-elevated); padding: 12px; border-radius: 8px;">
           <div><strong>Incident ID:</strong> <span>PROOF-REC-994821</span></div>
           <div><strong>Traveler Name:</strong> <span>Sarah Jenkins</span></div>
           <div><strong>Preferred Cabin:</strong> <span>Business Class</span></div>
@@ -631,7 +851,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button id="btn-audit-close-modal" class="btn btn-outline" onclick="document.getElementById('modal-audit-report')?.classList.remove('active');">Close</button>
+        <button id="btn-audit-close-modal" class="btn btn-outline"
+          onclick="document.getElementById('modal-audit-report')?.classList.remove('active');">Close</button>
       </div>
     </div>
   </div>
@@ -657,20 +878,31 @@
   <!-- Passenger Details Modal -->
   <div id="passengerDetailsModal" class="modal-backdrop">
     <div class="modal-dialog">
-      <div class="modal-header">
+      <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="font-size: 20px;"></div>
           <div>
             <h3 id="passenger-modal-name" class="modal-title">Passenger Profile & Flight Itinerary</h3>
             <div id="passenger-modal-email" style="font-size: 11px; color: var(--text-muted);">passenger@acme.com</div>
           </div>
         </div>
-        <button id="passenger-modal-close" class="modal-close" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕ Close</button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button id="passenger-modal-delete-btn-header" class="btn"
+            style="background: #dc2626; border: 1px solid #ef4444; color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 10px rgba(220, 38, 38, 0.45); display: flex; align-items: center; gap: 4px;">
+            🗑️ Delete Passenger
+          </button>
+          <button id="passenger-modal-close" class="modal-close"
+            style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕
+            Close</button>
+        </div>
       </div>
       <div class="modal-body" id="passenger-modal-body">
         Loading passenger details...
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <button id="passenger-modal-delete-btn" class="btn"
+          style="background: #dc2626; border: 1px solid #ef4444; color: #ffffff; font-size: 12.5px; font-weight: 700; padding: 8px 18px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 10px rgba(220, 38, 38, 0.45); display: flex; align-items: center; gap: 6px;">
+          🗑️ Delete Passenger Profile
+        </button>
         <button id="passenger-modal-close-btn" class="btn btn-primary">Close</button>
       </div>
     </div>
@@ -679,45 +911,60 @@
   <!-- High-Contrast Policy Guardrail HITL Approval Modal -->
   <div id="hitlApprovalModal" class="modal-backdrop">
     <div class="modal-dialog" style="max-width: 540px; border: 2px solid var(--color-amber);">
-      <div class="modal-header" style="background: rgba(245, 158, 11, 0.15); border-bottom: 1px solid rgba(245, 158, 11, 0.3);">
+      <div class="modal-header"
+        style="background: rgba(245, 158, 11, 0.15); border-bottom: 1px solid rgba(245, 158, 11, 0.3);">
         <div style="display: flex; align-items: center; gap: 10px;">
           <div style="font-size: 22px;"></div>
           <div>
             <h3 class="modal-title" style="color: #fbbf24;">Human-in-the-Loop Policy Approval Required</h3>
-            <div style="font-size: 11px; color: var(--text-muted);">Autonomous Rebooking Cost Delta Exceeds $300.00 Policy Limit</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Autonomous Rebooking Cost Delta Exceeds $300.00
+              Policy Limit</div>
           </div>
         </div>
         <button id="hitl-modal-close" class="modal-close">&times;</button>
       </div>
       <div class="modal-body" style="padding: 20px;">
-        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+        <div
+          style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Proposed Rebooking Delta</span>
-            <span id="hitl-modal-cost-delta" class="font-mono" style="font-size: 16px; font-weight: 700; color: #f43f5e;">+$450.00 USD</span>
+            <span
+              style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Proposed
+              Rebooking Delta</span>
+            <span id="hitl-modal-cost-delta" class="font-mono"
+              style="font-size: 16px; font-weight: 700; color: #f43f5e;">+$450.00 USD</span>
           </div>
           <div id="hitl-modal-summary" style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
-            Flight DL-1402 delayed +240m. Recommended Option: Direct Business Class Upgrade DL-1990 + Ritz Executive Suite.
+            Flight DL-1402 delayed +240m. Recommended Option: Direct Business Class Upgrade DL-1990 + Ritz Executive
+            Suite.
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; font-size: 12px;">
-          <div style="background: var(--bg-surface-elevated); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-            <div style="color: var(--text-muted); font-size: 10px; text-transform: uppercase;">Autonomous Policy Limit</div>
+          <div
+            style="background: var(--bg-surface-elevated); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+            <div style="color: var(--text-muted); font-size: 10px; text-transform: uppercase;">Autonomous Policy Limit
+            </div>
             <div style="font-weight: 700; color: var(--text-primary); margin-top: 2px;">$300.00 USD</div>
           </div>
-          <div style="background: var(--bg-surface-elevated); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-            <div style="color: var(--text-muted); font-size: 10px; text-transform: uppercase;">Vector Preference Alignment</div>
+          <div
+            style="background: var(--bg-surface-elevated); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+            <div style="color: var(--text-muted); font-size: 10px; text-transform: uppercase;">Vector Preference
+              Alignment</div>
             <div style="font-weight: 700; color: var(--color-emerald); margin-top: 2px;">98.4% Match</div>
           </div>
         </div>
 
         <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-          Auto-timeout decision in <strong id="hitl-modal-timer" class="font-mono" style="color: var(--color-amber);">60s</strong> (Transfers to standard concierge queue on timeout)
+          Auto-timeout decision in <strong id="hitl-modal-timer" class="font-mono"
+            style="color: var(--color-amber);">60s</strong> (Transfers to standard concierge queue on timeout)
         </div>
       </div>
       <div class="modal-footer" style="background: rgba(0, 0, 0, 0.2); justify-content: space-between;">
-        <button id="btn-hitl-modal-reject" class="btn btn-danger" style="padding: 10px 18px;">[Reject & Re-route]</button>
-        <button id="btn-hitl-modal-approve" class="btn btn-primary" style="padding: 10px 18px; background: #22c55e; border-color: #16a34a;">[Approve Exception (+$450.00)]</button>
+        <button id="btn-hitl-modal-reject" class="btn btn-danger" style="padding: 10px 18px;">[Reject &
+          Re-route]</button>
+        <button id="btn-hitl-modal-approve" class="btn btn-primary"
+          style="padding: 10px 18px; background: #22c55e; border-color: #16a34a;">[Approve Exception
+          (+$450.00)]</button>
       </div>
     </div>
   </div>
@@ -727,13 +974,220 @@
 
   <!-- Inline Application Logic -->
   <script>
+    // ── Real City & Airport Name Resolution System ──────────────────────
+    const CITY_NAME_MAP = {
+      'JFK': 'New York (JFK)',
+      'SFO': 'San Francisco (SFO)',
+      'CDG': 'Paris (CDG)',
+      'LHR': 'London Heathrow (LHR)',
+      'HND': 'Tokyo Haneda (HND)',
+      'NRT': 'Tokyo Narita (NRT)',
+      'FRA': 'Frankfurt (FRA)',
+      'ORD': 'Chicago (ORD)',
+      'MIA': 'Miami (MIA)',
+      'LAX': 'Los Angeles (LAX)',
+      'SIN': 'Singapore (SIN)',
+      'DXB': 'Dubai (DXB)',
+      'SYD': 'Sydney (SYD)',
+      'ZRH': 'Zurich (ZRH)',
+      'AMS': 'Amsterdam (AMS)',
+      'ICN': 'Seoul (ICN)',
+      'BCN': 'Barcelona (BCN)',
+      'MUC': 'Munich (MUC)',
+      'HKG': 'Hong Kong (HKG)',
+      'DOH': 'Doha (DOH)',
+      'LIS': 'Lisbon (LIS)',
+      'FCO': 'Rome (FCO)',
+      'MAD': 'Madrid (MAD)',
+      'BOS': 'Boston (BOS)',
+      'SEA': 'Seattle (SEA)',
+      'PHL': 'Philadelphia (PHL)',
+      'LYS': 'Lyon (LYS)',
+      'PAR': 'Paris (PAR)',
+      'KYT': 'Kyoto (KYT)',
+      'TYO': 'Tokyo (TYO)',
+      'EWR': 'Newark (EWR)',
+      'SPS': 'Wichita Falls (SPS)',
+    };
+
+    function getCityName(code) {
+      if (!code) return '';
+      const clean = String(code).trim().toUpperCase();
+      if (CITY_NAME_MAP[clean]) return CITY_NAME_MAP[clean];
+      if (typeof GLOBAL_AIRPORTS !== 'undefined' && Array.isArray(GLOBAL_AIRPORTS)) {
+        const found = GLOBAL_AIRPORTS.find(a => a.code === clean);
+        if (found) return `${found.city} (${found.code})`;
+      }
+      return clean;
+    }
+
+    // ── Multi-Modal Transport Mode State ──────────────────────────────
+    let currentModeFilter = 'ALL';
+
+    function setTransportModeFilter(filterMode) {
+      currentModeFilter = filterMode;
+      document.querySelectorAll('.mode-filter-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtnId = {
+        'ALL': 'mode-btn-all',
+        'FLIGHT': 'mode-btn-flight',
+        'RAIL': 'mode-btn-rail',
+        'ROAD': 'mode-btn-road',
+        'PLANE_TRAIN': 'mode-btn-plane-train',
+        'PLANE_CAR': 'mode-btn-plane-car',
+        'TRAIN_CAR': 'mode-btn-train-car'
+      }[filterMode] || 'mode-btn-all';
+      const targetBtn = document.getElementById(activeBtnId);
+      if (targetBtn) targetBtn.classList.add('active');
+
+      if (mapDisplayMode === 'fleet') {
+        renderAllFleetRoutes();
+      } else {
+        const activeProfile = TRAVELER_PROFILES[currentActiveTravelerId || 'itin-101'] || TRAVELER_PROFILES['itin-101'];
+        renderTravelerRoute(activeProfile);
+      }
+    }
+
+    function isSegmentActive(mode, filter) {
+      if (!filter || filter === 'ALL') return true;
+      const m = String(mode || 'FLIGHT').toUpperCase();
+      const isFlight = (m === 'FLIGHT');
+      const isRail = (m === 'RAIL' || m === 'TRAIN');
+      const isRoad = (m === 'BUS' || m === 'CAR' || m === 'TAXI' || m === 'SHUTTLE');
+
+      if (filter === 'FLIGHT') return isFlight;
+      if (filter === 'RAIL') return isRail;
+      if (filter === 'ROAD') return isRoad;
+      if (filter === 'PLANE_TRAIN') return isFlight || isRail;
+      if (filter === 'PLANE_CAR') return isFlight || isRoad;
+      if (filter === 'TRAIN_CAR') return isRail || isRoad;
+      return true;
+    }
+
+    function applyJourneySequence(seqType) {
+      document.querySelectorAll('[id^="seq-btn-"]').forEach(btn => btn.classList.remove('active'));
+      const activeBtnId = {
+        'CAR_PLANE_CAR': 'seq-btn-car-plane-car',
+        'CAR_PLANE_RAIL': 'seq-btn-car-plane-rail',
+        'RAIL_PLANE_CAR': 'seq-btn-rail-plane-car',
+        'CAR_PLANE': 'seq-btn-car-plane',
+        'PLANE_RAIL': 'seq-btn-plane-rail',
+        'PLANE_ONLY': 'seq-btn-plane-only'
+      }[seqType] || 'seq-btn-car-plane';
+
+      const targetBtn = document.getElementById(activeBtnId);
+      if (targetBtn) targetBtn.classList.add('active');
+
+      const activeProfile = TRAVELER_PROFILES[currentActiveTravelerId || 'itin-101'] || TRAVELER_PROFILES['itin-101'];
+      const oCode = activeProfile.originCode || 'SFO';
+      const dCode = activeProfile.destCode || activeProfile.destinationCode || 'LHR';
+
+      const oLat = activeProfile.originLat || 37.6213;
+      const oLng = activeProfile.originLng || -122.3790;
+      const dLat = activeProfile.destLat || 51.4700;
+      const dLng = activeProfile.destLng || -0.4543;
+
+      const cityCityCenter = {
+        'JFK': { code: 'NYC', label: 'New York City Center (NYC)', lat: 40.7128, lng: -74.0060 },
+        'SFO': { code: 'SJC', label: 'San Francisco Downtown (SJC)', lat: 37.7749, lng: -122.4194 },
+        'CDG': { code: 'PAR', label: 'Central Paris Hotel (PAR)', lat: 48.8566, lng: 2.3522 },
+        'LHR': { code: 'LON', label: 'Central London Hotel (LON)', lat: 51.5074, lng: -0.1278 },
+        'ORD': { code: 'CHI', label: 'Chicago Downtown Loop (CHI)', lat: 41.8781, lng: -87.6298 },
+        'HND': { code: 'TYO', label: 'Tokyo Shinjuku District (TYO)', lat: 35.6905, lng: 139.6995 },
+        'MIA': { code: 'MIA_D', label: 'Miami Beach Center (MIA)', lat: 25.7617, lng: -80.1918 }
+      };
+
+      const origCenter = cityCityCenter[oCode] || { code: oCode + '_C', label: getCityName(oCode) + ' City Center', lat: oLat - 0.15, lng: oLng - 0.15 };
+      const destCenter = cityCityCenter[dCode] || { code: dCode + '_C', label: getCityName(dCode) + ' Hotel Center', lat: dLat + 0.1, lng: dLng + 0.1 };
+
+      const originHub = { code: oCode, label: getCityName(oCode) + ' Airport', lat: oLat, lng: oLng };
+      const destHub = { code: dCode, label: getCityName(dCode) + ' Airport', lat: dLat, lng: dLng };
+
+      let waypoints = [];
+      let legsSummary = [];
+
+      if (seqType === 'CAR_PLANE_CAR') {
+        waypoints = [
+          { mode: 'CAR', provider: 'Executive Taxi / Car Transfer to Airport', from: origCenter, to: originHub, color: '#f59e0b' },
+          { mode: 'FLIGHT', provider: activeProfile.name + ' Primary Flight', from: originHub, to: destHub, color: '#6366f1' },
+          { mode: 'CAR', provider: 'Executive Transfer Taxi to Hotel', from: destHub, to: destCenter, color: '#f59e0b' }
+        ];
+        legsSummary = [
+          { provider: 'Executive Car Transfer', route: `${origCenter.code} → ${originHub.code}`, status: 'CONFIRMED', mode: 'CAR' },
+          { provider: 'Primary Flight Segment', route: `${originHub.code} → ${destHub.code}`, status: 'SCHEDULED', mode: 'FLIGHT' },
+          { provider: 'Executive Taxi Transfer', route: `${destHub.code} → ${destCenter.code}`, status: 'CONFIRMED', mode: 'CAR' }
+        ];
+      } else if (seqType === 'CAR_PLANE_RAIL') {
+        const railHub = { code: dCode + '_RL', label: getCityName(dCode) + ' High-Speed Rail Station', lat: dLat + 0.2, lng: dLng + 0.2 };
+        waypoints = [
+          { mode: 'CAR', provider: 'Executive Car Transfer to Airport', from: origCenter, to: originHub, color: '#f59e0b' },
+          { mode: 'FLIGHT', provider: activeProfile.name + ' Flight Segment', from: originHub, to: destHub, color: '#6366f1' },
+          { mode: 'RAIL', provider: 'High-Speed Rail Connector', from: destHub, to: railHub, color: '#10b981' }
+        ];
+        legsSummary = [
+          { provider: 'Executive Car Transfer', route: `${origCenter.code} → ${originHub.code}`, status: 'CONFIRMED', mode: 'CAR' },
+          { provider: 'Primary Flight Segment', route: `${originHub.code} → ${destHub.code}`, status: 'SCHEDULED', mode: 'FLIGHT' },
+          { provider: 'High-Speed Rail Connector', route: `${destHub.code} → ${railHub.code}`, status: 'SCHEDULED', mode: 'RAIL' }
+        ];
+      } else if (seqType === 'RAIL_PLANE_CAR') {
+        const origRail = { code: oCode + '_RL', label: getCityName(oCode) + ' Station', lat: oLat - 0.2, lng: oLng - 0.2 };
+        waypoints = [
+          { mode: 'RAIL', provider: 'Regional Express Rail to Airport', from: origRail, to: originHub, color: '#10b981' },
+          { mode: 'FLIGHT', provider: activeProfile.name + ' Flight Segment', from: originHub, to: destHub, color: '#6366f1' },
+          { mode: 'CAR', provider: 'Executive Transfer Car to Destination', from: destHub, to: destCenter, color: '#f59e0b' }
+        ];
+        legsSummary = [
+          { provider: 'Regional Express Rail', route: `${origRail.code} → ${originHub.code}`, status: 'CONFIRMED', mode: 'RAIL' },
+          { provider: 'Primary Flight Segment', route: `${originHub.code} → ${destHub.code}`, status: 'SCHEDULED', mode: 'FLIGHT' },
+          { provider: 'Executive Car Transfer', route: `${destHub.code} → ${destCenter.code}`, status: 'CONFIRMED', mode: 'CAR' }
+        ];
+      } else if (seqType === 'CAR_PLANE') {
+        waypoints = [
+          { mode: 'CAR', provider: 'Executive Car / Taxi Transfer to Airport', from: origCenter, to: originHub, color: '#f59e0b' },
+          { mode: 'FLIGHT', provider: activeProfile.name + ' Primary Flight Segment', from: originHub, to: destHub, color: '#6366f1' }
+        ];
+        legsSummary = [
+          { provider: 'Executive Car Transfer to Airport', route: `${origCenter.code} → ${originHub.code}`, status: 'CONFIRMED', mode: 'CAR' },
+          { provider: 'Primary Flight Segment', route: `${originHub.code} → ${destHub.code}`, status: 'SCHEDULED', mode: 'FLIGHT' }
+        ];
+      } else if (seqType === 'PLANE_RAIL') {
+        const railHub = { code: dCode + '_RL', label: getCityName(dCode) + ' High-Speed Rail Station', lat: dLat + 0.2, lng: dLng + 0.2 };
+        waypoints = [
+          { mode: 'FLIGHT', provider: activeProfile.name + ' Flight Segment', from: originHub, to: destHub, color: '#6366f1' },
+          { mode: 'RAIL', provider: 'High-Speed Rail Connector', from: destHub, to: railHub, color: '#10b981' }
+        ];
+        legsSummary = [
+          { provider: 'Primary Flight Segment', route: `${originHub.code} → ${destHub.code}`, status: 'SCHEDULED', mode: 'FLIGHT' },
+          { provider: 'High-Speed Rail Connector', route: `${destHub.code} → ${railHub.code}`, status: 'SCHEDULED', mode: 'RAIL' }
+        ];
+      } else {
+        waypoints = [
+          { mode: 'FLIGHT', provider: activeProfile.name + ' Direct Flight', from: originHub, to: destHub, color: '#6366f1' }
+        ];
+        legsSummary = [
+          { provider: 'Direct Transatlantic Flight', route: `${originHub.code} → ${destHub.code}`, status: 'SCHEDULED', mode: 'FLIGHT' }
+        ];
+      }
+
+      activeProfile.multiModalWaypoints = waypoints;
+      activeProfile.legs = legsSummary;
+
+      // Reset mode filter to ALL when changing sequence
+      currentModeFilter = 'ALL';
+      document.querySelectorAll('.mode-filter-btn').forEach(b => b.classList.remove('active'));
+      const allBtn = document.getElementById('mode-btn-all');
+      if (allBtn) allBtn.classList.add('active');
+
+      renderTravelerRoute(activeProfile);
+      showToast(`Journey sequence active: ${targetBtn ? targetBtn.innerText : seqType}`, 'success');
+    }
+
     // ── Global Executive Traveler Profiles Database ───────────────────────
     const TRAVELER_PROFILES = {
       'itin-101': {
         id: 'itin-101',
         name: 'Sarah Jenkins',
         email: 'sarah.jenkins@acme.com',
-        route: 'SFO ➔ LHR',
+        route: 'San Francisco (SFO) ➔ London Heathrow (LHR)',
         status: 'SELF_HEALED',
         loyaltyTier: 'Delta Diamond Medallion · SkyTeam Elite Plus',
         preferredCabin: 'Business Class Quiet Car',
@@ -745,22 +1199,22 @@
         destCode: 'LHR', destinationCode: 'LHR', destLat: 51.4700, destLng: -0.4543,
         centerLat: 44.5, centerLng: -61.4, zoom: 3,
         legs: [
-          { provider: 'Delta Air Lines (DL-1402)', route: 'SFO → JFK', status: 'DELAYED', mode: 'FLIGHT' },
-          { provider: 'Amtrak Acela Express (AMT-2158)', route: 'NY Moynihan → PHL 30th St', status: 'REBOOKED', mode: 'RAIL' },
+          { provider: 'Delta Air Lines (DL-1402)', route: 'San Francisco (SFO) → New York (JFK)', status: 'DELAYED', mode: 'FLIGHT' },
+          { provider: 'Amtrak Acela Express (AMT-2158)', route: 'New York Moynihan → Philadelphia (PHL)', status: 'REBOOKED', mode: 'RAIL' },
           { provider: 'Ritz-Carlton Executive Suite', route: 'Philadelphia Downtown', status: 'CONFIRMED', mode: 'HOTEL' },
-          { provider: 'British Airways (BA-178)', route: 'PHL → LHR', status: 'SCHEDULED', mode: 'FLIGHT' }
+          { provider: 'British Airways (BA-178)', route: 'Philadelphia (PHL) → London (LHR)', status: 'SCHEDULED', mode: 'FLIGHT' }
         ],
         multiModalWaypoints: [
-          { mode: 'FLIGHT', provider: 'Delta Air Lines (DL-1402)', from: { code: 'SFO', label: 'SFO — San Francisco Int\'l', lat: 37.6213, lng: -122.3790 }, to: { code: 'JFK', label: 'JFK — New York JFK', lat: 40.6413, lng: -73.7781 }, color: '#6366f1' },
-          { mode: 'RAIL', provider: 'Amtrak Acela Express (AMT-2158)', from: { code: 'JFK', label: 'JFK — NY Moynihan Rail', lat: 40.6413, lng: -73.7781 }, to: { code: 'PHL', label: 'PHL — Philadelphia 30th St', lat: 39.8729, lng: -75.2437 }, color: '#10b981' },
-          { mode: 'FLIGHT', provider: 'British Airways (BA-178)', from: { code: 'PHL', label: 'PHL — Philadelphia Int\'l', lat: 39.8729, lng: -75.2437 }, to: { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 }, color: '#6366f1' }
+          { mode: 'FLIGHT', provider: 'Delta Air Lines (DL-1402)', from: { code: 'SFO', label: 'San Francisco (SFO)', lat: 37.6213, lng: -122.3790 }, to: { code: 'JFK', label: 'New York (JFK)', lat: 40.6413, lng: -73.7781 }, color: '#6366f1' },
+          { mode: 'RAIL', provider: 'Amtrak Acela Express (AMT-2158)', from: { code: 'JFK', label: 'New York (JFK)', lat: 40.6413, lng: -73.7781 }, to: { code: 'PHL', label: 'Philadelphia (PHL)', lat: 39.8729, lng: -75.2437 }, color: '#10b981' },
+          { mode: 'FLIGHT', provider: 'British Airways (BA-178)', from: { code: 'PHL', label: 'Philadelphia (PHL)', lat: 39.8729, lng: -75.2437 }, to: { code: 'LHR', label: 'London Heathrow (LHR)', lat: 51.4700, lng: -0.4543 }, color: '#6366f1' }
         ]
       },
       'itin-102': {
         id: 'itin-102',
         name: 'Marcus Vance',
         email: 'marcus.vance@acme.com',
-        route: 'JFK ➔ CDG',
+        route: 'New York (JFK) ➔ Paris (CDG)',
         status: 'SCHEDULED',
         loyaltyTier: 'Air France Flying Blue Platinum',
         preferredCabin: 'First Class / Executive',
@@ -772,21 +1226,21 @@
         destCode: 'CDG', destinationCode: 'CDG', destLat: 49.0097, destLng: 2.5479,
         centerLat: 44.8, centerLng: -35.6, zoom: 3,
         legs: [
-          { provider: 'Air France (AF-023)', route: 'JFK → CDG', status: 'SCHEDULED', mode: 'FLIGHT' },
-          { provider: 'TGV InOui (TGV-6821)', route: 'Paris CDG → Lyon Part-Dieu', status: 'SCHEDULED', mode: 'RAIL' },
+          { provider: 'Air France (AF-023)', route: 'New York (JFK) → Paris (CDG)', status: 'SCHEDULED', mode: 'FLIGHT' },
+          { provider: 'TGV InOui (TGV-6821)', route: 'Paris (CDG) → Lyon (LYS)', status: 'SCHEDULED', mode: 'RAIL' },
           { provider: 'Four Seasons Hotel George V', route: 'Paris Eighth Arrondissement', status: 'CONFIRMED', mode: 'HOTEL' }
         ],
         multiModalWaypoints: [
-          { mode: 'FLIGHT', provider: 'Air France (AF-023)', from: { code: 'JFK', label: 'JFK — New York JFK', lat: 40.6413, lng: -73.7781 }, to: { code: 'CDG', label: 'CDG — Paris Charles de Gaulle', lat: 49.0097, lng: 2.5479 }, color: '#6366f1' },
-          { mode: 'RAIL', provider: 'TGV InOui High-Speed Rail', from: { code: 'CDG', label: 'CDG — Paris CDG Rail', lat: 49.0097, lng: 2.5479 }, to: { code: 'LYS', label: 'LYS — Lyon Part-Dieu Rail', lat: 45.7602, lng: 4.8597 }, color: '#10b981' },
-          { mode: 'BUS', provider: 'Executive Transfer Shuttle', from: { code: 'LYS', label: 'LYS — Lyon Station', lat: 45.7602, lng: 4.8597 }, to: { code: 'PAR', label: 'PAR — Paris Eighth Arr.', lat: 48.8688, lng: 2.3005 }, color: '#f59e0b' }
+          { mode: 'FLIGHT', provider: 'Air France (AF-023)', from: { code: 'JFK', label: 'New York (JFK)', lat: 40.6413, lng: -73.7781 }, to: { code: 'CDG', label: 'Paris Charles de Gaulle (CDG)', lat: 49.0097, lng: 2.5479 }, color: '#6366f1' },
+          { mode: 'RAIL', provider: 'TGV InOui High-Speed Rail', from: { code: 'CDG', label: 'Paris CDG Rail', lat: 49.0097, lng: 2.5479 }, to: { code: 'LYS', label: 'Lyon Part-Dieu Rail (LYS)', lat: 45.7602, lng: 4.8597 }, color: '#10b981' },
+          { mode: 'BUS', provider: 'Executive Transfer Shuttle', from: { code: 'LYS', label: 'Lyon Station (LYS)', lat: 45.7602, lng: 4.8597 }, to: { code: 'PAR', label: 'Paris Eighth Arr. (PAR)', lat: 48.8688, lng: 2.3005 }, color: '#f59e0b' }
         ]
       },
       'itin-103': {
         id: 'itin-103',
         name: 'Elena Rostova',
         email: 'elena.rostova@acme.com',
-        route: 'ORD ➔ HND',
+        route: 'Chicago (ORD) ➔ Tokyo Haneda (HND)',
         status: 'IN_TRANSIT',
         loyaltyTier: 'ANA Diamond Service · Star Alliance Gold',
         preferredCabin: 'Business Class / Shinkansen Gran Class',
@@ -798,21 +1252,21 @@
         destCode: 'HND', destinationCode: 'HND', destLat: 35.5494, destLng: 139.7798,
         centerLat: 45.0, centerLng: -170.0, zoom: 2,
         legs: [
-          { provider: 'ANA All Nippon Airways (NH-111)', route: 'ORD → HND', status: 'IN_TRANSIT', mode: 'FLIGHT' },
-          { provider: 'Shinkansen Nozomi (NK-309)', route: 'Tokyo → Kyoto', status: 'SCHEDULED', mode: 'RAIL' },
+          { provider: 'ANA All Nippon Airways (NH-111)', route: 'Chicago (ORD) → Tokyo (HND)', status: 'IN_TRANSIT', mode: 'FLIGHT' },
+          { provider: 'Shinkansen Nozomi (NK-309)', route: 'Tokyo (TYO) → Kyoto (KYT)', status: 'SCHEDULED', mode: 'RAIL' },
           { provider: 'Park Hyatt Tokyo', route: 'Shinjuku Tokyo', status: 'CONFIRMED', mode: 'HOTEL' }
         ],
         multiModalWaypoints: [
-          { mode: 'FLIGHT', provider: 'ANA All Nippon Airways (NH-111)', from: { code: 'ORD', label: 'ORD — Chicago O\'Hare', lat: 41.9742, lng: -87.9073 }, to: { code: 'HND', label: 'HND — Tokyo Haneda', lat: 35.5494, lng: 139.7798 }, color: '#6366f1' },
-          { mode: 'RAIL', provider: 'Shinkansen Bullet Train (NK-309)', from: { code: 'HND', label: 'HND — Tokyo Station', lat: 35.5494, lng: 139.7798 }, to: { code: 'KYT', label: 'KYT — Kyoto Station', lat: 34.9858, lng: 135.7588 }, color: '#10b981' },
-          { mode: 'BUS', provider: 'Executive Airport Bus Express', from: { code: 'KYT', label: 'KYT — Kyoto Transfer', lat: 34.9858, lng: 135.7588 }, to: { code: 'TYO', label: 'TYO — Shinjuku Tokyo', lat: 35.6905, lng: 139.6995 }, color: '#f59e0b' }
+          { mode: 'FLIGHT', provider: 'ANA All Nippon Airways (NH-111)', from: { code: 'ORD', label: 'Chicago O\'Hare (ORD)', lat: 41.9742, lng: -87.9073 }, to: { code: 'HND', label: 'Tokyo Haneda (HND)', lat: 35.5494, lng: 139.7798 }, color: '#6366f1' },
+          { mode: 'RAIL', provider: 'Shinkansen Bullet Train (NK-309)', from: { code: 'HND', label: 'Tokyo Station (HND)', lat: 35.5494, lng: 139.7798 }, to: { code: 'KYT', label: 'Kyoto Station (KYT)', lat: 34.9858, lng: 135.7588 }, color: '#10b981' },
+          { mode: 'BUS', provider: 'Executive Airport Bus Express', from: { code: 'KYT', label: 'Kyoto Transfer (KYT)', lat: 34.9858, lng: 135.7588 }, to: { code: 'TYO', label: 'Shinjuku Tokyo (TYO)', lat: 35.6905, lng: 139.6995 }, color: '#f59e0b' }
         ]
       },
       'itin-104': {
         id: 'itin-104',
         name: 'David Chen',
         email: 'david.chen@acme.com',
-        route: 'MIA ➔ LHR',
+        route: 'Miami (MIA) ➔ London Heathrow (LHR)',
         status: 'SELF_HEALED',
         loyaltyTier: 'British Airways Executive Club Gold · Oneworld Emerald',
         preferredCabin: 'Club World Business Class',
@@ -824,12 +1278,12 @@
         destCode: 'LHR', destinationCode: 'LHR', destLat: 51.4700, destLng: -0.4543,
         centerLat: 40.0, centerLng: -40.0, zoom: 3,
         legs: [
-          { provider: 'American Airlines (AA-038)', route: 'MIA → LHR', status: 'SELF_HEALED', mode: 'FLIGHT' },
-          { provider: 'Executive Taxi Transfer', route: 'LHR → London Hotel', status: 'CONFIRMED', mode: 'BUS' }
+          { provider: 'American Airlines (AA-038)', route: 'Miami (MIA) → London (LHR)', status: 'SELF_HEALED', mode: 'FLIGHT' },
+          { provider: 'Executive Taxi Transfer', route: 'London (LHR) → Central London Hotel', status: 'CONFIRMED', mode: 'BUS' }
         ],
         multiModalWaypoints: [
-          { mode: 'FLIGHT', provider: 'American Airlines (AA-038)', from: { code: 'MIA', label: 'MIA — Miami Int\'l', lat: 25.7959, lng: -80.2870 }, to: { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 }, color: '#6366f1' },
-          { mode: 'BUS', provider: 'Executive Taxi / Shuttle Transfer', from: { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 }, to: { code: 'LON', label: 'LON — Central London Hotel', lat: 51.5074, lng: -0.1278 }, color: '#f59e0b' }
+          { mode: 'FLIGHT', provider: 'American Airlines (AA-038)', from: { code: 'MIA', label: 'Miami Int\'l (MIA)', lat: 25.7959, lng: -80.2870 }, to: { code: 'LHR', label: 'London Heathrow (LHR)', lat: 51.4700, lng: -0.4543 }, color: '#6366f1' },
+          { mode: 'BUS', provider: 'Executive Taxi / Shuttle Transfer', from: { code: 'LHR', label: 'London Heathrow (LHR)', lat: 51.4700, lng: -0.4543 }, to: { code: 'LON', label: 'Central London Hotel (LON)', lat: 51.5074, lng: -0.1278 }, color: '#f59e0b' }
         ]
       }
     };
@@ -939,12 +1393,12 @@
     }
 
     // ── Mode Switcher (Traveler View vs System Internals) ─────────────
-    const tabTraveler    = document.getElementById('tab-mode-traveler');
-    const tabInternals   = document.getElementById('tab-mode-internals');
-    const navTravelerMenu  = document.getElementById('nav-traveler-menu');
+    const tabTraveler = document.getElementById('tab-mode-traveler');
+    const tabInternals = document.getElementById('tab-mode-internals');
+    const navTravelerMenu = document.getElementById('nav-traveler-menu');
     const navInternalsMenu = document.getElementById('nav-internals-menu');
-    const internalsBanner  = document.getElementById('internals-banner-bar');
-    const simulatorPanel   = document.getElementById('simulator-controls-panel');
+    const internalsBanner = document.getElementById('internals-banner-bar');
+    const simulatorPanel = document.getElementById('simulator-controls-panel');
 
     let currentMode = 'traveler';
 
@@ -971,7 +1425,7 @@
     if (tabInternals) tabInternals.addEventListener('click', () => switchMode('internals'));
 
     // ── View Navigation ───────────────────────────────────────────────
-    const navItems       = document.querySelectorAll('.nav-item');
+    const navItems = document.querySelectorAll('.nav-item');
     const viewContainers = document.querySelectorAll('.view-container');
 
     function switchView(targetView, customTitle) {
@@ -1008,7 +1462,7 @@
     // ── Modal Handlers ─────────────────────────────────────────────────────────
     const modal = document.getElementById('createItineraryModal');
     document.getElementById('btn-open-create-modal')?.addEventListener('click', () => modal?.classList.add('active'));
-    document.getElementById('btn-close-modal')?.addEventListener('click',  () => modal?.classList.remove('active'));
+    document.getElementById('btn-close-modal')?.addEventListener('click', () => modal?.classList.remove('active'));
     document.getElementById('btn-cancel-modal')?.addEventListener('click', () => modal?.classList.remove('active'));
     modal?.addEventListener('click', (e) => { if (e.target === modal) modal?.classList.remove('active'); });
 
@@ -1017,7 +1471,7 @@
       const btn = e.target.closest('.mode-select-btn');
       if (!btn) return;
       e.preventDefault();
-      
+
       document.querySelectorAll('.mode-select-btn').forEach(b => {
         b.classList.remove('active');
         b.style.background = 'rgba(255, 255, 255, 0.05)';
@@ -1055,11 +1509,15 @@
 
       const key = presetBtn.getAttribute('data-preset') || 'FLIGHT_ONLY';
       const fMileSelect = document.getElementById('modal-first-mile-mode');
-      const mainInput   = document.getElementById('modal-travel-mode');
+      const mainInput = document.getElementById('modal-travel-mode');
       const lMileSelect = document.getElementById('modal-transfer-mode');
 
       if (key === 'FLIGHT_ONLY') {
         if (fMileSelect) fMileSelect.value = 'NONE';
+        if (mainInput) mainInput.value = 'FLIGHT';
+        if (lMileSelect) lMileSelect.value = 'DIRECT';
+      } else if (key === 'CAR_FLIGHT') {
+        if (fMileSelect) fMileSelect.value = 'CAR';
         if (mainInput) mainInput.value = 'FLIGHT';
         if (lMileSelect) lMileSelect.value = 'DIRECT';
       } else if (key === 'TRAIN_ONLY') {
@@ -1079,7 +1537,7 @@
         if (mainInput) mainInput.value = 'FLIGHT';
         if (lMileSelect) lMileSelect.value = 'DIRECT';
       } else if (key === 'FULL_MULTIMODAL') {
-        if (fMileSelect) fMileSelect.value = 'RAIL';
+        if (fMileSelect) fMileSelect.value = 'CAR';
         if (mainInput) mainInput.value = 'FLIGHT';
         if (lMileSelect) lMileSelect.value = 'CAR_TRANSFER';
       }
@@ -1102,11 +1560,15 @@
 
     document.getElementById('form-create-itinerary')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('modal-traveler-name')?.value;
-      const email = document.getElementById('modal-traveler-email')?.value;
+      const name = document.getElementById('modal-traveler-name')?.value || 'Executive Traveler';
+      const email = document.getElementById('modal-traveler-email')?.value || 'executive@acme.com';
+      const firstMileMode = document.getElementById('modal-first-mile-mode')?.value || 'NONE';
+      const firstMileOrigin = document.getElementById('modal-first-mile-origin')?.value || '';
       const primaryMode = document.getElementById('modal-travel-mode')?.value || 'FLIGHT';
       const originInputVal = document.getElementById('modal-origin-input')?.value;
       const destInputVal = document.getElementById('modal-dest-input')?.value;
+      const lastMileMode = document.getElementById('modal-transfer-mode')?.value || 'CAR_TRANSFER';
+      const lastMileDest = document.getElementById('modal-last-mile-dest')?.value || '';
       const depDate = document.getElementById('modal-dep-date')?.value || '2026-08-10';
       const depTime = document.getElementById('modal-dep-time')?.value || '09:00';
       const arrDate = document.getElementById('modal-arr-date')?.value || '2026-08-10';
@@ -1115,20 +1577,24 @@
       const cabinPref = document.getElementById('modal-cabin-pref')?.value || 'Business Class Quiet Car';
       const strat = document.getElementById('modal-strategy')?.value || 'EXECUTIVE_SPEED';
 
-      let origAp = selectedOriginAp;
-      if (!origAp && originInputVal) {
+      let origAp;
+      if (originInputVal) {
         const q = originInputVal.trim().toUpperCase();
-        origAp = GLOBAL_AIRPORTS.find(a => q.includes(a.code) || a.city.toUpperCase().includes(q) || a.name.toUpperCase().includes(q)) || GLOBAL_AIRPORTS[1];
+        origAp = (typeof GLOBAL_AIRPORTS !== 'undefined' ? GLOBAL_AIRPORTS.find(a => a.code === q || q.includes(a.code) || a.city.toUpperCase().includes(q) || a.name?.toUpperCase().includes(q)) : null) || selectedOriginAp || (typeof GLOBAL_AIRPORTS !== 'undefined' ? GLOBAL_AIRPORTS[1] : null);
+      } else {
+        origAp = selectedOriginAp || (typeof GLOBAL_AIRPORTS !== 'undefined' ? GLOBAL_AIRPORTS[1] : null);
       }
 
-      let destAp = selectedDestAp;
-      if (!destAp && destInputVal) {
-        const q = destInputVal.trim().toUpperCase();
-        destAp = GLOBAL_AIRPORTS.find(a => q.includes(a.code) || a.city.toUpperCase().includes(q) || a.name.toUpperCase().includes(q)) || GLOBAL_AIRPORTS[2];
+      let destAp;
+      if (destInputVal) {
+        const qD = destInputVal.trim().toUpperCase();
+        destAp = (typeof GLOBAL_AIRPORTS !== 'undefined' ? GLOBAL_AIRPORTS.find(a => a.code === qD || qD.includes(a.code) || a.city.toUpperCase().includes(qD) || a.name?.toUpperCase().includes(qD)) : null) || selectedDestAp || (typeof GLOBAL_AIRPORTS !== 'undefined' ? GLOBAL_AIRPORTS[2] : null);
+      } else {
+        destAp = selectedDestAp || (typeof GLOBAL_AIRPORTS !== 'undefined' ? GLOBAL_AIRPORTS[2] : null);
       }
 
       const originStr = originInputVal || (origAp ? `${origAp.code} — ${origAp.city}` : 'SFO');
-      const destStr   = destInputVal   || (destAp ? `${destAp.code} — ${destAp.city}`   : 'LHR');
+      const destStr = destInputVal || (destAp ? `${destAp.code} — ${destAp.city}` : 'LHR');
 
       if (origAp && destAp && origAp.code === destAp.code) {
         showToast('Origin and Destination hubs cannot be identical.', 'warning');
@@ -1142,15 +1608,19 @@
           body: JSON.stringify({
             travelerName: name,
             travelerEmail: email,
-            primaryMode: primaryMode,
+            firstMileMode,
+            firstMileOrigin,
+            primaryMode,
             origin: originStr,
             destination: destStr,
-            depDate: depDate,
-            depTime: depTime,
-            arrDate: arrDate,
-            arrTime: arrTime,
-            transferMode: transferMode,
-            cabinPref: cabinPref,
+            lastMileMode,
+            lastMileDest,
+            depDate,
+            depTime,
+            arrDate,
+            arrTime,
+            transferMode,
+            cabinPref,
             strategy: strat,
             originLat: origAp?.lat || 37.6213,
             originLng: origAp?.lng || -122.3790,
@@ -1163,6 +1633,9 @@
           modal?.classList.remove('active');
 
           TRAVELER_PROFILES[data.profile.id] = data.profile;
+          if (typeof defaultFleetData !== 'undefined' && Array.isArray(defaultFleetData)) {
+            defaultFleetData.unshift(data.newTrip || { id: data.profile.id, traveler: data.profile.name, route: data.profile.route, status: 'SCHEDULED' });
+          }
 
           const optionHtml = `<option value="${data.profile.id}">${data.profile.name} (${data.profile.route})</option>`;
           document.getElementById('traveler-selector')?.insertAdjacentHTML('afterbegin', optionHtml);
@@ -1182,7 +1655,7 @@
     });
 
     // ── Delay Slider ─────────────────────────────────────────────────
-    const slider    = document.getElementById('sim-delay-slider');
+    const slider = document.getElementById('sim-delay-slider');
     const sliderTxt = document.getElementById('slider-val-txt');
 
     function getDurationStr(mins) {
@@ -1233,10 +1706,10 @@
 
     // ── Itinerary data ────────────────────────────────────────────────
     let graphNodes = [
-      { id: '1', provider: 'Delta Air Lines',       reference_code: 'DL-1402',  origin: 'SFO', destination: 'JFK', scheduled_departure: '2026-07-25T12:00:00.000Z', scheduled_arrival: '2026-07-25T17:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', mode: 'FLIGHT', pricing: 'Business Class · Direct · No change fee' },
-      { id: '2', provider: 'Amtrak Acela Express',  reference_code: 'AMT-2150', origin: 'NY Moynihan', destination: 'PHL 30th St', scheduled_departure: '2026-07-25T18:30:00.000Z', scheduled_arrival: '2026-07-25T19:45:00.000Z', status: 'SCHEDULED', segment_type: 'TRAIN', mode: 'RAIL', pricing: 'First Class Quiet Car · Wi-Fi Included · No change fee' },
+      { id: '1', provider: 'Delta Air Lines', reference_code: 'DL-1402', origin: 'SFO', destination: 'JFK', scheduled_departure: '2026-07-25T12:00:00.000Z', scheduled_arrival: '2026-07-25T17:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', mode: 'FLIGHT', pricing: 'Business Class · Direct · No change fee' },
+      { id: '2', provider: 'Amtrak Acela Express', reference_code: 'AMT-2150', origin: 'NY Moynihan', destination: 'PHL 30th St', scheduled_departure: '2026-07-25T18:30:00.000Z', scheduled_arrival: '2026-07-25T19:45:00.000Z', status: 'SCHEDULED', segment_type: 'TRAIN', mode: 'RAIL', pricing: 'First Class Quiet Car · Wi-Fi Included · No change fee' },
       { id: '3', provider: 'Ritz-Carlton Philadelphia', reference_code: 'HTL-9921', origin: 'Philadelphia', destination: 'Philadelphia', scheduled_departure: '2026-07-25T20:15:00.000Z', scheduled_arrival: '2026-07-26T12:00:00.000Z', status: 'SCHEDULED', segment_type: 'HOTEL', mode: null, pricing: 'Executive Suite · Late Check-in Guaranteed · No change fee' },
-      { id: '4', provider: 'British Airways',        reference_code: 'BA-178',   origin: 'PHL', destination: 'LHR', scheduled_departure: '2026-07-26T15:00:00.000Z', scheduled_arrival: '2026-07-26T22:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', mode: 'FLIGHT', pricing: 'Club World Cabin · Direct Transatlantic · No change fee' }
+      { id: '4', provider: 'British Airways', reference_code: 'BA-178', origin: 'PHL', destination: 'LHR', scheduled_departure: '2026-07-26T15:00:00.000Z', scheduled_arrival: '2026-07-26T22:00:00.000Z', status: 'SCHEDULED', segment_type: 'FLIGHT', mode: 'FLIGHT', pricing: 'Club World Cabin · Direct Transatlantic · No change fee' }
     ];
 
     function renderItineraryNodes(segments, containerId = 'nodes-container') {
@@ -1252,12 +1725,12 @@
         const arr = new Date(seg.scheduled_arrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         let statusTag = `<span class="status-tag status-tag-neutral">${seg.status}</span>`;
-        if (seg.status === 'DELAYED')    statusTag = `<span class="status-tag status-tag-red">Delayed (+150m)</span>`;
-        if (seg.status === 'REBOOKED')   statusTag = `<span class="status-tag status-tag-green">Updated Automatically</span>`;
-        if (seg.status === 'SCHEDULED')  statusTag = `<span class="status-tag status-tag-neutral">On Schedule</span>`;
-        if (seg.status === 'CANCELLED')  statusTag = `<span class="status-tag status-tag-red">Cancelled</span>`;
-        if (seg.status === 'REROUTED')   statusTag = `<span class="status-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.3);">Rerouted</span>`;
-        if (seg.status === 'FAILOVER')   statusTag = `<span class="status-tag status-tag-amber">Ground Transit Fallback</span>`;
+        if (seg.status === 'DELAYED') statusTag = `<span class="status-tag status-tag-red">Delayed (+150m)</span>`;
+        if (seg.status === 'REBOOKED') statusTag = `<span class="status-tag status-tag-green">Updated Automatically</span>`;
+        if (seg.status === 'SCHEDULED') statusTag = `<span class="status-tag status-tag-neutral">On Schedule</span>`;
+        if (seg.status === 'CANCELLED') statusTag = `<span class="status-tag status-tag-red">Cancelled</span>`;
+        if (seg.status === 'REROUTED') statusTag = `<span class="status-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.3);">Rerouted</span>`;
+        if (seg.status === 'FAILOVER') statusTag = `<span class="status-tag status-tag-amber">Ground Transit Fallback</span>`;
 
         const iconHtml = getSegmentIcon(seg.segment_type || seg.type || seg.provider);
 
@@ -1304,23 +1777,23 @@
     const TRAVELER_ROUTES = {
       'marcus vance': {
         label: 'Marcus Vance — ORD to CDG',
-        origin:  { code: 'ORD', label: 'ORD — Chicago O\'Hare', lat: 41.9742, lng: -87.9073 },
-        dest:    { code: 'CDG', label: 'CDG — Paris Charles de Gaulle', lat: 49.0097, lng: 2.5479 },
+        origin: { code: 'ORD', label: 'ORD — Chicago O\'Hare', lat: 41.9742, lng: -87.9073 },
+        dest: { code: 'CDG', label: 'CDG — Paris Charles de Gaulle', lat: 49.0097, lng: 2.5479 },
       },
       'elena rostova': {
         label: 'Elena Rostova — ORD to HND',
-        origin:  { code: 'ORD', label: 'ORD — Chicago O\'Hare', lat: 41.9742, lng: -87.9073 },
-        dest:    { code: 'HND', label: 'HND — Tokyo Haneda', lat: 35.5494, lng: 139.7798 },
+        origin: { code: 'ORD', label: 'ORD — Chicago O\'Hare', lat: 41.9742, lng: -87.9073 },
+        dest: { code: 'HND', label: 'HND — Tokyo Haneda', lat: 35.5494, lng: 139.7798 },
       },
       'david chen': {
         label: 'David Chen — MIA to LHR',
-        origin:  { code: 'MIA', label: 'MIA — Miami International', lat: 25.7959, lng: -80.2870 },
-        dest:    { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 },
+        origin: { code: 'MIA', label: 'MIA — Miami International', lat: 25.7959, lng: -80.2870 },
+        dest: { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 },
       },
       'sarah jenkins': {
         label: 'Sarah Jenkins — SFO to LHR',
-        origin:  { code: 'SFO', label: 'SFO — San Francisco', lat: 37.6213, lng: -122.379 },
-        dest:    { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 },
+        origin: { code: 'SFO', label: 'SFO — San Francisco', lat: 37.6213, lng: -122.379 },
+        dest: { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543 },
       },
     };
 
@@ -1330,7 +1803,7 @@
     // ── Dashboard data fetch ──────────────────────────────────────────
     async function loadDashboardData() {
       try {
-        const res  = await fetch('/api/dashboard');
+        const res = await fetch('/api/dashboard');
         const data = await res.json();
         if (data.metrics && data.metrics.active_itineraries) {
           const countEl = document.getElementById('metric-active-count');
@@ -1366,6 +1839,8 @@
 
       const colors = ['#6366f1', '#10b981', '#06b6d4', '#f59e0b', '#ec4899', '#8b5cf6'];
       const allCoords = [];
+      let activeSegCount = 0;
+      let totalDistanceKm = 0;
       const profiles = Object.values(TRAVELER_PROFILES);
 
       profiles.forEach((profile, idx) => {
@@ -1375,17 +1850,27 @@
           {
             mode: 'FLIGHT',
             provider: profile.name + ' Primary Flight',
-            from: { code: profile.originCode || 'ORIG', label: profile.originCode, lat: profile.originLat, lng: profile.originLng },
-            to: { code: profile.destCode || profile.destinationCode || 'DEST', label: profile.destCode || profile.destinationCode, lat: profile.destLat, lng: profile.destLng },
+            from: { code: profile.originCode || 'ORIG', label: getCityName(profile.originCode), lat: profile.originLat, lng: profile.originLng },
+            to: { code: profile.destCode || profile.destinationCode || 'DEST', label: getCityName(profile.destCode), lat: profile.destLat, lng: profile.destLng },
             color: colors[idx % colors.length]
           }
         ];
 
         waypoints.forEach((seg, sIdx) => {
           const m = String(seg.mode || 'FLIGHT').toUpperCase();
+          const isFilterActive = isSegmentActive(seg.mode, currentModeFilter);
           const segColor = seg.color || (m === 'RAIL' ? '#10b981' : (m === 'BUS' || m === 'CAR' ? '#f59e0b' : '#6366f1'));
           const arc = buildRouteGeometry(seg.from, seg.to, seg.mode, 60);
+
+          if (!isFilterActive) {
+            // Render subtle background guide polyline for filtered-out segments
+            L.polyline(arc, { color: segColor, weight: 1.5, opacity: 0.12, dashArray: '4, 8' }).addTo(routeLayerGroup);
+            return;
+          }
+
+          activeSegCount++;
           allCoords.push(...arc);
+          totalDistanceKm += calcTotalPathDistanceKm(arc);
 
           let polyline;
           if (m === 'RAIL' || m === 'TRAIN') {
@@ -1409,6 +1894,9 @@
             polyline = L.polyline(arc, { color: segColor, weight: 3, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
           }
 
+          const fromCity = getCityName(seg.from.code);
+          const toCity = getCityName(seg.to.code);
+
           const popupHtml = `
             <div style="font-family:Inter,sans-serif; padding:4px; min-width:210px;">
               <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; margin-bottom:6px;">
@@ -1416,8 +1904,8 @@
                 <span style="font-size:10px; background:rgba(99,102,241,0.2); color:${segColor}; padding:2px 6px; border-radius:4px; font-weight:700;">[${seg.mode}]</span>
               </div>
               <div style="font-size:11px; color:#94a3b8; line-height:1.6;">
-                <div><strong>Segment:</strong> <span style="color:#f8fafc; font-weight:600;">${seg.provider}</span></div>
-                <div><strong>Route:</strong> <span style="color:#38bdf8; font-family:monospace; font-weight:700;">${seg.from.code} ➔ ${seg.to.code}</span></div>
+                <div><strong>Provider:</strong> <span style="color:#f8fafc; font-weight:600;">${seg.provider}</span></div>
+                <div><strong>Route:</strong> <span style="color:#38bdf8; font-weight:700;">${fromCity} ➔ ${toCity}</span></div>
                 <div><strong>Full Itinerary:</strong> ${profile.route}</div>
               </div>
               <button onclick="selectTraveler('${profile.id}'); openPassengerDetailsModal('${profile.id}');" style="margin-top:8px; width:100%; padding:6px; background:${segColor}; color:#fff; border:none; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer;">
@@ -1445,29 +1933,43 @@
             });
           }
 
-          // Hub Station Markers
+          // Hub Station Markers with Real City Labels
           [seg.from, seg.to].forEach((node, nIdx) => {
             const nodeCode = node.code || 'HUB';
-            const nodeLabel = node.label || nodeCode;
+            const fullCity = getCityName(nodeCode);
             const dotIcon = L.divIcon({
               className: '',
               html: `<div style="
-                width:11px;height:11px;
+                width:12px;height:12px;
                 border-radius:50%;
                 background:${segColor};
-                border:2px solid #ffffff;
-                box-shadow:0 0 8px ${segColor};
+                border:2.5px solid #ffffff;
+                box-shadow:0 0 10px ${segColor};
               "></div>`,
-              iconSize: [11, 11],
-              iconAnchor: [5.5, 5.5],
+              iconSize: [12, 12],
+              iconAnchor: [6, 6],
             });
 
             L.marker([node.lat, node.lng], { icon: dotIcon })
               .addTo(routeLayerGroup)
-              .bindPopup(`<strong>${nodeCode}</strong> — ${nodeLabel}<br/>Passenger: ${profile.name} (${profile.route})`);
+              .bindPopup(`<strong>${fullCity}</strong><br/>Passenger: ${profile.name}<br/>Itinerary: ${profile.route}`);
+
+            // Real City Pin Label Badge
+            L.marker([node.lat, node.lng], {
+              icon: L.divIcon({
+                className: '',
+                html: `<div class="city-pin-label">${fullCity}</div>`,
+                iconSize: [140, 22],
+                iconAnchor: [70, -4],
+              }),
+              interactive: false,
+              zIndexOffset: 50,
+            }).addTo(routeLayerGroup);
           });
         });
       });
+
+      setElInner('map-telemetry-badge', `⚡ OSRM Road API & Geodesic Arcs | Mode: <strong>${currentModeFilter}</strong> · ${activeSegCount} Segments · ${Math.round(totalDistanceKm).toLocaleString()} km`);
 
       if (allCoords.length > 0) {
         leafletMap.fitBounds(L.latLngBounds(allCoords), { padding: [40, 40] });
@@ -1492,8 +1994,8 @@
       const activeProfile = TRAVELER_PROFILES[currentActiveTravelerId || 'itin-101'] || TRAVELER_PROFILES['itin-101'];
 
       // Update map title elements
-      const nameStr = activeProfile.name || (route.label.includes('—') ? route.label.split('—')[0].trim() : route.label);
-      const routeStr = activeProfile.route || (route.label.includes('—') ? route.label.split('—')[1].trim() : route.label);
+      const nameStr = activeProfile.name || (route.label && route.label.includes('—') ? route.label.split('—')[0].trim() : route.label);
+      const routeStr = activeProfile.route || (route.label && route.label.includes('—') ? route.label.split('—')[1].trim() : route.label);
       setElText('map-route-title', routeStr);
       setElText('map-route-subtitle', `${nameStr} (Multi-Modal Itinerary)`);
 
@@ -1509,19 +2011,30 @@
         {
           mode: 'FLIGHT',
           provider: 'Primary Flight',
-          from: { code: activeProfile.originCode || 'SFO', label: 'Origin Airport', lat: activeProfile.originLat || route.origin.lat, lng: activeProfile.originLng || route.origin.lng },
-          to: { code: activeProfile.destCode || activeProfile.destinationCode || 'LHR', label: 'Destination Airport', lat: activeProfile.destLat || route.dest.lat, lng: activeProfile.destLng || route.dest.lng },
+          from: { code: activeProfile.originCode || 'SFO', label: getCityName(activeProfile.originCode), lat: activeProfile.originLat || route.origin.lat, lng: activeProfile.originLng || route.origin.lng },
+          to: { code: activeProfile.destCode || activeProfile.destinationCode || 'LHR', label: getCityName(activeProfile.destCode), lat: activeProfile.destLat || route.dest.lat, lng: activeProfile.destLng || route.dest.lng },
           color: '#6366f1'
         }
       ];
 
       const allCoords = [];
+      let activeSegCount = 0;
+      let totalDistanceKm = 0;
 
       waypoints.forEach((seg, sIdx) => {
         const m = String(seg.mode || 'FLIGHT').toUpperCase();
+        const isFilterActive = isSegmentActive(seg.mode, currentModeFilter);
         const segColor = seg.color || (m === 'RAIL' ? '#10b981' : (m === 'BUS' || m === 'CAR' ? '#f59e0b' : '#6366f1'));
         const arc = buildRouteGeometry(seg.from, seg.to, seg.mode, 60);
+
+        if (!isFilterActive) {
+          L.polyline(arc, { color: segColor, weight: 1.5, opacity: 0.12, dashArray: '4, 8' }).addTo(routeLayerGroup);
+          return;
+        }
+
+        activeSegCount++;
         allCoords.push(...arc);
+        totalDistanceKm += calcTotalPathDistanceKm(arc);
 
         let polyline;
         if (m === 'RAIL' || m === 'TRAIN') {
@@ -1545,58 +2058,52 @@
           polyline = L.polyline(arc, { color: segColor, weight: 3, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
         }
 
+        const fromCity = getCityName(seg.from.code);
+        const toCity = getCityName(seg.to.code);
+
         polyline.bindPopup(`
           <div style="padding:4px; font-family:Inter,sans-serif;">
             <div style="font-size:10px; font-weight:700; color:${segColor}; text-transform:uppercase;">[${seg.mode}] Segment</div>
             <div style="font-size:13px; font-weight:700; color:#f8fafc; margin-top:2px;">${seg.provider}</div>
-            <div style="font-size:11px; color:#94a3b8; margin-top:3px;">Route: <span style="color:#38bdf8; font-family:monospace;">${seg.from.code} ➔ ${seg.to.code}</span></div>
+            <div style="font-size:11px; color:#94a3b8; margin-top:3px;">Route: <span style="color:#38bdf8; font-weight:700;">${fromCity} ➔ ${toCity}</span></div>
           </div>
-        `, { maxWidth: 220 });
+        `, { maxWidth: 240 });
 
-        // Add Station / Hub Markers
+        // Add Station / Hub Markers with Real City Badges
         [seg.from, seg.to].forEach((node, nIdx) => {
           const isFinalDest = (sIdx === waypoints.length - 1 && nIdx === 1);
           const isOrigin = (sIdx === 0 && nIdx === 0);
           const nodeCode = node.code || (isFinalDest ? (activeProfile.destCode || activeProfile.destinationCode || 'DEST') : (activeProfile.originCode || 'ORIG'));
+          const fullCity = getCityName(nodeCode);
           const dotColor = isFinalDest ? '#22c55e' : (isOrigin ? '#6366f1' : segColor);
 
           const dotIcon = L.divIcon({
             className: '',
             html: `<div style="
-              width:12px;height:12px;
+              width:13px;height:13px;
               border-radius:50%;
               background:${dotColor};
               border:2.5px solid #ffffff;
               box-shadow: 0 0 10px ${dotColor};
             "></div>`,
-            iconSize: [12, 12],
-            iconAnchor: [6, 6],
+            iconSize: [13, 13],
+            iconAnchor: [6.5, 6.5],
           });
 
           L.marker([node.lat, node.lng], { icon: dotIcon })
             .addTo(routeLayerGroup)
-            .bindPopup(`<strong>${nodeCode}</strong> — ${node.label || nodeCode}`);
+            .bindPopup(`<strong>${fullCity}</strong><br/>Location Code: <span style="font-family:monospace; color:#38bdf8;">${nodeCode}</span>`);
 
-          // Label text
+          // City Pin Label Badge
           L.marker([node.lat, node.lng], {
             icon: L.divIcon({
               className: '',
-              html: `<div style="
-                color:rgba(255,255,255,0.9);
-                font-size:11px;
-                font-weight:700;
-                font-family:Inter,sans-serif;
-                white-space:nowrap;
-                pointer-events:none;
-                text-shadow:0 1px 3px rgba(0,0,0,0.9);
-                padding-left:14px;
-                margin-top:2px;
-              ">${nodeCode}</div>`,
-              iconSize: [50, 16],
-              iconAnchor: [-2, 8],
+              html: `<div class="city-pin-label">${fullCity}</div>`,
+              iconSize: [140, 22],
+              iconAnchor: [70, -4],
             }),
             interactive: false,
-            zIndexOffset: -1,
+            zIndexOffset: 50,
           }).addTo(routeLayerGroup);
         });
 
@@ -1619,6 +2126,8 @@
         }
       });
 
+      setElInner('map-telemetry-badge', `⚡ OSRM Road API & Geodesic Arcs | Mode: <strong>${currentModeFilter}</strong> · ${activeSegCount} Segments · ${Math.round(totalDistanceKm).toLocaleString()} km`);
+
       if (allCoords.length > 0) {
         leafletMap.fitBounds(L.latLngBounds(allCoords), { padding: [36, 48] });
       }
@@ -1630,7 +2139,7 @@
     // ── Health data fetch ─────────────────────────────────────────────
     async function loadHealthData() {
       try {
-        const res  = await fetch('/api/health');
+        const res = await fetch('/api/health');
         const data = await res.json();
         if (data.cockroach_db && data.cockroach_db.p99_latency) {
           setElText('telemetry-latency-val', data.cockroach_db.p99_latency);
@@ -1643,12 +2152,12 @@
     // Scenario configuration — all state for each simulation button
     const SCENARIOS = {
       disrupt: {
-        badgeClass:  'status-tag-amber',
-        badgeText:   'Flight Delay Detected',
-        strategy:    'Strategy: Balanced — fastest connection with zero added fee',
-        delay:       '+2h 30m Delay',
-        fee:         '$0.00 — Carrier Covered',
-        buffer:      '+90 minutes',
+        badgeClass: 'status-tag-amber',
+        badgeText: 'Flight Delay Detected',
+        strategy: 'Strategy: Balanced — fastest connection with zero added fee',
+        delay: '+2h 30m Delay',
+        fee: '$0.00 — Carrier Covered',
+        buffer: '+90 minutes',
         logLines: [
           '[TRIGGER] Carrier delay signal received: DL-1402 +150m',
           '[MODAL EVALUATION] First-mile flight delay: 150m. Connection risk at hub: HIGH.',
@@ -1667,12 +2176,12 @@
         ],
       },
       chaos: {
-        badgeClass:  'status-tag-red',
-        badgeText:   'Multi-Segment Cascading Disruption',
-        strategy:    'Strategy: Executive Speed — fastest multi-modal path',
-        delay:       '+5h 15m Delay',
-        fee:         '$0.00 — Force Majeure',
-        buffer:      '+45 minutes',
+        badgeClass: 'status-tag-red',
+        badgeText: 'Multi-Segment Cascading Disruption',
+        strategy: 'Strategy: Executive Speed — fastest multi-modal path',
+        delay: '+5h 15m Delay',
+        fee: '$0.00 — Force Majeure',
+        buffer: '+45 minutes',
         logLines: [
           '[TRIGGER] Multi-segment disruption event: DL-1402 CANCELLED, AMT-2150 MISSED',
           '[AGENT::RecoveryAgent] Cascading disruption detected across 3 segments',
@@ -1682,19 +2191,19 @@
         ],
         nodes: () => [
           { ...graphNodes[0], status: 'CANCELLED', provider: 'Delta Air Lines — Flight Cancelled' },
-          { ...graphNodes[1], status: 'REROUTED',  provider: 'Amtrak Acela (Alternate Route 2291)' },
-          { ...graphNodes[2], status: 'REBOOKED',  provider: 'Ritz-Carlton Philadelphia — Late Arrival Confirmed' },
+          { ...graphNodes[1], status: 'REROUTED', provider: 'Amtrak Acela (Alternate Route 2291)' },
+          { ...graphNodes[2], status: 'REBOOKED', provider: 'Ritz-Carlton Philadelphia — Late Arrival Confirmed' },
           { ...graphNodes[3], status: 'SCHEDULED' },
         ],
       },
       contention: {
-        badgeClass:  '',
-        badgeStyle:  'background:rgba(139,92,246,0.12);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);',
-        badgeText:   'Seat Contention Detected',
-        strategy:    'Strategy: CockroachDB SERIALIZABLE Retry — conflict-free commit',
-        delay:       '+1h 00m Delay',
-        fee:         '$0.00 — Retry Absorbed',
-        buffer:      '+60 minutes',
+        badgeClass: '',
+        badgeStyle: 'background:rgba(139,92,246,0.12);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);',
+        badgeText: 'Seat Contention Detected',
+        strategy: 'Strategy: CockroachDB SERIALIZABLE Retry — conflict-free commit',
+        delay: '+1h 00m Delay',
+        fee: '$0.00 — Retry Absorbed',
+        buffer: '+60 minutes',
         logLines: [
           '[TRIGGER] Write contention on seat AMT-2150 Row 3A — concurrent booking detected',
           '[DB::CockroachDB] SERIALIZABLE isolation: transaction aborted, retry initiated',
@@ -1710,12 +2219,12 @@
         ],
       },
       failover: {
-        badgeClass:  'status-tag-red',
-        badgeText:   'us-east-1 Outage',
-        strategy:    'Strategy: Multi-Region Failover to Ground Transit',
-        delay:       '+3h 45m Delay',
-        fee:         '$0.00 — Act of Force Majeure',
-        buffer:      '+25 minutes',
+        badgeClass: 'status-tag-red',
+        badgeText: 'us-east-1 Outage',
+        strategy: 'Strategy: Multi-Region Failover to Ground Transit',
+        delay: '+3h 45m Delay',
+        fee: '$0.00 — Act of Force Majeure',
+        buffer: '+25 minutes',
         logLines: [
           '[TRIGGER] Regional outage detected: us-east-1 rail infrastructure offline',
           '[AGENT::FailoverAgent] Initiating multi-region failover protocol...',
@@ -1726,7 +2235,7 @@
         nodes: () => [
           { ...graphNodes[0], status: 'DELAYED' },
           { ...graphNodes[1], status: 'CANCELLED', provider: 'Amtrak — Service Suspended (Regional Outage)' },
-          { ...graphNodes[2], status: 'FAILOVER',  provider: 'Executive Taxi — PHL to EWR Airport Transfer', reference_code: 'GND-TX-01', origin: 'Philadelphia', destination: 'EWR', scheduled_departure: graphNodes[2].scheduled_departure, scheduled_arrival: graphNodes[3].scheduled_departure, segment_type: 'TRAIN', pricing: 'Premium Ground Transfer · Carrier Covered · Door-to-door' },
+          { ...graphNodes[2], status: 'FAILOVER', provider: 'Executive Taxi — PHL to EWR Airport Transfer', reference_code: 'GND-TX-01', origin: 'Philadelphia', destination: 'EWR', scheduled_departure: graphNodes[2].scheduled_departure, scheduled_arrival: graphNodes[3].scheduled_departure, segment_type: 'TRAIN', pricing: 'Premium Ground Transfer · Carrier Covered · Door-to-door' },
           { ...graphNodes[3], status: 'SCHEDULED' },
         ],
       },
@@ -1766,11 +2275,11 @@
 
       // 4. Metrics cards
       const delayBadge = document.getElementById('analytics-delay-badge');
-      const costBadge  = document.getElementById('analytics-cost-badge');
-      const slackVal   = document.getElementById('analytics-slack-val');
+      const costBadge = document.getElementById('analytics-cost-badge');
+      const slackVal = document.getElementById('analytics-slack-val');
       if (delayBadge) delayBadge.textContent = cfg.delay;
-      if (costBadge)  costBadge.textContent  = cfg.fee;
-      if (slackVal)   slackVal.textContent   = cfg.buffer;
+      if (costBadge) costBadge.textContent = cfg.fee;
+      if (slackVal) slackVal.textContent = cfg.buffer;
 
       // 5. Route node highlighting
       renderItineraryNodes(cfg.nodes());
@@ -1825,7 +2334,7 @@
       }
     }
 
-    
+
     function appendCotLog(logText) {
       const cotBox = document.getElementById('audit-cot-timeline');
       const termBox = document.getElementById('terminal-stream-body');
@@ -1859,12 +2368,12 @@
     if (btnDisrupt) {
       btnDisrupt.addEventListener('click', () => {
         handleActionButtonClick(btnDisrupt, `<span>Simulate: Flight Delayed</span>`, 'disrupt', async () => {
-          const typeVal     = document.getElementById('sim-disrupt-type')?.value || 'FLIGHT_DELAY';
+          const typeVal = document.getElementById('sim-disrupt-type')?.value || 'FLIGHT_DELAY';
           const strategyVal = document.getElementById('sim-strategy')?.value || 'EXECUTIVE_SPEED';
-          const delayVal    = parseInt(document.getElementById('sim-delay-slider')?.value || '150', 10);
-          const itinId      = document.getElementById('simulator-traveler-select')?.value || currentActiveTravelerId || 'itin-101';
-          const profile     = TRAVELER_PROFILES[itinId] || TRAVELER_PROFILES['itin-101'];
-          const hubVal      = document.getElementById('sim-target-hub')?.value || 'SFO';
+          const delayVal = parseInt(document.getElementById('sim-delay-slider')?.value || '150', 10);
+          const itinId = document.getElementById('simulator-traveler-select')?.value || currentActiveTravelerId || 'itin-101';
+          const profile = TRAVELER_PROFILES[itinId] || TRAVELER_PROFILES['itin-101'];
+          const hubVal = document.getElementById('sim-target-hub')?.value || 'SFO';
 
           appendCotLog(`[SIGNAL_RECEIVED] Disruption event for ${profile.name} (${profile.route}) at hub ${hubVal}: ${typeVal} (+${delayVal}m).`);
           appendCotLog(`[BEDROCK_INFERENCE] Querying HNSW 1536-dim vector index for ${profile.name} preferences...`);
@@ -1918,22 +2427,22 @@
 
       const hazardIcon = L.divIcon({
         className: '',
-        html: `<div class="hazard-pulse-marker" title="${eventType.replace('_',' ')} at ${hubCode}"></div>`,
+        html: `<div class="hazard-pulse-marker" title="${eventType.replace('_', ' ')} at ${hubCode}"></div>`,
         iconSize: [28, 28],
         iconAnchor: [14, 14],
       });
 
       hazardMarker = L.marker([hubAp.lat, hubAp.lng], { icon: hazardIcon, zIndexOffset: 2000 }).addTo(leafletMap);
-      hazardMarker.bindPopup(`<strong>${eventType.replace('_',' ')}</strong><br>Target Hub: ${hubAp.code} (${hubAp.city})`).openPopup();
+      hazardMarker.bindPopup(`<strong>${eventType.replace('_', ' ')}</strong><br>Target Hub: ${hubAp.code} (${hubAp.city})`).openPopup();
       leafletMap.flyTo([hubAp.lat, hubAp.lng], 4, { duration: 1.5 });
     }
 
     const btnCustomWhatIf = document.getElementById('btn-custom-whatif');
     if (btnCustomWhatIf) {
       btnCustomWhatIf.addEventListener('click', async () => {
-        const hubCode   = document.getElementById('sim-target-hub')?.value || 'FRA';
+        const hubCode = document.getElementById('sim-target-hub')?.value || 'FRA';
         const eventType = document.getElementById('sim-custom-type')?.value || 'AIRPORT_STRIKE';
-        const delayVal  = parseInt(document.getElementById('sim-delay-slider')?.value || '180', 10);
+        const delayVal = parseInt(document.getElementById('sim-delay-slider')?.value || '180', 10);
 
         try {
           const res = await fetch('/api/disrupt/what-if', {
@@ -1956,10 +2465,10 @@
     if (btnPolicyHitl) {
       btnPolicyHitl.addEventListener('click', () => {
         handleActionButtonClick(btnPolicyHitl, `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Test HITL</span>`, 'disrupt', async () => {
-          const typeVal     = document.getElementById('sim-disrupt-type')?.value || 'FLIGHT_DELAY';
+          const typeVal = document.getElementById('sim-disrupt-type')?.value || 'FLIGHT_DELAY';
           const strategyVal = 'HIGH_COST_GUARDRAIL';
-          const delayVal    = parseInt(document.getElementById('sim-delay-slider')?.value || '150', 10);
-          const itinId      = currentActiveTravelerId || window.activeTravelerId || 'itin-101';
+          const delayVal = parseInt(document.getElementById('sim-delay-slider')?.value || '150', 10);
+          const itinId = currentActiveTravelerId || window.activeTravelerId || 'itin-101';
 
           appendCotLog(`[POLICY_CHECK] Evaluating strategy HIGH_COST_GUARDRAIL vs Policy limit ($300.00).`);
           appendCotLog(`[GUARDRAIL_TRIGGERED] Rebooking delta ($450.00) exceeds $300.00 limit. Prompting HITL Executive Approval Modal.`);
@@ -2128,12 +2637,12 @@
       } catch (err) { console.warn(err); }
     }
 
-    
+
     let isSpeaking = false;
 
-    
 
-        
+
+
     // ── FEATURE 4: Interactive In-App iOS Push Card Banner ────────────
     function showIosPushBanner(title, body, onClickAction) {
       const banner = document.getElementById('ios-push-notification-banner');
@@ -2311,11 +2820,11 @@
 
       if (typeof html2pdf !== 'undefined') {
         const opt = {
-          margin:       6,
-          filename:     `audit-report-${incidentId}.pdf`,
-          image:        { type: 'jpeg', quality: 0.98 },
-          html2canvas:  { scale: 2, useCORS: true },
-          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          margin: 6,
+          filename: `audit-report-${incidentId}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         try {
           await html2pdf().set(opt).from(pdfWrapper).save();
@@ -2695,22 +3204,42 @@
     let planeAnimFrame = null;
     let planeProgress = 0;
 
-    const TILE_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    const TILE_DARK = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
     const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
     const WAYPOINTS = [
-      { code: 'SFO', label: 'SFO — San Francisco', lat: 37.6213, lng: -122.379,  type: 'origin' },
-      { code: 'JFK', label: 'JFK — New York',       lat: 40.6413, lng: -73.7781,  type: 'stop' },
-      { code: 'PHL', label: 'PHL — Philadelphia',   lat: 39.8729, lng: -75.2437,  type: 'stop' },
-      { code: 'LHR', label: 'LHR — London Heathrow',lat: 51.4700, lng: -0.4543,   type: 'destination' },
+      { code: 'SFO', label: 'SFO — San Francisco', lat: 37.6213, lng: -122.379, type: 'origin' },
+      { code: 'JFK', label: 'JFK — New York', lat: 40.6413, lng: -73.7781, type: 'stop' },
+      { code: 'PHL', label: 'PHL — Philadelphia', lat: 39.8729, lng: -75.2437, type: 'stop' },
+      { code: 'LHR', label: 'LHR — London Heathrow', lat: 51.4700, lng: -0.4543, type: 'destination' },
     ];
+
+    function calcDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function calcTotalPathDistanceKm(coords) {
+      if (!coords || coords.length < 2) return 0;
+      let total = 0;
+      for (let i = 0; i < coords.length - 1; i++) {
+        total += calcDistanceKm(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1]);
+      }
+      return total;
+    }
 
     function buildGreatCircleArc(from, to, steps = 80) {
       if (typeof turf !== 'undefined' && turf.greatCircle && turf.point) {
         try {
           const line = turf.greatCircle(
             turf.point([from.lng, from.lat]),
-            turf.point([to.lng,   to.lat]),
+            turf.point([to.lng, to.lat]),
             { npoints: steps }
           );
           return line.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
@@ -2727,6 +3256,9 @@
           from.lng + (to.lng - from.lng) * t
         ]);
       }
+      return coords;
+    }
+
     const ROAD_GEOMETRY_CACHE = {};
 
     async function fetchRealOSRMRoute(from, to) {
@@ -2767,7 +3299,6 @@
       const midLng = (from.lng + to.lng) / 2;
       const dx = (to.lng - from.lng);
       const dy = (to.lat - from.lat);
-      // Realistic ground highway curvature following terrain contours
       const perpLat = midLat + (dx * 0.09);
       const perpLng = midLng - (dy * 0.09);
 
@@ -2787,7 +3318,6 @@
       const midLng = (from.lng + to.lng) / 2;
       const dx = (to.lng - from.lng);
       const dy = (to.lat - from.lat);
-      // High-speed railway track geometry following rail corridors
       const perpLat = midLat - (dx * 0.05);
       const perpLng = midLng + (dy * 0.05);
 
@@ -2811,356 +3341,368 @@
       return buildGreatCircleArc(from, to, steps);
     }
 
-    function buildFullRoute() {
-      const segments = [
-        [WAYPOINTS[0], WAYPOINTS[1], 30],
-        [WAYPOINTS[1], WAYPOINTS[2], 10],
-        [WAYPOINTS[2], WAYPOINTS[3], 50],
-      ];
-      let coords = [];
-      segments.forEach(([from, to, steps]) => {
-        const seg = buildGreatCircleArc(from, to, steps);
-        if (coords.length > 0) seg.shift();
-        coords = coords.concat(seg);
-      });
-      return coords;
-    }
+      function buildFullRoute() {
+        const segments = [
+          [WAYPOINTS[0], WAYPOINTS[1], 30],
+          [WAYPOINTS[1], WAYPOINTS[2], 10],
+          [WAYPOINTS[2], WAYPOINTS[3], 50],
+        ];
+        let coords = [];
+        segments.forEach(([from, to, steps]) => {
+          const seg = buildGreatCircleArc(from, to, steps);
+          if (coords.length > 0) seg.shift();
+          coords = coords.concat(seg);
+        });
+        return coords;
+      }
 
-    function makeVehicleIcon(mode, bearing) {
-      if (typeof L === 'undefined') return null;
-      const m = String(mode || 'FLIGHT').toUpperCase();
-      if (m === 'RAIL' || m === 'TRAIN') {
-        return L.divIcon({
-          className: 'vehicle-marker train-marker',
-          html: `<div style="transform:rotate(${bearing}deg); background:#10b981; border:2px solid #ffffff; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(16,185,129,0.8);">
+      function makeVehicleIcon(mode, bearing) {
+        if (typeof L === 'undefined') return null;
+        const m = String(mode || 'FLIGHT').toUpperCase();
+        if (m === 'RAIL' || m === 'TRAIN') {
+          return L.divIcon({
+            className: 'vehicle-marker train-marker',
+            html: `<div style="transform:rotate(${bearing}deg); background:#10b981; border:2px solid #ffffff; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(16,185,129,0.8);">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/><path d="M6 17h12"/><path d="M6 3h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/>
             </svg>
           </div>`,
-          iconSize:   [26, 26],
-          iconAnchor: [13, 13],
-        });
-      }
-      if (m === 'BUS' || m === 'SHUTTLE' || m === 'TAXI') {
-        return L.divIcon({
-          className: 'vehicle-marker bus-marker',
-          html: `<div style="transform:rotate(${bearing}deg); background:#f59e0b; border:2px solid #ffffff; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(245,158,11,0.8);">
+            iconSize: [26, 26],
+            iconAnchor: [13, 13],
+          });
+        }
+        if (m === 'BUS' || m === 'SHUTTLE' || m === 'TAXI' || m === 'CAR' || m === 'ROAD') {
+          return L.divIcon({
+            className: 'vehicle-marker bus-marker',
+            html: `<div style="transform:rotate(${bearing}deg); background:#f59e0b; border:2px solid #ffffff; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(245,158,11,0.8);">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="8" rx="2"/><path d="M6 11L9 5h6l3 6"/><circle cx="7" cy="16" r="1.5"/><circle cx="17" cy="16" r="1.5"/>
             </svg>
           </div>`,
-          iconSize:   [26, 26],
-          iconAnchor: [13, 13],
-        });
-      }
-      return L.divIcon({
-        className: 'vehicle-marker plane-marker',
-        html: `<svg style="transform:rotate(${bearing}deg)" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+            iconSize: [26, 26],
+            iconAnchor: [13, 13],
+          });
+        }
+        return L.divIcon({
+          className: 'vehicle-marker plane-marker',
+          html: `<svg style="transform:rotate(${bearing}deg)" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
           <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
         </svg>`,
-        iconSize:   [28, 28],
-        iconAnchor: [14, 14],
-      });
-    }
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+        });
+      }
 
-    function makePlaneIcon(bearing) {
-      return makeVehicleIcon('FLIGHT', bearing);
-    }
+      function makePlaneIcon(bearing) {
+        return makeVehicleIcon('FLIGHT', bearing);
+      }
 
-    function calcBearing(from, to) {
-      const toRad = d => d * Math.PI / 180;
-      const toDeg = r => r * 180 / Math.PI;
-      const dLng = toRad(to[1] - from[1]);
-      const lat1 = toRad(from[0]), lat2 = toRad(to[0]);
-      const y = Math.sin(dLng) * Math.cos(lat2);
-      const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
-      return (toDeg(Math.atan2(y, x)) + 360) % 360;
-    }
+      function calcBearing(from, to) {
+        const toRad = d => d * Math.PI / 180;
+        const toDeg = r => r * 180 / Math.PI;
+        const dLng = toRad(to[1] - from[1]);
+        const lat1 = toRad(from[0]), lat2 = toRad(to[0]);
+        const y = Math.sin(dLng) * Math.cos(lat2);
+        const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+        return (toDeg(Math.atan2(y, x)) + 360) % 360;
+      }
 
-    function lerpLatLng(a, b, t) {
-      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
-    }
+      function lerpLatLng(a, b, t) {
+        return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+      }
 
-    let fleetPlanesData = [];
-    let fleetAnimFrame = null;
+      let fleetPlanesData = [];
+      let fleetAnimFrame = null;
 
-    function animateFleetPlanes() {
-      if (fleetPlanesData.length === 0) return;
+      function animateFleetPlanes() {
+        if (fleetPlanesData.length === 0) return;
 
-      fleetPlanesData.forEach(p => {
-        if (!p.marker || !p.arc || p.arc.length < 2) return;
-        p.progress = (p.progress + p.speed) % 1;
-        const total = p.arc.length - 1;
-        const idx = Math.floor(p.progress * total);
-        const frac = (p.progress * total) - idx;
-        const posA = p.arc[idx];
-        const posB = p.arc[Math.min(idx + 1, total)];
+        fleetPlanesData.forEach(p => {
+          if (!p.marker || !p.arc || p.arc.length < 2) return;
+          p.progress = (p.progress + p.speed) % 1;
+          const total = p.arc.length - 1;
+          const idx = Math.floor(p.progress * total);
+          const frac = (p.progress * total) - idx;
+          const posA = p.arc[idx];
+          const posB = p.arc[Math.min(idx + 1, total)];
+          const pos = lerpLatLng(posA, posB, frac);
+          const bearing = calcBearing(posA, posB);
+          p.marker.setLatLng(pos);
+          const icon = makeVehicleIcon(p.mode, bearing);
+          if (icon) p.marker.setIcon(icon);
+        });
+
+        fleetAnimFrame = requestAnimationFrame(animateFleetPlanes);
+      }
+
+      function animatePlane() {
+        if (!planeMarker || routeArcCoords.length < 2) return;
+        planeProgress = (planeProgress + 0.0008) % 1;
+        const total = routeArcCoords.length - 1;
+        const idx = Math.floor(planeProgress * total);
+        const frac = (planeProgress * total) - idx;
+        const posA = routeArcCoords[idx];
+        const posB = routeArcCoords[Math.min(idx + 1, total)];
         const pos = lerpLatLng(posA, posB, frac);
         const bearing = calcBearing(posA, posB);
-        p.marker.setLatLng(pos);
-        const icon = makeVehicleIcon(p.mode, bearing);
-        if (icon) p.marker.setIcon(icon);
+        planeMarker.setLatLng(pos);
+        const icon = makeVehicleIcon('FLIGHT', bearing);
+        if (icon) planeMarker.setIcon(icon);
+        planeAnimFrame = requestAnimationFrame(animatePlane);
+      }
+
+      function initLeafletMap() {
+        const mapEl = document.getElementById('leaflet-route-map') || document.getElementById('map');
+        if (!mapEl || typeof L === 'undefined') return;
+
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+
+        if (!leafletMap) {
+          leafletMap = L.map(mapEl.id, {
+            center: [47, -35],
+            zoom: 3,
+            zoomControl: true,
+            attributionControl: true,
+            scrollWheelZoom: true,
+            dragging: true,
+            touchZoom: true,
+            doubleClickZoom: true,
+            worldCopyJump: true,
+            minZoom: 2,
+            maxZoom: 18,
+            maxBounds: [[-85, -210], [85, 210]],
+            maxBoundsViscosity: 1.0,
+          });
+
+          leafletTileLayer = L.tileLayer(isDark ? TILE_DARK : TILE_LIGHT, {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19,
+          }).addTo(leafletMap);
+
+          routeLayerGroup = L.layerGroup().addTo(leafletMap);
+        }
+
+        // Immediately trigger dynamic route rendering for the active traveler with Car -> Plane sequence
+        selectTraveler(currentActiveTravelerId || 'itin-101');
+        applyJourneySequence('CAR_PLANE');
+        setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 100);
+      }
+
+      // ── Light/Dark Theme Switcher ─────────────────────────────────────
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('cascade-theme', theme);
+
+        // Update icon visibility
+        const moonIcon = document.getElementById('theme-icon-moon');
+        const sunIcon = document.getElementById('theme-icon-sun');
+        if (moonIcon && sunIcon) {
+          moonIcon.style.display = theme === 'light' ? 'none' : 'block';
+          sunIcon.style.display = theme === 'light' ? 'block' : 'none';
+        }
+
+        // Swap Leaflet tile layer between CartoDB Dark Matter / Positron
+        if (leafletMap && leafletTileLayer) {
+          leafletTileLayer.remove();
+          leafletTileLayer = L.tileLayer(theme === 'light' ? TILE_LIGHT : TILE_DARK, {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19,
+          }).addTo(leafletMap);
+        }
+      }
+
+      // Restore persisted preference (default: dark)
+      applyTheme(localStorage.getItem('cascade-theme') || 'dark');
+
+      document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        applyTheme(current === 'dark' ? 'light' : 'dark');
       });
 
-      fleetAnimFrame = requestAnimationFrame(animateFleetPlanes);
-    }
+      // ── Real-time latency ping ────────────────────────────────────────
+      function startLatencyPing() {
+        const latencyEl = document.getElementById('footer-latency');
+        const statusDot = document.getElementById('status-dot');
+        const statusLbl = document.getElementById('status-label');
 
-    function animatePlane() {
-      if (!planeMarker || routeArcCoords.length < 2) return;
-      planeProgress = (planeProgress + 0.0008) % 1;
-      const total  = routeArcCoords.length - 1;
-      const idx    = Math.floor(planeProgress * total);
-      const frac   = (planeProgress * total) - idx;
-      const posA   = routeArcCoords[idx];
-      const posB   = routeArcCoords[Math.min(idx + 1, total)];
-      const pos    = lerpLatLng(posA, posB, frac);
-      const bearing = calcBearing(posA, posB);
-      planeMarker.setLatLng(pos);
-      const icon = makeVehicleIcon('FLIGHT', bearing);
-      if (icon) planeMarker.setIcon(icon);
-      planeAnimFrame = requestAnimationFrame(animatePlane);
-    }
+        async function measurePing() {
+          const t0 = performance.now();
+          try {
+            // Lightweight HEAD-equiv: fetch with no-cache to skip cached response
+            await fetch('/api/health', { method: 'GET', cache: 'no-store' });
+            const ms = Math.round(performance.now() - t0);
 
-    function initLeafletMap() {
-      const mapEl = document.getElementById('leaflet-route-map') || document.getElementById('map');
-      if (!mapEl || typeof L === 'undefined') return;
+            // Update footer latency badge
+            if (latencyEl) {
+              latencyEl.textContent = `${ms}ms`;
+              latencyEl.className = 'footer-latency-val'; // reset
+              if (ms < 50) {
+                latencyEl.style.color = '#10B981';  // emerald
+              } else if (ms > 150) {
+                latencyEl.style.color = '#f59e0b';  // amber
+              } else {
+                latencyEl.style.color = '';         // inherit CSS var (green)
+              }
+            }
 
-      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            // Keep status dot healthy
+            if (statusDot) {
+              statusDot.classList.remove('degraded', 'offline');
+            }
+            if (statusLbl) statusLbl.textContent = 'System Operational';
 
-      if (!leafletMap) {
-        leafletMap = L.map(mapEl.id, {
-          center: [47, -35],
-          zoom: 3,
-          zoomControl: true,
-          attributionControl: true,
-          scrollWheelZoom: true,
-          dragging: true,
-          touchZoom: true,
-          doubleClickZoom: true,
-          worldCopyJump: true,
-          minZoom: 2,
-          maxZoom: 18,
-          maxBounds: [[-85, -210], [85, 210]],
-          maxBoundsViscosity: 1.0,
+          } catch (err) {
+            // Network error / offline
+            if (latencyEl) {
+              latencyEl.textContent = 'N/A';
+              latencyEl.style.color = 'var(--status-red)';
+            }
+            if (statusDot) {
+              statusDot.classList.remove('offline');
+              statusDot.classList.add('degraded');
+            }
+            if (statusLbl) statusLbl.textContent = '● Degraded / Offline';
+          }
+        }
+
+        // Run immediately, then every 3 seconds
+        measurePing();
+        setInterval(measurePing, 3000);
+      }
+
+      // ── Initialization & Telegram Mini App URL Parameter Parser ────────
+      switchPrimaryTab('operations');
+      renderItineraryNodes(graphNodes);
+      initSSE();
+      setTimeout(initLeafletMap, 100);
+      startLatencyPing();   // live ping every 3 s
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const isMobileMode = urlParams.get('mobile') === 'true';
+      const targetTravelerParam = urlParams.get('traveler');
+
+      if (isMobileMode) {
+        document.body.classList.add('mobile-companion-mode');
+      }
+
+      if (targetTravelerParam) {
+        setTimeout(() => {
+          selectTraveler(targetTravelerParam);
+          if (isMobileMode) {
+            showToast(`Mobile Companion Active`, 'info');
+          }
+        }, 300);
+      }
+      // ── Primary 3-Tab Architecture Navigation & Map Resizing ──────────
+      function switchPrimaryTab(tabName) {
+        document.querySelectorAll('.nav-tabs-group .tab-btn[data-tab]').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
         });
 
-        leafletTileLayer = L.tileLayer(isDark ? TILE_DARK : TILE_LIGHT, {
-          attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-        }).addTo(leafletMap);
+        const paneOps = document.getElementById('tab-pane-operations');
+        const paneSim = document.getElementById('tab-pane-simulator');
+        const paneAudit = document.getElementById('tab-pane-audit');
 
-        routeLayerGroup = L.layerGroup().addTo(leafletMap);
-      }
+        if (paneOps) paneOps.classList.toggle('hidden', tabName !== 'operations');
+        if (paneSim) paneSim.classList.toggle('hidden', tabName !== 'simulator');
+        if (paneAudit) paneAudit.classList.toggle('hidden', tabName !== 'audit');
 
-      // Immediately trigger dynamic route rendering for the active traveler
-      selectTraveler(currentActiveTravelerId || 'itin-101');
-      setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 100);
-    }
-
-    // ── Light/Dark Theme Switcher ─────────────────────────────────────
-    function applyTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('cascade-theme', theme);
-
-      // Update icon visibility
-      const moonIcon = document.getElementById('theme-icon-moon');
-      const sunIcon  = document.getElementById('theme-icon-sun');
-      if (moonIcon && sunIcon) {
-        moonIcon.style.display = theme === 'light' ? 'none' : 'block';
-        sunIcon.style.display  = theme === 'light' ? 'block' : 'none';
-      }
-
-      // Swap Leaflet tile layer between CartoDB Dark Matter / Positron
-      if (leafletMap && leafletTileLayer) {
-        leafletTileLayer.remove();
-        leafletTileLayer = L.tileLayer(theme === 'light' ? TILE_LIGHT : TILE_DARK, {
-          attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-        }).addTo(leafletMap);
-      }
-    }
-
-    // Restore persisted preference (default: dark)
-    applyTheme(localStorage.getItem('cascade-theme') || 'dark');
-
-    document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') || 'dark';
-      applyTheme(current === 'dark' ? 'light' : 'dark');
-    });
-
-    // ── Real-time latency ping ────────────────────────────────────────
-    function startLatencyPing() {
-      const latencyEl  = document.getElementById('footer-latency');
-      const statusDot  = document.getElementById('status-dot');
-      const statusLbl  = document.getElementById('status-label');
-
-      async function measurePing() {
-        const t0 = performance.now();
-        try {
-          // Lightweight HEAD-equiv: fetch with no-cache to skip cached response
-          await fetch('/api/health', { method: 'GET', cache: 'no-store' });
-          const ms = Math.round(performance.now() - t0);
-
-          // Update footer latency badge
-          if (latencyEl) {
-            latencyEl.textContent = `${ms}ms`;
-            latencyEl.className   = 'footer-latency-val'; // reset
-            if (ms < 50) {
-              latencyEl.style.color = '#10B981';  // emerald
-            } else if (ms > 150) {
-              latencyEl.style.color = '#f59e0b';  // amber
-            } else {
-              latencyEl.style.color = '';         // inherit CSS var (green)
+        if (tabName === 'operations') {
+          setTimeout(() => {
+            if (typeof leafletMap !== 'undefined' && leafletMap) {
+              leafletMap.invalidateSize();
             }
-          }
-
-          // Keep status dot healthy
-          if (statusDot) {
-            statusDot.classList.remove('degraded', 'offline');
-          }
-          if (statusLbl) statusLbl.textContent = 'System Operational';
-
-        } catch (err) {
-          // Network error / offline
-          if (latencyEl) {
-            latencyEl.textContent = 'N/A';
-            latencyEl.style.color = 'var(--status-red)';
-          }
-          if (statusDot) {
-            statusDot.classList.remove('offline');
-            statusDot.classList.add('degraded');
-          }
-          if (statusLbl) statusLbl.textContent = '● Degraded / Offline';
+          }, 100);
         }
       }
 
-      // Run immediately, then every 3 seconds
-      measurePing();
-      setInterval(measurePing, 3000);
-    }
+      // ── Robust Fleet Table & Traveler Profile Renderer ────────────────
+      const defaultFleetData = [
+        { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'SFO ➔ LHR', status: 'SELF_HEALED', legs: 'Flight · Train · Hotel · Flight', last_event: 'Flight delayed +150m — automatically rebooked to Amtrak Acela Express' },
+        { id: 'itin-102', traveler: 'Marcus Vance', route: 'JFK ➔ CDG', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer' },
+        { id: 'itin-103', traveler: 'Elena Rostova', route: 'ORD ➔ HND', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time' },
+        { id: 'itin-104', traveler: 'David Chen', route: 'MIA ➔ LHR', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival' },
+      ];
 
-    // ── Initialization & Telegram Mini App URL Parameter Parser ────────
-    switchPrimaryTab('operations');
-    renderItineraryNodes(graphNodes);
-    initSSE();
-    setTimeout(initLeafletMap, 100);
-    startLatencyPing();   // live ping every 3 s
+      function renderFleetTable(fleetList) {
+        const fleetData = (fleetList && fleetList.length > 0) ? fleetList : defaultFleetData;
+        const listContainer = document.getElementById('travelers-list');
+        const tableContainer = document.getElementById('dashboard-fleet-table');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const isMobileMode = urlParams.get('mobile') === 'true';
-    const targetTravelerParam = urlParams.get('traveler');
+        [listContainer, tableContainer].forEach(tbody => {
+          if (!tbody) return;
+          tbody.innerHTML = '';
 
-    if (isMobileMode) {
-      document.body.classList.add('mobile-companion-mode');
-    }
+          fleetData.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            const tId = item.id || `itin-10${idx + 1}`;
+            tr.setAttribute('data-traveler-id', tId);
+            tr.className = 'clickable-row' + (tId === (currentActiveTravelerId || 'itin-101') ? ' selected active-row active-row-highlight' : '');
 
-    if (targetTravelerParam) {
-      setTimeout(() => {
-        selectTraveler(targetTravelerParam);
-        if (isMobileMode) {
-          showToast(`Mobile Companion Active`, 'info');
-        }
-      }, 300);
-    }
-    // ── Primary 3-Tab Architecture Navigation & Map Resizing ──────────
-    function switchPrimaryTab(tabName) {
-      document.querySelectorAll('.nav-tabs-group .tab-btn[data-tab]').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
-      });
+            let tagClass = 'status-tag-green';
+            let tagLabel = item.status || 'Auto-Healed';
 
-      const paneOps = document.getElementById('tab-pane-operations');
-      const paneSim = document.getElementById('tab-pane-simulator');
-      const paneAudit = document.getElementById('tab-pane-audit');
+            if (item.status === 'SELF_HEALED' || item.status === 'AUTO_HEALED') {
+              tagClass = 'status-tag-green';
+              tagLabel = 'Auto-Healed';
+            } else if (item.status === 'SCHEDULED' || item.status === 'PENDING') {
+              tagClass = 'status-tag-amber';
+              tagLabel = 'Pending';
+            } else if (item.status === 'IN_TRANSIT' || item.status === 'REROUTED') {
+              tagClass = 'status-tag-cyan';
+              tagLabel = 'In Transit';
+            } else if (item.status === 'DELAYED' || item.status === 'DISRUPTED') {
+              tagClass = 'status-tag-red';
+              tagLabel = 'Disrupted';
+            }
 
-      if (paneOps) paneOps.classList.toggle('hidden', tabName !== 'operations');
-      if (paneSim) paneSim.classList.toggle('hidden', tabName !== 'simulator');
-      if (paneAudit) paneAudit.classList.toggle('hidden', tabName !== 'audit');
+            let formattedRoute = item.route;
+            if (item.route) {
+              const segs = item.route.split(/→|➔/);
+              if (segs.length === 2) {
+                formattedRoute = `${getCityName(segs[0].trim())} ➔ ${getCityName(segs[1].trim())}`;
+              }
+            }
 
-      if (tabName === 'operations') {
-        setTimeout(() => {
-          if (typeof leafletMap !== 'undefined' && leafletMap) {
-            leafletMap.invalidateSize();
-          }
-        }, 100);
-      }
-    }
-
-    // ── Robust Fleet Table & Traveler Profile Renderer ────────────────
-    const defaultFleetData = [
-      { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'SFO ➔ LHR', status: 'SELF_HEALED', legs: 'Flight · Train · Hotel · Flight', last_event: 'Flight delayed +150m — automatically rebooked to Amtrak Acela Express' },
-      { id: 'itin-102', traveler: 'Marcus Vance', route: 'JFK ➔ CDG', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer' },
-      { id: 'itin-103', traveler: 'Elena Rostova', route: 'ORD ➔ HND', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time' },
-      { id: 'itin-104', traveler: 'David Chen', route: 'MIA ➔ LHR', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival' },
-    ];
-
-    function renderFleetTable(fleetList) {
-      const fleetData = (fleetList && fleetList.length > 0) ? fleetList : defaultFleetData;
-      const listContainer = document.getElementById('travelers-list');
-      const tableContainer = document.getElementById('dashboard-fleet-table');
-
-      [listContainer, tableContainer].forEach(tbody => {
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        fleetData.forEach((item, idx) => {
-          const tr = document.createElement('tr');
-          const tId = item.id || `itin-10${idx+1}`;
-          tr.setAttribute('data-traveler-id', tId);
-          tr.className = 'clickable-row' + (tId === (currentActiveTravelerId || 'itin-101') ? ' selected active-row active-row-highlight' : '');
-
-          let tagClass = 'status-tag-green';
-          let tagLabel = item.status || 'Auto-Healed';
-
-          if (item.status === 'SELF_HEALED' || item.status === 'AUTO_HEALED') {
-            tagClass = 'status-tag-green';
-            tagLabel = 'Auto-Healed';
-          } else if (item.status === 'SCHEDULED' || item.status === 'PENDING') {
-            tagClass = 'status-tag-amber';
-            tagLabel = 'Pending';
-          } else if (item.status === 'IN_TRANSIT' || item.status === 'REROUTED') {
-            tagClass = 'status-tag-cyan';
-            tagLabel = 'In Transit';
-          } else if (item.status === 'DELAYED' || item.status === 'DISRUPTED') {
-            tagClass = 'status-tag-red';
-            tagLabel = 'Disrupted';
-          }
-
-          tr.innerHTML = `
+            tr.innerHTML = `
             <td style="font-weight: 600; color: var(--text-primary);">${item.traveler || item.name || 'Executive Traveler'}</td>
-            <td style="color: var(--text-secondary); font-family: var(--font-mono);">${item.route}</td>
-            <td><span class="status-tag ${tagClass}">${tagLabel}</span></td>
+            <td style="color: var(--text-secondary); font-family: var(--font-mono); font-size: 11.5px;">${formattedRoute}</td>
+            <td style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+              <span class="status-tag ${tagClass}">${tagLabel}</span>
+              <button onclick="event.stopPropagation(); deleteTraveler('${tId}');" title="Delete Traveler" style="background: transparent; border: none; color: #ef4444; font-size: 12px; cursor: pointer; opacity: 0.6; padding: 2px 4px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">🗑️</button>
+            </td>
           `;
 
-          tr.addEventListener('click', () => {
-            selectTraveler(tId);
-          });
+            tr.addEventListener('click', () => {
+              selectTraveler(tId);
+            });
 
-          tr.addEventListener('dblclick', () => {
-            openPassengerDetailsModal(tId);
-          });
+            tr.addEventListener('dblclick', () => {
+              openPassengerDetailsModal(tId);
+            });
 
-          tbody.appendChild(tr);
+            tbody.appendChild(tr);
+          });
         });
-      });
-    }
+      }
 
-    function openPassengerDetailsModal(travelerId) {
-      const targetId = travelerId || currentActiveTravelerId || 'itin-101';
-      const profile = TRAVELER_PROFILES[targetId] || TRAVELER_PROFILES['itin-101'];
-      const modal = document.getElementById('passengerDetailsModal');
-      if (!modal) return;
+      function openPassengerDetailsModal(travelerId) {
+        const targetId = travelerId || currentActiveTravelerId || 'itin-101';
+        const profile = TRAVELER_PROFILES[targetId] || TRAVELER_PROFILES['itin-101'];
+        const modal = document.getElementById('passengerDetailsModal');
+        if (!modal) return;
 
-      const loyaltyTier = profile.loyaltyTier || (profile.name && profile.name.includes('Sarah') ? 'Delta Diamond Medallion · SkyTeam Elite Plus' : (profile.name && profile.name.includes('Marcus') ? 'Air France Flying Blue Platinum' : 'Executive Club Gold'));
-      const seatPref = profile.seatPref || (profile.preferredCabin || 'Business Class Quiet Car') + ' · No Middle Seats · Bulkhead Preferred';
-      const riskTolerance = 'LOW RISK · Max Autonomous Approval Limit: $' + (profile.policyLimitUsd || 300) + '.00 USD';
-      const historyLog = 'Trip #101 (SFO➔LHR): Flight DL-1402 delayed +150m. Auto-healed via Amtrak Acela Express (Train 2158). Past preferred reroute: Rail + Executive Suite.';
+        const loyaltyTier = profile.loyaltyTier || (profile.name && profile.name.includes('Sarah') ? 'Delta Diamond Medallion · SkyTeam Elite Plus' : (profile.name && profile.name.includes('Marcus') ? 'Air France Flying Blue Platinum' : 'Executive Club Gold'));
+        const seatPref = profile.seatPref || (profile.preferredCabin || 'Business Class Quiet Car') + ' · No Middle Seats · Bulkhead Preferred';
+        const riskTolerance = 'LOW RISK · Max Autonomous Approval Limit: $' + (profile.policyLimitUsd || 300) + '.00 USD';
+        const historyLog = 'Trip #101 (SFO➔LHR): Flight DL-1402 delayed +150m. Auto-healed via Amtrak Acela Express (Train 2158). Past preferred reroute: Rail + Executive Suite.';
 
-      setElText('passenger-modal-name', `${profile.name} — Executive Corporate Profile`);
-      setElText('passenger-modal-email', profile.email || `${(profile.name || 'passenger').toLowerCase().replace(' ', '.')}@acme.com`);
+        setElText('passenger-modal-name', `${profile.name} — Executive Corporate Profile`);
+        setElText('passenger-modal-email', profile.email || `${(profile.name || 'passenger').toLowerCase().replace(' ', '.')}@acme.com`);
 
-      const legsHtml = (profile.legs || []).map((leg, i) => `
+        const legsHtml = (profile.legs || []).map((leg, i) => `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--bg-surface-elevated); border:1px solid var(--border-color); border-radius:6px; margin-bottom:8px;">
           <div>
             <div style="font-weight:600; font-size:13px; color:var(--text-primary);">${leg.provider}</div>
@@ -3170,7 +3712,7 @@
         </div>
       `).join('');
 
-      setElInner('passenger-modal-body', `
+        setElInner('passenger-modal-body', `
         <div style="display:flex; flex-direction:column; gap:14px;">
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:rgba(99,102,241,0.06); padding:12px; border-radius:8px; border:1px solid rgba(99,102,241,0.2);">
             <div>
@@ -3219,27 +3761,74 @@
         </div>
       `);
 
-      modal.classList.add('active');
-    }
+        modal.classList.add('active');
+      }
 
-    function renderTravelerInspector(profile) {
-      const container = document.getElementById('inspector-rendered-content');
-      if (!container) return;
+      async function deleteTraveler(travelerId) {
+        if (!travelerId) return;
+        const profile = TRAVELER_PROFILES[travelerId];
+        const name = profile ? profile.name : travelerId;
 
-      const budget = profile.policyLimitUsd || (profile.policyTier && profile.policyTier.includes('500') ? 500 : 300);
-      const cabin = profile.preferredCabin || 'Business Class Quiet Car';
-      const tier = profile.policyTier || 'Executive Tier ($300 Limit)';
-      const score = profile.vectorScore || 0.984;
-      const email = profile.email || `${(profile.name || 'traveler').toLowerCase().replace(' ', '.')}@acme.com`;
+        if (!confirm(`Are you sure you want to delete passenger "${name}"?`)) return;
 
-      container.innerHTML = `
+        try {
+          await fetch('/api/traveler/' + travelerId, { method: 'DELETE' });
+        } catch (e) {
+          console.warn(e);
+        }
+
+        delete TRAVELER_PROFILES[travelerId];
+
+        if (typeof defaultFleetData !== 'undefined' && Array.isArray(defaultFleetData)) {
+          const idx = defaultFleetData.findIndex(item => (item.id === travelerId || item.traveler === name));
+          if (idx !== -1) defaultFleetData.splice(idx, 1);
+        }
+
+        // Remove option from dropdowns
+        ['traveler-selector', 'tab2-traveler-selector', 'simulator-traveler-select'].forEach(id => {
+          const sel = document.getElementById(id);
+          if (sel) {
+            const opt = sel.querySelector(`option[value="${travelerId}"]`);
+            if (opt) opt.remove();
+          }
+        });
+
+        // Close passenger details modal if open
+        document.getElementById('passengerDetailsModal')?.classList.remove('active');
+
+        // Re-render fleet table
+        renderFleetTable(defaultFleetData);
+
+        // Switch active traveler to next remaining traveler
+        const remainingIds = Object.keys(TRAVELER_PROFILES);
+        if (remainingIds.length > 0) {
+          await selectTraveler(remainingIds[0]);
+        }
+
+        showToast(`Passenger "${name}" deleted successfully.`, 'success');
+      }
+
+      function renderTravelerInspector(profile) {
+        const container = document.getElementById('inspector-rendered-content');
+        if (!container) return;
+
+        const budget = profile.policyLimitUsd || (profile.policyTier && profile.policyTier.includes('500') ? 500 : 300);
+        const cabin = profile.preferredCabin || 'Business Class Quiet Car';
+        const tier = profile.policyTier || 'Executive Tier ($300 Limit)';
+        const score = profile.vectorScore || 0.984;
+        const email = profile.email || `${(profile.name || 'traveler').toLowerCase().replace(' ', '.')}@acme.com`;
+
+        container.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <div>
               <div style="font-size: 15px; font-weight: 700; color: var(--text-primary);">${profile.name}</div>
               <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${email} &bull; Route: <span class="font-mono" style="color: var(--text-secondary);">${profile.route}</span></div>
             </div>
-            <button id="btn-view-details" onclick="openPassengerDetailsModal('${profile.id}')" class="btn btn-outline btn-view-details" data-traveler-id="${profile.id}" style="padding: 4px 8px; font-size: 11px;">View Details</button>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button id="btn-view-details" onclick="openPassengerDetailsModal('${profile.id}')" class="btn btn-outline btn-view-details" data-traveler-id="${profile.id}" style="padding: 4px 8px; font-size: 11px;">View Details</button>
+              <button onclick="deleteTraveler('${profile.id}')" class="btn btn-outline" style="padding: 4px 8px; font-size: 11px; color: #f87171; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.1); cursor: pointer;" title="Delete Traveler Profile">🗑️ Delete</button>
+            </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; background: var(--bg-surface-elevated); border-radius: 6px; border: 1px solid var(--border-color);">
@@ -3262,151 +3851,158 @@
           </div>
         </div>
       `;
-    }
-
-    // Initialize UI Data & Event Handlers on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', () => {
-      // 1. Initial render of travelers table
-      renderFleetTable(defaultFleetData);
-
-      // Explicit View Details Button Binding Handler
-      document.addEventListener('click', (e) => {
-        const viewDetailsBtn = e.target.closest('#btn-view-details, .btn-view-details');
-        if (viewDetailsBtn) {
-          e.preventDefault();
-          const targetId = viewDetailsBtn.getAttribute('data-traveler-id') || currentActiveTravelerId || 'itin-101';
-          openPassengerDetailsModal(targetId);
-        }
-      });
-
-      // 2. Primary 3-Tab switcher bindings
-      document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          switchPrimaryTab(btn.getAttribute('data-tab'));
-        });
-      });
-
-      // 2. Simulator Traveler Selector Binding
-      document.getElementById('simulator-traveler-select')?.addEventListener('change', (e) => {
-        const val = e.target.value;
-        selectTraveler(val);
-        const profile = TRAVELER_PROFILES[val] || TRAVELER_PROFILES['itin-101'];
-        appendCotLog(`[TRAVELER_SWITCHED] Active profile changed to ${profile.name} (${profile.route}). Policy limit: $${profile.policyLimitUsd || 300}.00 USD.`);
-      });
-
-      // Map View Mode Switcher Bindings
-      document.getElementById('map-btn-all-fleet')?.addEventListener('click', () => {
-        renderAllFleetRoutes();
-      });
-      document.getElementById('map-btn-active-route')?.addEventListener('click', () => {
-        const profile = TRAVELER_PROFILES[currentActiveTravelerId || 'itin-101'];
-        if (profile) {
-          renderTravelerRoute({
-            label: `${profile.name} — ${profile.route}`,
-            origin: { lat: profile.originLat, lng: profile.originLng, code: profile.originCode },
-            dest: { lat: profile.destLat, lng: profile.destLng, code: profile.destinationCode },
-          });
-        }
-      });
-
-      // Passenger Modal Close Handlers
-      document.getElementById('passenger-modal-close')?.addEventListener('click', () => {
-        document.getElementById('passengerDetailsModal')?.classList.remove('active');
-      });
-      document.getElementById('passenger-modal-close-btn')?.addEventListener('click', () => {
-        document.getElementById('passengerDetailsModal')?.classList.remove('active');
-      });
-      document.getElementById('passengerDetailsModal')?.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('passengerDetailsModal')) {
-          document.getElementById('passengerDetailsModal')?.classList.remove('active');
-        }
-      });
-
-      // 3. New Trip modal button binding
-      const btnNewTrip = document.getElementById('btn-new-trip');
-      if (btnNewTrip) {
-        btnNewTrip.addEventListener('click', () => {
-          document.getElementById('createItineraryModal')?.classList.add('active');
-        });
       }
 
-      // 4. Trigger disruption button binding
-      const btnTriggerDisrupt = document.getElementById('btn-trigger-disruption');
-      if (btnTriggerDisrupt) {
-        btnTriggerDisrupt.addEventListener('click', () => {
-          handleActionButtonClick(btnTriggerDisrupt, `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Trigger Disruption</span>`, 'disrupt', async () => {
-            const typeVal     = document.getElementById('sim-disrupt-type')?.value || 'FLIGHT_DELAY';
-            const strategyVal = document.getElementById('sim-strategy')?.value || 'EXECUTIVE_SPEED';
-            const delayVal    = parseInt(document.getElementById('sim-delay-slider')?.value || '150', 10);
-            const itinId      = document.getElementById('simulator-traveler-select')?.value || currentActiveTravelerId || 'itin-101';
-            const profile     = TRAVELER_PROFILES[itinId] || TRAVELER_PROFILES['itin-101'];
-            const hubVal      = document.getElementById('sim-target-hub')?.value || 'SFO';
+      // Initialize UI Data & Event Handlers on DOMContentLoaded
+      document.addEventListener('DOMContentLoaded', () => {
+        // 1. Initial render of travelers table
+        renderFleetTable(defaultFleetData);
 
-            appendCotLog(`[SIGNAL_RECEIVED] Disruption event for ${profile.name} (${profile.route}) at hub ${hubVal}: ${typeVal} (+${delayVal}m).`);
-            appendCotLog(`[BEDROCK_INFERENCE] Querying HNSW 1536-dim vector index for ${profile.name} preferences...`);
+        // Explicit View Details Button Binding Handler
+        document.addEventListener('click', (e) => {
+          const viewDetailsBtn = e.target.closest('#btn-view-details, .btn-view-details');
+          if (viewDetailsBtn) {
+            e.preventDefault();
+            const targetId = viewDetailsBtn.getAttribute('data-traveler-id') || currentActiveTravelerId || 'itin-101';
+            openPassengerDetailsModal(targetId);
+          }
+        });
 
-            await fetch('/api/disrupt', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ itineraryId: itinId, delayMinutes: delayVal, type: typeVal, strategy: strategyVal })
+        // 2. Primary 3-Tab switcher bindings
+        document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            switchPrimaryTab(btn.getAttribute('data-tab'));
+          });
+        });
+
+        // 2. Simulator Traveler Selector Binding
+        document.getElementById('simulator-traveler-select')?.addEventListener('change', (e) => {
+          const val = e.target.value;
+          selectTraveler(val);
+          const profile = TRAVELER_PROFILES[val] || TRAVELER_PROFILES['itin-101'];
+          appendCotLog(`[TRAVELER_SWITCHED] Active profile changed to ${profile.name} (${profile.route}). Policy limit: $${profile.policyLimitUsd || 300}.00 USD.`);
+        });
+
+        // Map View Mode Switcher Bindings
+        document.getElementById('map-btn-all-fleet')?.addEventListener('click', () => {
+          renderAllFleetRoutes();
+        });
+        document.getElementById('map-btn-active-route')?.addEventListener('click', () => {
+          const profile = TRAVELER_PROFILES[currentActiveTravelerId || 'itin-101'];
+          if (profile) {
+            renderTravelerRoute({
+              label: `${profile.name} — ${profile.route}`,
+              origin: { lat: profile.originLat, lng: profile.originLng, code: profile.originCode },
+              dest: { lat: profile.destLat, lng: profile.destLng, code: profile.destinationCode },
             });
+          }
+        });
 
-            appendCotLog(`[POLICY_GUARDRAIL] Rebooking strategy "${strategyVal}" evaluated for ${profile.name}. Fee limit compliant.`);
-            appendCotLog(`[DB_TRANSACTION] CockroachDB SERIALIZABLE write committed across multi-region nodes.`);
-            appendCotLog(`[CASCADE_HEALED] Itinerary auto-healed in 392ms. Traveler push alert dispatched to ${profile.email}.`);
+        // Passenger Modal Close & Delete Handlers
+        document.getElementById('passenger-modal-close')?.addEventListener('click', () => {
+          document.getElementById('passengerDetailsModal')?.classList.remove('active');
+        });
+        document.getElementById('passenger-modal-close-btn')?.addEventListener('click', () => {
+          document.getElementById('passengerDetailsModal')?.classList.remove('active');
+        });
+        document.getElementById('passenger-modal-delete-btn')?.addEventListener('click', () => {
+          deleteTraveler(currentActiveTravelerId);
+        });
+        document.getElementById('passenger-modal-delete-btn-header')?.addEventListener('click', () => {
+          deleteTraveler(currentActiveTravelerId);
+        });
+        document.getElementById('passengerDetailsModal')?.addEventListener('click', (e) => {
+          if (e.target === document.getElementById('passengerDetailsModal')) {
+            document.getElementById('passengerDetailsModal')?.classList.remove('active');
+          }
+        });
+
+        // 3. New Trip modal button binding
+        const btnNewTrip = document.getElementById('btn-new-trip');
+        if (btnNewTrip) {
+          btnNewTrip.addEventListener('click', () => {
+            document.getElementById('createItineraryModal')?.classList.add('active');
           });
+        }
+
+        // 4. Trigger disruption button binding
+        const btnTriggerDisrupt = document.getElementById('btn-trigger-disruption');
+        if (btnTriggerDisrupt) {
+          btnTriggerDisrupt.addEventListener('click', () => {
+            handleActionButtonClick(btnTriggerDisrupt, `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Trigger Disruption</span>`, 'disrupt', async () => {
+              const typeVal = document.getElementById('sim-disrupt-type')?.value || 'FLIGHT_DELAY';
+              const strategyVal = document.getElementById('sim-strategy')?.value || 'EXECUTIVE_SPEED';
+              const delayVal = parseInt(document.getElementById('sim-delay-slider')?.value || '150', 10);
+              const itinId = document.getElementById('simulator-traveler-select')?.value || currentActiveTravelerId || 'itin-101';
+              const profile = TRAVELER_PROFILES[itinId] || TRAVELER_PROFILES['itin-101'];
+              const hubVal = document.getElementById('sim-target-hub')?.value || 'SFO';
+
+              appendCotLog(`[SIGNAL_RECEIVED] Disruption event for ${profile.name} (${profile.route}) at hub ${hubVal}: ${typeVal} (+${delayVal}m).`);
+              appendCotLog(`[BEDROCK_INFERENCE] Querying HNSW 1536-dim vector index for ${profile.name} preferences...`);
+
+              await fetch('/api/disrupt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itineraryId: itinId, delayMinutes: delayVal, type: typeVal, strategy: strategyVal })
+              });
+
+              appendCotLog(`[POLICY_GUARDRAIL] Rebooking strategy "${strategyVal}" evaluated for ${profile.name}. Fee limit compliant.`);
+              appendCotLog(`[DB_TRANSACTION] CockroachDB SERIALIZABLE write committed across multi-region nodes.`);
+              appendCotLog(`[CASCADE_HEALED] Itinerary auto-healed in 392ms. Traveler push alert dispatched to ${profile.email}.`);
+            });
+          });
+        }
+
+        // 5. PDF Export button binding
+        const btnExportPdf = document.getElementById('btn-export-pdf');
+        if (btnExportPdf && typeof downloadAuditPdf === 'function') {
+          btnExportPdf.addEventListener('click', downloadAuditPdf);
+        }
+
+        // 6. Mode toggle buttons (Traveler / Internals)
+        document.getElementById('tab-mode-traveler')?.addEventListener('click', () => {
+          if (typeof switchMode === 'function') switchMode('traveler');
+          setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 100);
         });
-      }
 
-      // 5. PDF Export button binding
-      const btnExportPdf = document.getElementById('btn-export-pdf');
-      if (btnExportPdf && typeof downloadAuditPdf === 'function') {
-        btnExportPdf.addEventListener('click', downloadAuditPdf);
-      }
-
-      // 6. Mode toggle buttons (Traveler / Internals)
-      document.getElementById('tab-mode-traveler')?.addEventListener('click', () => {
-        if (typeof switchMode === 'function') switchMode('traveler');
-        setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 100);
-      });
-
-      document.getElementById('tab-mode-internals')?.addEventListener('click', () => {
-        if (typeof switchMode === 'function') switchMode('internals');
-        setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 100);
-      });
-
-      // 7. Sync latency telemetry indicators
-      const latVal = document.getElementById('latency-val');
-      const telemLatVal = document.getElementById('telemetry-latency-val');
-      if (latVal && telemLatVal) {
-        const observer = new MutationObserver(() => {
-          if (latVal.innerText !== telemLatVal.innerText) {
-            latVal.innerText = telemLatVal.innerText;
-          }
+        document.getElementById('tab-mode-internals')?.addEventListener('click', () => {
+          if (typeof switchMode === 'function') switchMode('internals');
+          setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 100);
         });
-        observer.observe(telemLatVal, { childList: true, characterData: true, subtree: true });
-      }
 
-      // 8. Window Resize & Display Scale Event Listener for Leaflet Map Redraw
-      let resizeTimer;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          if (typeof leafletMap !== 'undefined' && leafletMap) {
-            leafletMap.invalidateSize();
-          }
-        }, 150);
+        // 7. Sync latency telemetry indicators
+        const latVal = document.getElementById('latency-val');
+        const telemLatVal = document.getElementById('telemetry-latency-val');
+        if (latVal && telemLatVal) {
+          const observer = new MutationObserver(() => {
+            if (latVal.innerText !== telemLatVal.innerText) {
+              latVal.innerText = telemLatVal.innerText;
+            }
+          });
+          observer.observe(telemLatVal, { childList: true, characterData: true, subtree: true });
+        }
+
+        // 8. Window Resize & Display Scale Event Listener for Leaflet Map Redraw
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            if (typeof leafletMap !== 'undefined' && leafletMap) {
+              leafletMap.invalidateSize();
+            }
+          }, 150);
+        });
+
+        // Populate initial AWS Bedrock Chain-of-Thought logs
+        appendCotLog(`[BEDROCK_ENGINE_INIT] Initialized AWS Bedrock Claude 3.5 Sonnet Reasoning Loop.`);
+        appendCotLog(`[CDC_CHANGEFEED_ACTIVE] CockroachDB Changefeed listening on table "itinerary_segments".`);
+        appendCotLog(`[SYSTEM_READY] Standing by for carrier disruption signals...`);
+
+        // 9. Initial traveler selection to populate profile inspector card and route map
+        selectTraveler('itin-101');
       });
-
-      // Populate initial AWS Bedrock Chain-of-Thought logs
-      appendCotLog(`[BEDROCK_ENGINE_INIT] Initialized AWS Bedrock Claude 3.5 Sonnet Reasoning Loop.`);
-      appendCotLog(`[CDC_CHANGEFEED_ACTIVE] CockroachDB Changefeed listening on table "itinerary_segments".`);
-      appendCotLog(`[SYSTEM_READY] Standing by for carrier disruption signals...`);
-
-      // 9. Initial traveler selection to populate profile inspector card and route map
-      selectTraveler('itin-101');
-    });
 
   </script>
 </body>
+
 </html>

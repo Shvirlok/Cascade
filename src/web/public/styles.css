@@ -1667,3 +1667,98 @@ footer.app-footer {
     flex: 1;
   }
 }
+
+/* 7. Multi-Modal Transport Filter Bar & Geographic City Pin Badges */
+.map-filter-subbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 12px;
+  border-radius: 8px;
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 400;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  flex-wrap: wrap;
+  max-width: calc(100% - 24px);
+}
+
+[data-theme="light"] .map-filter-subbar {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.mode-filter-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.mode-filter-btn:hover {
+  background: rgba(99, 102, 241, 0.25);
+  color: var(--text-primary);
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.mode-filter-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+}
+
+.map-telemetry-badge {
+  position: absolute;
+  top: 56px;
+  right: 12px;
+  z-index: 400;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #34d399;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .map-telemetry-badge {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #10b981;
+  color: #047857;
+}
+
+.city-pin-label {
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: Inter, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.8);
+  padding: 2px 7px;
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}

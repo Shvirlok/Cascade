@@ -41,10 +41,10 @@ cdcEventEmitter.on('human_approval_required', (data) => broadcastSSE('human_appr
 
 // In-Memory Fleet Database State
 let activeFleetData = [
-  { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'SFO → LHR', status: 'SELF_HEALED', legs: 'Flight · Train · Hotel · Flight', last_event: 'Flight delayed +150m — automatically rebooked to next Amtrak Acela Express', region: 'us-east-1' },
-  { id: 'itin-102', traveler: 'Marcus Vance', route: 'JFK → CDG', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer', region: 'eu-west-1' },
-  { id: 'itin-103', traveler: 'Elena Rostova', route: 'ORD → HND', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time', region: 'ap-northeast-1' },
-  { id: 'itin-104', traveler: 'David Chen', route: 'MIA → LHR', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival — guaranteed at no extra cost', region: 'us-east-1' },
+  { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'San Francisco (SFO) ➔ London (LHR)', status: 'SELF_HEALED', legs: 'Flight · Train · Hotel · Flight', last_event: 'Flight delayed +150m — automatically rebooked to next Amtrak Acela Express', region: 'us-east-1' },
+  { id: 'itin-102', traveler: 'Marcus Vance', route: 'New York (JFK) ➔ Paris (CDG)', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer', region: 'eu-west-1' },
+  { id: 'itin-103', traveler: 'Elena Rostova', route: 'Chicago (ORD) ➔ Tokyo (HND)', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time', region: 'ap-northeast-1' },
+  { id: 'itin-104', traveler: 'David Chen', route: 'Miami (MIA) ➔ London (LHR)', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival — guaranteed at no extra cost', region: 'us-east-1' },
 ];
 
 let inMemoryGraphCache: any = {
@@ -184,38 +184,52 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
   const cLat = (resolvedOrigLat + resolvedDestLat) / 2;
   const cLng = (resolvedOrigLng + resolvedDestLng) / 2;
 
+  const cityCenters: Record<string, { code: string; label: string; lat: number; lng: number }> = {
+    JFK: { code: 'NYC', label: 'New York City Center', lat: 40.7128, lng: -74.0060 },
+    SFO: { code: 'SJC', label: 'San Francisco Downtown', lat: 37.7749, lng: -122.4194 },
+    CDG: { code: 'PAR', label: 'Central Paris Hotel', lat: 48.8566, lng: 2.3522 },
+    LHR: { code: 'LON', label: 'Central London Hotel', lat: 51.5074, lng: -0.1278 },
+    ORD: { code: 'CHI', label: 'Chicago Downtown Loop', lat: 41.8781, lng: -87.6298 },
+    HND: { code: 'TYO', label: 'Tokyo Shinjuku District', lat: 35.6905, lng: 139.6995 },
+    MIA: { code: 'MIA_D', label: 'Miami Beach Center', lat: 25.7617, lng: -80.1918 }
+  };
+
   const fMileUpper = String(firstMileMode).toUpperCase();
-  const mainModeUpper = String(primaryMode).toUpperCase();
+  // Enforce FLIGHT for long distance / oceanic hub-to-hub main legs
+  const distEstKm = Math.sqrt(Math.pow((resolvedOrigLat - resolvedDestLat) * 111, 2) + Math.pow((resolvedOrigLng - resolvedDestLng) * 85, 2));
+  const mainModeUpper = (distEstKm > 600 || origCode !== destCode) ? 'FLIGHT' : String(primaryMode).toUpperCase();
   const lMileUpper = String(lastMileMode || transferMode || 'CAR_TRANSFER').toUpperCase();
 
   const multiModalWaypoints: any[] = [];
   const legs: any[] = [];
 
-  // First mile
+  // First mile (Inland City Center to Airport Hub)
   if (fMileUpper !== 'NONE') {
-    const fMileName = firstMileOrigin || `${origCode}-LOCAL`;
-    const fMileCode = fMileName.substring(0, 4).toUpperCase();
+    const fMileName = firstMileOrigin || (cityCenters[origCode]?.label || `${origCode} City Center`);
+    const fMileCode = cityCenters[origCode]?.code || fMileName.substring(0, 4).toUpperCase();
+    const fMileLat = cityCenters[origCode]?.lat || (resolvedOrigLat + 0.08);
+    const fMileLng = cityCenters[origCode]?.lng || (resolvedOrigLng + 0.08);
     const fColor = fMileUpper === 'RAIL' ? '#10b981' : (fMileUpper === 'CAR' ? '#f59e0b' : '#38bdf8');
-    const fProvider = fMileUpper === 'RAIL' ? 'Regional Commuter Rail' : (fMileUpper === 'CAR' ? 'Private Taxi Transfer' : 'Airport Bus Express');
+    const fProvider = fMileUpper === 'RAIL' ? 'Regional Commuter Rail' : (fMileUpper === 'CAR' ? 'Executive Car Transfer' : 'Airport Bus Express');
 
     legs.push({
       type: fMileUpper === 'RAIL' ? 'TRAIN' : 'CAR',
       provider: fProvider,
       route: `${fMileName} → ${origCode}`,
       status: 'SCHEDULED',
-      mode: fMileUpper
+      mode: fMileUpper === 'CAR' ? 'CAR' : fMileUpper
     });
 
     multiModalWaypoints.push({
-      mode: fMileUpper,
+      mode: fMileUpper === 'CAR' ? 'CAR' : fMileUpper,
       provider: fProvider,
-      from: { code: fMileCode, label: `${fMileName} Station`, lat: resolvedOrigLat - 0.25, lng: resolvedOrigLng - 0.25 },
+      from: { code: fMileCode, label: fMileName, lat: fMileLat, lng: fMileLng },
       to: { code: origCode, label: `${origCode} Origin Hub`, lat: resolvedOrigLat, lng: resolvedOrigLng },
       color: fColor
     });
   }
 
-  // Main Leg
+  // Main Intercity / Transoceanic Leg (Airport Hub to Airport Hub)
   const mainColor = mainModeUpper === 'RAIL' ? '#10b981' : (mainModeUpper === 'CAR' || mainModeUpper === 'BUS' ? '#f59e0b' : '#6366f1');
   const mainProvider = mainModeUpper === 'RAIL'
     ? `Amtrak / Eurostar High-Speed Rail (${origCode}-${Math.floor(100+Math.random()*899)})`
@@ -241,9 +255,10 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     color: mainColor
   });
 
-  // Last Mile
-  const lMileName = lastMileDest || `${destCode} Downtown Hotel`;
-  const lMileCode = lMileName.substring(0, 4).toUpperCase();
+  // Last Mile (Destination Airport Hub to Inland Hotel/Office)
+  const destCenterObj = cityCenters[destCode] || { code: destCode + '_H', label: `${destCode} Hotel Center`, lat: resolvedDestLat + 0.08, lng: resolvedDestLng + 0.08 };
+  const lMileName = lastMileDest || destCenterObj.label;
+  const lMileCode = destCenterObj.code;
   const lColor = lMileUpper.includes('CAR') ? '#f59e0b' : (lMileUpper.includes('BUS') ? '#f59e0b' : '#10b981');
   const lProvider = lMileUpper.includes('CAR')
     ? 'Executive Sedan Chauffeur'
@@ -269,7 +284,7 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     mode: lMileUpper.includes('CAR') ? 'CAR' : (lMileUpper.includes('BUS') ? 'BUS' : 'RAIL'),
     provider: lProvider,
     from: { code: destCode, label: `${destCode} Destination Hub`, lat: resolvedDestLat, lng: resolvedDestLng },
-    to: { code: lMileCode, label: `${lMileName}`, lat: resolvedDestLat + 0.06, lng: resolvedDestLng + 0.06 },
+    to: { code: lMileCode, label: lMileName, lat: destCenterObj.lat, lng: destCenterObj.lng },
     color: lColor
   });
 
@@ -308,7 +323,7 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     legs: legs.map(l => l.mode || l.type).join(' · '),
     riskScore: 0.05,
   };
-  ACTIVE_FLEET_TRIPS.unshift(newTrip);
+  activeFleetData.unshift(newTrip);
 
   res.json({
     success: true,
@@ -436,6 +451,16 @@ app.get('/api/travelers', (_req: Request, res: Response) => {
 app.get('/api/traveler/:id', (req: Request, res: Response) => {
   const profile = TRAVELER_PROFILES[req.params.id] || TRAVELER_PROFILES['itin-101'];
   res.json(profile);
+});
+
+/**
+ * Endpoint: Delete Traveler Profile by ID
+ */
+app.delete('/api/traveler/:id', (req: Request, res: Response) => {
+  const id = req.params.id;
+  delete TRAVELER_PROFILES[id];
+  activeFleetData = activeFleetData.filter(t => t.id !== id);
+  res.json({ success: true, message: `Traveler ${id} deleted successfully.` });
 });
 
 /**
