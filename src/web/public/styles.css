@@ -333,18 +333,31 @@ header.app-header {
 #tab-pane-audit,
 #tab-audit {
   overflow-y: auto !important;
-  max-height: calc(100vh - 80px) !important;
-  padding-bottom: 50px !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box !important;
 }
 
 .audit-layout {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: start;
   width: 100%;
-  padding: 16px 16px 50px 16px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 16px 20px 60px 20px !important;
   gap: 16px;
   min-height: auto !important;
   height: auto !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 1100px) {
+  .audit-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .timeline-container,
@@ -1094,14 +1107,14 @@ button:active,
 .timeline-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
 }
 
 .node-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
+  padding: 10px 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -1110,12 +1123,12 @@ button:active,
 .node-left {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .node-icon-box {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.25);
@@ -1127,8 +1140,8 @@ button:active,
 }
 
 .node-icon-box svg {
-  width: 22px;
-  height: 22px;
+  width: 19px;
+  height: 19px;
   stroke: #10B981;
   fill: none;
   display: block;
@@ -1145,10 +1158,10 @@ button:active,
 }
 
 .connector {
-  height: 16px;
+  height: 8px;
   width: 2px;
   background: var(--border-color);
-  margin-left: 35px;
+  margin-left: 31px;
 }
 
 /* Floating Glassmorphism Badge for Map Header */

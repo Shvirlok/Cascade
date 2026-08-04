@@ -108,12 +108,9 @@
         <aside class="ops-sidebar">
           <!-- Active Executive Travelers List -->
           <div class="card table-container">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-              <span class="card-title">Executive Travelers / Users</span>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <button onclick="deleteUser(currentActiveTravelerId);" title="Delete Currently Selected User" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;">🗑️ Delete User</button>
-                <span id="metric-active-count" class="badge status-tag-green">4 ACTIVE</span>
-              </div>
+            <div class="card-header">
+              <span class="card-title">Executive Travelers</span>
+              <span id="metric-active-count" class="badge status-tag-green">4 ACTIVE</span>
             </div>
             <div class="table-wrapper">
               <table class="travelers-table">
@@ -256,10 +253,7 @@
             </div>
             <div id="simulator-controls-panel" class="card-body">
               <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <label for="simulator-traveler-select" style="margin-bottom: 0;">Executive Traveler Profile / User</label>
-                  <button id="btn-delete-sim-user" type="button" onclick="const id = document.getElementById('simulator-traveler-select').value; deleteUser(id);" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px;">🗑️ Delete User</button>
-                </div>
+                <label for="simulator-traveler-select">Executive Traveler Profile</label>
                 <select id="simulator-traveler-select" class="form-control">
                   <option value="itin-101">Sarah Jenkins (San Francisco [SFO] ➔ London Heathrow [LHR] | $300 Policy Limit)</option>
                   <option value="itin-102">Marcus Vance (New York [JFK] ➔ Paris [CDG] | $500 Policy Limit)</option>
@@ -446,9 +440,8 @@
       </div>
 
       <!-- TAB 3: Audit & Proofs (Enterprise Compliance & Reports) -->
-      <div id="tab-pane-audit" class="tab-view-pane hidden"
-        style="overflow-y: auto !important; max-height: calc(100vh - 80px) !important; padding-bottom: 60px !important;">
-        <div class="audit-layout" style="padding-bottom: 60px;">
+      <div id="tab-pane-audit" class="tab-view-pane hidden">
+        <div class="audit-layout">
           <!-- Timeline & Comparison Card -->
           <div class="card">
             <div class="card-header">
@@ -885,29 +878,30 @@
   <div id="passengerDetailsModal" class="modal-backdrop">
     <div class="modal-dialog">
       <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div>
-            <h3 id="passenger-modal-name" class="modal-title">Passenger Profile & Flight Itinerary</h3>
-            <div id="passenger-modal-email" style="font-size: 11px; color: var(--text-muted);">passenger@acme.com</div>
-          </div>
+        <div>
+          <h3 id="passenger-modal-name" class="modal-title">Passenger Profile & Flight Itinerary</h3>
+          <div id="passenger-modal-email" style="font-size: 11px; color: var(--text-muted);">passenger@acme.com</div>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button id="passenger-modal-delete-btn-header" class="btn"
-            style="background: #dc2626; border: 1px solid #ef4444; color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 10px rgba(220, 38, 38, 0.45); display: flex; align-items: center; gap: 4px;">
-            🗑️ Delete Passenger
-          </button>
-          <button id="passenger-modal-close" class="modal-close"
-            style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕
-            Close</button>
-        </div>
+        <button id="passenger-modal-close" class="modal-close"
+          style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕
+          Close</button>
       </div>
       <div class="modal-body" id="passenger-modal-body">
         Loading passenger details...
       </div>
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
         <button id="passenger-modal-delete-btn" class="btn"
-          style="background: #dc2626; border: 1px solid #ef4444; color: #ffffff; font-size: 12.5px; font-weight: 700; padding: 8px 18px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 10px rgba(220, 38, 38, 0.45); display: flex; align-items: center; gap: 6px;">
-          🗑️ Delete Passenger Profile
+          style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; font-size: 12.5px; font-weight: 600; padding: 8px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s ease;"
+          onmouseover="this.style.background='rgba(239,68,68,0.22)'; this.style.borderColor='rgba(239,68,68,0.6)';"
+          onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.borderColor='rgba(239,68,68,0.35)';">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+          Delete Passenger
         </button>
         <button id="passenger-modal-close-btn" class="btn btn-primary">Close</button>
       </div>
@@ -3677,7 +3671,13 @@
             <td style="color: var(--text-secondary); font-family: var(--font-mono); font-size: 11.5px;">${formattedRoute}</td>
             <td style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
               <span class="status-tag ${tagClass}">${tagLabel}</span>
-              <button onclick="event.stopPropagation(); deleteTraveler('${tId}');" title="Delete Traveler" style="background: transparent; border: none; color: #ef4444; font-size: 12px; cursor: pointer; opacity: 0.6; padding: 2px 4px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">🗑️</button>
+              <button onclick="event.stopPropagation(); deleteTraveler('${tId}');" title="Delete Traveler" class="row-delete-btn" style="background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 4px 6px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease;" onmouseover="this.style.background='rgba(239,68,68,0.18)'; this.style.borderColor='rgba(239,68,68,0.4)'; this.style.color='#f87171';" onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='var(--text-muted)';">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"/>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                </svg>
+              </button>
             </td>
           `;
 
@@ -3838,7 +3838,14 @@
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
               <button id="btn-view-details" onclick="openPassengerDetailsModal('${profile.id}')" class="btn btn-outline btn-view-details" data-traveler-id="${profile.id}" style="padding: 4px 8px; font-size: 11px;">View Details</button>
-              <button onclick="deleteTraveler('${profile.id}')" class="btn btn-outline" style="padding: 4px 8px; font-size: 11px; color: #f87171; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.1); cursor: pointer;" title="Delete Traveler Profile">🗑️ Delete</button>
+              <button onclick="deleteTraveler('${profile.id}')" class="btn btn-outline" style="padding: 4px 10px; font-size: 11px; color: #f87171; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.1); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; transition: all 0.15s ease;" title="Delete Traveler Profile" onmouseover="this.style.background='rgba(239,68,68,0.2)'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='rgba(239,68,68,0.1)'; this.style.borderColor='rgba(239,68,68,0.3)';">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"/>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                </svg>
+                Delete
+              </button>
             </div>
           </div>
 
