@@ -429,10 +429,37 @@
       <form id="form-create-itinerary" style="padding: 24px; max-height: 82vh; overflow-y: auto;">
         <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px; padding: 0;">
           
+          <!-- Preset Combination Buttons -->
+          <div>
+            <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
+              Select Travel Mode Combination Preset
+            </label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
+              <button type="button" class="preset-btn active" data-preset="FLIGHT_ONLY" style="padding: 10px 8px; background: rgba(99,102,241,0.25); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                ✈️ Plane Only
+              </button>
+              <button type="button" class="preset-btn" data-preset="TRAIN_ONLY" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                🚆 Train Only
+              </button>
+              <button type="button" class="preset-btn" data-preset="CAR_ONLY" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                🚗 Car / Drive Only
+              </button>
+              <button type="button" class="preset-btn" data-preset="FLIGHT_CAR" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                ✈️ + 🚗 Plane + Car
+              </button>
+              <button type="button" class="preset-btn" data-preset="TRAIN_FLIGHT" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                🚆 + ✈️ Train + Plane
+              </button>
+              <button type="button" class="preset-btn" data-preset="FULL_MULTIMODAL" style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                🚆 + ✈️ + 🚗 Train + Plane + Car
+              </button>
+            </div>
+          </div>
+
           <!-- Mode Selector Buttons -->
           <div>
             <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
-              Select Main Travel Mode (Hub ➔ Hub)
+              Main Travel Mode (Hub ➔ Hub)
             </label>
             <input type="hidden" id="modal-travel-mode" value="FLIGHT">
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
@@ -1006,6 +1033,71 @@
       const mode = btn.getAttribute('data-mode') || 'FLIGHT';
       const modeInput = document.getElementById('modal-travel-mode');
       if (modeInput) modeInput.value = mode;
+    });
+
+    // Preset Buttons click listener
+    document.addEventListener('click', (e) => {
+      const presetBtn = e.target.closest('.preset-btn');
+      if (!presetBtn) return;
+      e.preventDefault();
+
+      document.querySelectorAll('.preset-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'rgba(255, 255, 255, 0.05)';
+        b.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+        b.style.color = '#94a3b8';
+      });
+
+      presetBtn.classList.add('active');
+      presetBtn.style.background = 'rgba(99, 102, 241, 0.25)';
+      presetBtn.style.borderColor = '#6366f1';
+      presetBtn.style.color = '#ffffff';
+
+      const key = presetBtn.getAttribute('data-preset') || 'FLIGHT_ONLY';
+      const fMileSelect = document.getElementById('modal-first-mile-mode');
+      const mainInput   = document.getElementById('modal-travel-mode');
+      const lMileSelect = document.getElementById('modal-transfer-mode');
+
+      if (key === 'FLIGHT_ONLY') {
+        if (fMileSelect) fMileSelect.value = 'NONE';
+        if (mainInput) mainInput.value = 'FLIGHT';
+        if (lMileSelect) lMileSelect.value = 'DIRECT';
+      } else if (key === 'TRAIN_ONLY') {
+        if (fMileSelect) fMileSelect.value = 'NONE';
+        if (mainInput) mainInput.value = 'RAIL';
+        if (lMileSelect) lMileSelect.value = 'DIRECT';
+      } else if (key === 'CAR_ONLY') {
+        if (fMileSelect) fMileSelect.value = 'NONE';
+        if (mainInput) mainInput.value = 'CAR';
+        if (lMileSelect) lMileSelect.value = 'DIRECT';
+      } else if (key === 'FLIGHT_CAR') {
+        if (fMileSelect) fMileSelect.value = 'NONE';
+        if (mainInput) mainInput.value = 'FLIGHT';
+        if (lMileSelect) lMileSelect.value = 'CAR_TRANSFER';
+      } else if (key === 'TRAIN_FLIGHT') {
+        if (fMileSelect) fMileSelect.value = 'RAIL';
+        if (mainInput) mainInput.value = 'FLIGHT';
+        if (lMileSelect) lMileSelect.value = 'DIRECT';
+      } else if (key === 'FULL_MULTIMODAL') {
+        if (fMileSelect) fMileSelect.value = 'RAIL';
+        if (mainInput) mainInput.value = 'FLIGHT';
+        if (lMileSelect) lMileSelect.value = 'CAR_TRANSFER';
+      }
+
+      document.querySelectorAll('.mode-select-btn').forEach(b => {
+        const mode = b.getAttribute('data-mode');
+        if (mode === (mainInput?.value || 'FLIGHT')) {
+          b.classList.add('active');
+          b.style.background = 'rgba(99, 102, 241, 0.25)';
+          b.style.borderColor = '#6366f1';
+          b.style.color = '#ffffff';
+        } else {
+          b.classList.remove('active');
+          b.style.background = 'rgba(255, 255, 255, 0.05)';
+          b.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+          b.style.color = '#94a3b8';
+        }
+      });
     });
 
     document.getElementById('form-create-itinerary')?.addEventListener('submit', async (e) => {
