@@ -148,7 +148,24 @@ app.get('/api/dashboard', async (_req: Request, res: Response) => {
  * Create / Import Executive Itinerary Endpoint
  */
 app.post('/api/itinerary/create', async (req: Request, res: Response) => {
-  const { travelerName, travelerEmail, origin, destination, strategy, originLat, originLng, destLat, destLng } = req.body;
+  const {
+    travelerName,
+    travelerEmail,
+    primaryMode = 'FLIGHT',
+    origin,
+    destination,
+    depDate = '2026-08-10',
+    depTime = '09:00',
+    arrDate = '2026-08-10',
+    arrTime = '17:30',
+    transferMode = 'RAIL_TRANSFER',
+    cabinPref = 'Business Class Quiet Car',
+    strategy = 'EXECUTIVE_SPEED',
+    originLat,
+    originLng,
+    destLat,
+    destLng
+  } = req.body;
 
   const newId = `traveler_${Date.now()}`;
   const origCode = (origin || 'JFK').split(' ')[0].split('—')[0].trim();
@@ -163,6 +180,25 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
   const cLat = (resolvedOrigLat + resolvedDestLat) / 2;
   const cLng = (resolvedOrigLng + resolvedDestLng) / 2;
 
+  const modeUpper = String(primaryMode).toUpperCase();
+  const leg1Type = modeUpper === 'RAIL' ? 'TRAIN' : (modeUpper === 'CAR' || modeUpper === 'BUS' ? 'CAR' : 'FLIGHT');
+  const leg1Provider = modeUpper === 'RAIL'
+    ? `Amtrak / Eurostar High-Speed Rail (${origCode}-${Math.floor(100+Math.random()*899)})`
+    : (modeUpper === 'CAR'
+        ? `Executive Private Sedan (${origCode} Chauffeur)`
+        : (modeUpper === 'BUS'
+            ? `Airport Bus Express (${origCode}-EXPRESS)`
+            : `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`));
+
+  const transferUpper = String(transferMode).toUpperCase();
+  const leg2Mode = transferUpper.includes('CAR') ? 'BUS' : (transferUpper.includes('BUS') ? 'BUS' : 'RAIL');
+  const leg2Provider = transferUpper.includes('CAR')
+    ? 'Executive Sedan Ground Transfer'
+    : (transferUpper.includes('BUS') ? 'Express Shuttle Bus' : 'Express Rail Connection');
+
+  const leg1Color = modeUpper === 'RAIL' ? '#10b981' : (modeUpper === 'CAR' || modeUpper === 'BUS' ? '#f59e0b' : '#6366f1');
+  const leg2Color = leg2Mode === 'RAIL' ? '#10b981' : '#f59e0b';
+
   const newProfile = {
     id: newId,
     name: travelerName || 'Executive Traveler',
@@ -176,22 +212,22 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     destLat: resolvedDestLat,
     destLng: resolvedDestLng,
     status: 'SCHEDULED',
+    schedule: `${depDate} ${depTime} ➔ ${arrDate} ${arrTime}`,
     policyTier: strategy === 'COMFORT_BUSINESS' ? 'VIP Executive ($500 Limit)' : 'Executive Tier ($300 Limit)',
     policyLimitUsd: strategy === 'COMFORT_BUSINESS' ? 500 : 300,
-    preferredCabin: strategy === 'COMFORT_BUSINESS' ? 'First Class Quiet Car' : 'Business Class Direct',
+    preferredCabin: cabinPref || (strategy === 'COMFORT_BUSINESS' ? 'First Class Quiet Car' : 'Business Class Direct'),
     vectorScore: 0.965,
     centerLat: cLat,
     centerLng: cLng,
     zoom: 3,
     legs: [
-      { type: 'FLIGHT', provider: `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`, route: `${origCode} → ${destCode}`, status: 'SCHEDULED', mode: 'FLIGHT' },
-      { type: 'TRAIN', provider: 'Express Rail Connection', route: `${destCode} Central Station`, status: 'SCHEDULED', mode: 'RAIL' },
+      { type: leg1Type, provider: leg1Provider, route: `${origCode} → ${destCode}`, status: 'SCHEDULED', mode: modeUpper },
+      { type: leg2Mode === 'RAIL' ? 'TRAIN' : 'CAR', provider: leg2Provider, route: `${destCode} Station → Hotel`, status: 'SCHEDULED', mode: leg2Mode },
       { type: 'HOTEL', provider: 'Luxury Five-Star Executive Hotel', route: `${destCode} Downtown`, status: 'CONFIRMED', mode: 'HOTEL' },
     ],
     multiModalWaypoints: [
-      { mode: 'FLIGHT', provider: `Executive Air (${origCode})`, from: { code: origCode, label: `${origCode} Origin Int'l`, lat: resolvedOrigLat, lng: resolvedOrigLng }, to: { code: destCode, label: `${destCode} Destination Airport`, lat: resolvedDestLat, lng: resolvedDestLng }, color: '#6366f1' },
-      { mode: 'RAIL', provider: 'Express Rail Connection', from: { code: destCode, label: `${destCode} Rail Hub`, lat: resolvedDestLat, lng: resolvedDestLng }, to: { code: `${destCode}-CENTRAL`, label: `${destCode} Central Station`, lat: resolvedDestLat + 0.04, lng: resolvedDestLng + 0.04 }, color: '#10b981' },
-      { mode: 'BUS', provider: 'Executive Transfer Shuttle', from: { code: `${destCode}-CENTRAL`, label: `${destCode} Central Station`, lat: resolvedDestLat + 0.04, lng: resolvedDestLng + 0.04 }, to: { code: `${destCode}-CITY`, label: `${destCode} Hotel District`, lat: resolvedDestLat + 0.07, lng: resolvedDestLng + 0.07 }, color: '#f59e0b' }
+      { mode: modeUpper, provider: leg1Provider, from: { code: origCode, label: `${origCode} Origin Hub`, lat: resolvedOrigLat, lng: resolvedOrigLng }, to: { code: destCode, label: `${destCode} Station/Hub`, lat: resolvedDestLat, lng: resolvedDestLng }, color: leg1Color },
+      { mode: leg2Mode, provider: leg2Provider, from: { code: destCode, label: `${destCode} Station/Hub`, lat: resolvedDestLat, lng: resolvedDestLng }, to: { code: `${destCode}-CITY`, label: `${destCode} Executive Destination`, lat: resolvedDestLat + 0.05, lng: resolvedDestLng + 0.05 }, color: leg2Color }
     ]
   };
 
@@ -202,12 +238,9 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     traveler: newProfile.name,
     route: routeStr,
     status: 'SCHEDULED',
-    legs: 'Flight · Express Rail · Hotel',
-    last_event: `New trip created (${routeStr}). Traveler preferences loaded.`,
-    region: 'us-east-1',
+    legs: `${modeUpper} · ${leg2Mode} · Hotel`,
+    riskScore: 0.05,
   };
-
-  activeFleetData.unshift(newTrip);
 
   res.json({
     success: true,
