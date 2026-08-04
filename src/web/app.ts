@@ -151,14 +151,18 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
   const {
     travelerName,
     travelerEmail,
+    firstMileMode = 'RAIL',
+    firstMileOrigin = '',
     primaryMode = 'FLIGHT',
     origin,
     destination,
+    lastMileMode = 'CAR_TRANSFER',
+    lastMileDest = '',
     depDate = '2026-08-10',
     depTime = '09:00',
     arrDate = '2026-08-10',
     arrTime = '17:30',
-    transferMode = 'RAIL_TRANSFER',
+    transferMode,
     cabinPref = 'Business Class Quiet Car',
     strategy = 'EXECUTIVE_SPEED',
     originLat,
@@ -180,24 +184,94 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
   const cLat = (resolvedOrigLat + resolvedDestLat) / 2;
   const cLng = (resolvedOrigLng + resolvedDestLng) / 2;
 
-  const modeUpper = String(primaryMode).toUpperCase();
-  const leg1Type = modeUpper === 'RAIL' ? 'TRAIN' : (modeUpper === 'CAR' || modeUpper === 'BUS' ? 'CAR' : 'FLIGHT');
-  const leg1Provider = modeUpper === 'RAIL'
+  const fMileUpper = String(firstMileMode).toUpperCase();
+  const mainModeUpper = String(primaryMode).toUpperCase();
+  const lMileUpper = String(lastMileMode || transferMode || 'CAR_TRANSFER').toUpperCase();
+
+  const multiModalWaypoints: any[] = [];
+  const legs: any[] = [];
+
+  // First mile
+  if (fMileUpper !== 'NONE') {
+    const fMileName = firstMileOrigin || `${origCode}-LOCAL`;
+    const fMileCode = fMileName.substring(0, 4).toUpperCase();
+    const fColor = fMileUpper === 'RAIL' ? '#10b981' : (fMileUpper === 'CAR' ? '#f59e0b' : '#38bdf8');
+    const fProvider = fMileUpper === 'RAIL' ? 'Regional Commuter Rail' : (fMileUpper === 'CAR' ? 'Private Taxi Transfer' : 'Airport Bus Express');
+
+    legs.push({
+      type: fMileUpper === 'RAIL' ? 'TRAIN' : 'CAR',
+      provider: fProvider,
+      route: `${fMileName} → ${origCode}`,
+      status: 'SCHEDULED',
+      mode: fMileUpper
+    });
+
+    multiModalWaypoints.push({
+      mode: fMileUpper,
+      provider: fProvider,
+      from: { code: fMileCode, label: `${fMileName} Station`, lat: resolvedOrigLat - 0.25, lng: resolvedOrigLng - 0.25 },
+      to: { code: origCode, label: `${origCode} Origin Hub`, lat: resolvedOrigLat, lng: resolvedOrigLng },
+      color: fColor
+    });
+  }
+
+  // Main Leg
+  const mainColor = mainModeUpper === 'RAIL' ? '#10b981' : (mainModeUpper === 'CAR' || mainModeUpper === 'BUS' ? '#f59e0b' : '#6366f1');
+  const mainProvider = mainModeUpper === 'RAIL'
     ? `Amtrak / Eurostar High-Speed Rail (${origCode}-${Math.floor(100+Math.random()*899)})`
-    : (modeUpper === 'CAR'
-        ? `Executive Private Sedan (${origCode} Chauffeur)`
-        : (modeUpper === 'BUS'
-            ? `Airport Bus Express (${origCode}-EXPRESS)`
+    : (mainModeUpper === 'CAR'
+        ? `Long-Distance Chauffeur Sedan (${origCode}-${destCode})`
+        : (mainModeUpper === 'BUS'
+            ? `Intercity Bus Express (${origCode}-${destCode})`
             : `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`));
 
-  const transferUpper = String(transferMode).toUpperCase();
-  const leg2Mode = transferUpper.includes('CAR') ? 'BUS' : (transferUpper.includes('BUS') ? 'BUS' : 'RAIL');
-  const leg2Provider = transferUpper.includes('CAR')
-    ? 'Executive Sedan Ground Transfer'
-    : (transferUpper.includes('BUS') ? 'Express Shuttle Bus' : 'Express Rail Connection');
+  legs.push({
+    type: mainModeUpper === 'RAIL' ? 'TRAIN' : (mainModeUpper === 'CAR' || mainModeUpper === 'BUS' ? 'CAR' : 'FLIGHT'),
+    provider: mainProvider,
+    route: `${origCode} → ${destCode}`,
+    status: 'SCHEDULED',
+    mode: mainModeUpper
+  });
 
-  const leg1Color = modeUpper === 'RAIL' ? '#10b981' : (modeUpper === 'CAR' || modeUpper === 'BUS' ? '#f59e0b' : '#6366f1');
-  const leg2Color = leg2Mode === 'RAIL' ? '#10b981' : '#f59e0b';
+  multiModalWaypoints.push({
+    mode: mainModeUpper,
+    provider: mainProvider,
+    from: { code: origCode, label: `${origCode} Main Hub`, lat: resolvedOrigLat, lng: resolvedOrigLng },
+    to: { code: destCode, label: `${destCode} Destination Hub`, lat: resolvedDestLat, lng: resolvedDestLng },
+    color: mainColor
+  });
+
+  // Last Mile
+  const lMileName = lastMileDest || `${destCode} Downtown Hotel`;
+  const lMileCode = lMileName.substring(0, 4).toUpperCase();
+  const lColor = lMileUpper.includes('CAR') ? '#f59e0b' : (lMileUpper.includes('BUS') ? '#f59e0b' : '#10b981');
+  const lProvider = lMileUpper.includes('CAR')
+    ? 'Executive Sedan Chauffeur'
+    : (lMileUpper.includes('BUS') ? 'Airport Express Shuttle' : 'City Express Rail Transfer');
+
+  legs.push({
+    type: lMileUpper.includes('CAR') || lMileUpper.includes('BUS') ? 'CAR' : 'TRAIN',
+    provider: lProvider,
+    route: `${destCode} → ${lMileName}`,
+    status: 'SCHEDULED',
+    mode: lMileUpper.includes('CAR') ? 'CAR' : (lMileUpper.includes('BUS') ? 'BUS' : 'RAIL')
+  });
+
+  legs.push({
+    type: 'HOTEL',
+    provider: lMileName,
+    route: `${destCode} City District`,
+    status: 'CONFIRMED',
+    mode: 'HOTEL'
+  });
+
+  multiModalWaypoints.push({
+    mode: lMileUpper.includes('CAR') ? 'CAR' : (lMileUpper.includes('BUS') ? 'BUS' : 'RAIL'),
+    provider: lProvider,
+    from: { code: destCode, label: `${destCode} Destination Hub`, lat: resolvedDestLat, lng: resolvedDestLng },
+    to: { code: lMileCode, label: `${lMileName}`, lat: resolvedDestLat + 0.06, lng: resolvedDestLng + 0.06 },
+    color: lColor
+  });
 
   const newProfile = {
     id: newId,
@@ -220,15 +294,8 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     centerLat: cLat,
     centerLng: cLng,
     zoom: 3,
-    legs: [
-      { type: leg1Type, provider: leg1Provider, route: `${origCode} → ${destCode}`, status: 'SCHEDULED', mode: modeUpper },
-      { type: leg2Mode === 'RAIL' ? 'TRAIN' : 'CAR', provider: leg2Provider, route: `${destCode} Station → Hotel`, status: 'SCHEDULED', mode: leg2Mode },
-      { type: 'HOTEL', provider: 'Luxury Five-Star Executive Hotel', route: `${destCode} Downtown`, status: 'CONFIRMED', mode: 'HOTEL' },
-    ],
-    multiModalWaypoints: [
-      { mode: modeUpper, provider: leg1Provider, from: { code: origCode, label: `${origCode} Origin Hub`, lat: resolvedOrigLat, lng: resolvedOrigLng }, to: { code: destCode, label: `${destCode} Station/Hub`, lat: resolvedDestLat, lng: resolvedDestLng }, color: leg1Color },
-      { mode: leg2Mode, provider: leg2Provider, from: { code: destCode, label: `${destCode} Station/Hub`, lat: resolvedDestLat, lng: resolvedDestLng }, to: { code: `${destCode}-CITY`, label: `${destCode} Executive Destination`, lat: resolvedDestLat + 0.05, lng: resolvedDestLng + 0.05 }, color: leg2Color }
-    ]
+    legs,
+    multiModalWaypoints
   };
 
   TRAVELER_PROFILES[newId] = newProfile;
@@ -238,16 +305,17 @@ app.post('/api/itinerary/create', async (req: Request, res: Response) => {
     traveler: newProfile.name,
     route: routeStr,
     status: 'SCHEDULED',
-    legs: `${modeUpper} · ${leg2Mode} · Hotel`,
+    legs: legs.map(l => l.mode || l.type).join(' · '),
     riskScore: 0.05,
   };
+  ACTIVE_FLEET_TRIPS.unshift(newTrip);
 
   res.json({
     success: true,
     itineraryId: newId,
     newTrip,
     profile: newProfile,
-    message: 'Trip created and traveler preferences loaded successfully.',
+    message: 'Multi-modal trip created successfully.',
   });
 });
 

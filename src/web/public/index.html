@@ -432,7 +432,7 @@
           <!-- Mode Selector Buttons -->
           <div>
             <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
-              Select Primary Travel Mode
+              Select Main Travel Mode (Hub ➔ Hub)
             </label>
             <input type="hidden" id="modal-travel-mode" value="FLIGHT">
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
@@ -468,11 +468,33 @@
             </div>
           </div>
 
-          <!-- Where: Origin & Destination -->
+          <!-- First-Mile Connection Section (Small Town / Home Station -> Main Hub) -->
+          <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 12px;">
+            <div style="font-size: 11px; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+              Step 1: First Mile (Small Town / Local Station ➔ Main Hub)
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">First-Mile Transport</label>
+                <select id="modal-first-mile-mode" style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+                  <option value="RAIL">🚆 Regional Train (Small Town to Hub)</option>
+                  <option value="CAR">🚗 Driving / Private Car Transfer</option>
+                  <option value="BUS">🚌 Airport Shuttle / Express Bus</option>
+                  <option value="NONE">⚡ Direct (Start at Main Hub)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Local Small Town / Origin Station</label>
+                <input id="modal-first-mile-origin" placeholder="e.g. San Jose Station / Reading / Versailles" style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Where: Main Origin & Destination Hubs -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="form-group" style="position: relative; margin: 0;">
               <label for="modal-origin-input" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-                Where From (Origin Station/Hub)
+                Step 2: Main Origin Hub
               </label>
               <input id="modal-origin-input" class="form-control" placeholder="e.g. SFO (San Francisco)" autocomplete="off" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
               <div id="modal-origin-suggestions" class="autocomplete-dropdown"></div>
@@ -480,7 +502,7 @@
 
             <div class="form-group" style="position: relative; margin: 0;">
               <label for="modal-dest-input" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-                Where To (Destination Station/Hub)
+                Step 2: Main Destination Hub
               </label>
               <input id="modal-dest-input" class="form-control" placeholder="e.g. LHR (London Heathrow)" autocomplete="off" required style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
               <div id="modal-dest-suggestions" class="autocomplete-dropdown"></div>
@@ -510,19 +532,27 @@
             </div>
           </div>
 
-          <!-- Multi-Modal Ground Transfer Connection Choice -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group" style="margin: 0;">
-              <label for="modal-transfer-mode" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-                Secondary Connection Leg
-              </label>
-              <select id="modal-transfer-mode" class="form-control" style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px; cursor: pointer;">
-                <option value="RAIL_TRANSFER">🚆 Amtrak / High-Speed Rail Transfer</option>
-                <option value="CAR_TRANSFER">🚗 Private Executive Car / Sedan Transfer</option>
-                <option value="BUS_TRANSFER">🚌 Regional Airport Bus Express</option>
-                <option value="DIRECT">⚡ Direct Point-to-Point</option>
-              </select>
+          <!-- Last-Mile Connection Section (Destination Hub -> Hotel/Office) -->
+          <div style="background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 10px; padding: 12px;">
+            <div style="font-size: 11px; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+              Step 3: Last Mile (Destination Hub ➔ Final Hotel / Office)
             </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Last-Mile Transport</label>
+                <select id="modal-transfer-mode" style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+                  <option value="CAR_TRANSFER">🚗 Private Executive Sedan / Chauffeur</option>
+                  <option value="BUS_TRANSFER">🚌 Airport Express Shuttle</option>
+                  <option value="RAIL_TRANSFER">🚆 City Metro / High-Speed Rail Transfer</option>
+                  <option value="DIRECT">⚡ Direct Hotel Check-In</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Destination Hotel / Office Name</label>
+                <input id="modal-last-mile-dest" placeholder="e.g. Ritz-Carlton Downtown / Four Seasons" style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+              </div>
+            </div>
+          </div>
 
             <div class="form-group" style="margin: 0;">
               <label for="modal-cabin-pref" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
@@ -1271,9 +1301,16 @@
             L.polyline(arc, { color: '#10b981', weight: 6, opacity: 0.9, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
             polyline = L.polyline(arc, { color: '#ffffff', weight: 2.2, dashArray: '6, 10', opacity: 0.95, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
           } else if (m === 'BUS' || m === 'CAR' || m === 'SHUTTLE' || m === 'TAXI') {
-            // 🚗 HIGHWAY ROAD RENDERING: Amber road base + Light yellow dashed lane divider
-            L.polyline(arc, { color: '#f59e0b', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
+            // 🚗 REAL ROAD & HIGHWAY RENDERING (OSRM GeoJSON Route API)
+            const roadBase = L.polyline(arc, { color: '#f59e0b', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
             polyline = L.polyline(arc, { color: '#fef08a', weight: 1.8, dashArray: '5, 8', opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
+
+            fetchRealOSRMRoute(seg.from, seg.to).then(realCoords => {
+              if (realCoords && realCoords.length > 2) {
+                roadBase.setLatLngs(realCoords);
+                polyline.setLatLngs(realCoords);
+              }
+            });
           } else {
             // ✈️ FLIGHT RENDERING: Bowed high-altitude arc with glowing indigo style
             L.polyline(arc, { color: segColor, weight: 8, opacity: 0.22, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
@@ -1400,9 +1437,16 @@
           L.polyline(arc, { color: '#10b981', weight: 7, opacity: 0.9, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
           polyline = L.polyline(arc, { color: '#ffffff', weight: 2.5, dashArray: '6, 10', opacity: 0.95, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
         } else if (m === 'BUS' || m === 'CAR' || m === 'SHUTTLE' || m === 'TAXI') {
-          // 🚗 HIGHWAY ROAD RENDERING
-          L.polyline(arc, { color: '#f59e0b', weight: 7, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
+          // 🚗 REAL ROAD & HIGHWAY RENDERING (OSRM GeoJSON Route API)
+          const roadBase = L.polyline(arc, { color: '#f59e0b', weight: 7, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
           polyline = L.polyline(arc, { color: '#fef08a', weight: 2, dashArray: '5, 8', opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
+
+          fetchRealOSRMRoute(seg.from, seg.to).then(realCoords => {
+            if (realCoords && realCoords.length > 2) {
+              roadBase.setLatLngs(realCoords);
+              polyline.setLatLngs(realCoords);
+            }
+          });
         } else {
           // ✈️ FLIGHT RENDERING
           L.polyline(arc, { color: segColor, weight: 8, opacity: 0.22, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
@@ -2591,7 +2635,37 @@
           from.lng + (to.lng - from.lng) * t
         ]);
       }
-      return coords;
+    const ROAD_GEOMETRY_CACHE = {};
+
+    async function fetchRealOSRMRoute(from, to) {
+      if (!from || !to || typeof from.lat !== 'number' || typeof to.lat !== 'number') {
+        return buildRoadPath(from, to, 60);
+      }
+      const key = `${from.lat.toFixed(4)},${from.lng.toFixed(4)}_${to.lat.toFixed(4)},${to.lng.toFixed(4)}`;
+      if (ROAD_GEOMETRY_CACHE[key]) return ROAD_GEOMETRY_CACHE[key];
+
+      try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3000);
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timer);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.routes && data.routes[0] && data.routes[0].geometry && data.routes[0].geometry.coordinates) {
+            const coords = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+            if (coords && coords.length > 2) {
+              ROAD_GEOMETRY_CACHE[key] = coords;
+              return coords;
+            }
+          }
+        }
+      } catch (_err) {
+        // Fallback
+      }
+      const fallback = buildRoadPath(from, to, 60);
+      ROAD_GEOMETRY_CACHE[key] = fallback;
+      return fallback;
     }
 
     function buildRoadPath(from, to, steps = 60) {
