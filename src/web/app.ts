@@ -28,6 +28,9 @@ cdcListener.startListening();
 // Active SSE client connections
 const sseClients: Response[] = [];
 
+// Active fleet trips array
+export const ACTIVE_FLEET_TRIPS: any[] = [];
+
 function broadcastSSE(eventType: string, data: any) {
   const payload = `event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`;
   sseClients.forEach((client) => client.write(payload));

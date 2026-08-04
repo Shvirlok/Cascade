@@ -442,7 +442,23 @@
       <!-- TAB 3: Audit & Proofs (Enterprise Compliance & Reports) -->
       <div id="tab-pane-audit" class="tab-view-pane hidden">
         <div class="audit-layout">
-          <!-- Timeline & Comparison Card -->
+          <!-- Sleek Top Audit Stats Header Bar -->
+          <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 20px; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 9px; height: 9px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981;"></div>
+              <span style="font-weight: 600; font-size: 14px; color: var(--text-primary); letter-spacing: -0.01em;">Autonomous Compliance & Verification Engine</span>
+              <span class="badge status-tag-green" style="font-size: 10px; padding: 3px 8px;">CDC CHANGEFEED ACTIVE</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 28px; font-size: 12px;">
+              <div><span style="color:var(--text-muted);">Total Healed:</span> <strong style="color:var(--text-primary); margin-left: 4px;" class="font-mono">384 Trips</strong></div>
+              <div><span style="color:var(--text-muted);">Avg SLA:</span> <strong style="color:#10B981; margin-left: 4px;" class="font-mono">392ms</strong></div>
+              <div><span style="color:var(--text-muted);">Cost Delta:</span> <strong style="color:#38BDF8; margin-left: 4px;" class="font-mono">$0.00</strong></div>
+              <div><span style="color:var(--text-muted);">P99 Latency:</span> <strong style="color:#818CF8; margin-left: 4px;" class="font-mono">18ms</strong></div>
+              <div><span style="color:var(--text-muted);">Policy Compliance:</span> <strong style="color:#10B981; margin-left: 4px;" class="font-mono">100%</strong></div>
+            </div>
+          </div>
+
+          <!-- Left Column: Timeline & Comparison Card -->
           <div class="card">
             <div class="card-header">
               <span class="card-title">Itinerary Execution Timeline & Healing Comparison</span>
@@ -472,50 +488,47 @@
             </div>
           </div>
 
-          <!-- CockroachDB Immutable Proof Metadata Card -->
-          <div class="card" style="margin-bottom: 24px;">
+          <!-- Right Column: CockroachDB Immutable Proof & Compliance Card -->
+          <div class="card">
             <div class="card-header">
               <span class="card-title">CockroachDB SERIALIZABLE Immutable Proof Artifact</span>
+              <span class="badge status-tag-purple">SOC2 TYPE II</span>
             </div>
-            <div class="card-body" style="font-size: 13px; padding: 18px; padding-bottom: 24px;">
-              <div
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: var(--bg-surface-elevated); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <div><strong>Incident ID:</strong> <span id="audit-val-id" class="font-mono">PROOF-REC-994821</span>
-                </div>
-                <div><strong>Traveler Name:</strong> <span id="audit-profile-name">Sarah Jenkins</span></div>
-                <div><strong>Preferred Cabin:</strong> <span id="audit-profile-cabin">Business Class</span></div>
-                <div><strong>Policy Limit:</strong> <span id="audit-profile-limit">$300 USD</span></div>
-                <div><strong>Resolution SLA:</strong> <span id="audit-val-time" class="font-mono">392ms</span></div>
-                <div><strong>Financial Delta:</strong> <span id="audit-val-cost" class="font-mono">$0.00</span></div>
-                <div><strong>P99 Latency:</strong> <span id="audit-val-latency" class="font-mono">18ms</span></div>
-                <div><strong>Tx Hash:</strong> <span id="audit-tx-hash" class="font-mono">0x8f4b2c1e</span></div>
+            <div class="card-body" style="font-size: 13px; padding: 18px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: var(--bg-surface-elevated); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div><span style="color:var(--text-muted); font-size:11px; display:block;">Incident ID</span><strong id="audit-val-id" class="font-mono">PROOF-REC-994821</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11px; display:block;">Traveler Name</span><strong id="audit-profile-name">Sarah Jenkins</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11px; display:block;">Preferred Cabin</span><strong id="audit-profile-cabin">Business Class</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11px; display:block;">Policy Limit</span><strong id="audit-profile-limit">$300 USD</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11px; display:block;">Resolution SLA</span><strong id="audit-val-time" class="font-mono" style="color:#10B981;">392ms</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11px; display:block;">Financial Delta</span><strong id="audit-val-cost" class="font-mono" style="color:#38BDF8;">$0.00</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11px; display:block;">P99 Latency</span><strong id="audit-val-latency" class="font-mono">18ms</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11px; display:block;">Tx Hash</span><strong id="audit-tx-hash" class="font-mono" style="color:var(--accent);">0x8f4b2c1e</strong></div>
               </div>
 
-              <div style="margin-top: 16px;">
-                <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Signature Proof:</div>
-                <code id="audit-proof-sig" class="font-mono"
-                  style="display:block; background:#090a0f; padding:12px; margin:16px 0; border-radius:8px; font-size:12px; color:#A7F3D0; border: 1px solid var(--border-color); word-break: break-all; user-select: all;">sha256-cockroach-bedrock-0x8f4b2c1e9a3d7b4c8e</code>
+              <div style="margin-bottom: 16px;">
+                <div style="font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px;">Signature Proof:</div>
+                <code id="audit-proof-sig" class="font-mono" style="display:block; background:#07080D; padding:10px 14px; border-radius:6px; font-size:11px; color:#A7F3D0; border: 1px solid var(--border-color); word-break: break-all;">sha256-cockroach-bedrock-0x8f4b2c1e9a3d7b4c8e</code>
               </div>
 
-              <div style="display: flex; gap: 10px; margin-bottom: 30px;">
-                <button id="btn-export-pdf" class="btn btn-primary" style="padding: 9px 18px; font-size: 12px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;">
+                <span class="badge status-tag-green" style="font-size:10px; padding:3px 8px;">✓ SOC2 Verified</span>
+                <span class="badge status-tag-blue" style="font-size:10px; padding:3px 8px;">✓ AWS Bedrock Privacy Enforced</span>
+                <span class="badge status-tag-purple" style="font-size:10px; padding:3px 8px;">✓ SERIALIZABLE Isolation</span>
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <button id="btn-export-pdf" class="btn btn-primary" style="padding: 9px 18px; font-size: 12px; flex: 1; justify-content: center;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
                     <line x1="16" y1="13" x2="8" y2="13" />
                     <line x1="16" y1="17" x2="8" y2="17" />
-                    <polyline points="10 9 9 9 8 9" />
                   </svg>
                   Export PDF Audit Report
                 </button>
                 <button id="btn-proof-artifact" class="btn btn-outline" style="padding: 9px 18px; font-size: 12px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                  </svg>
-                  View CockroachDB Proof Hash
+                  View Proof Hash
                 </button>
                 <button id="btn-audit-export-pdf" style="display:none;"></button>
                 <button id="btn-generate-audit-report" style="display:none;"></button>
@@ -523,6 +536,72 @@
 
               <div id="audit-original-segments" style="display:none;"></div>
               <div id="audit-healed-segments" style="display:none;"></div>
+            </div>
+          </div>
+
+          <!-- Bottom Row: Full-Width Autonomous Healing Transaction Stream Table -->
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="card-header">
+              <span class="card-title">Autonomous Executive Recovery Transaction Ledger & Immutable History</span>
+              <span class="badge status-tag-purple">VERIFIED LEDGER</span>
+            </div>
+            <div class="card-body" style="padding: 0; overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                <thead>
+                  <tr style="background: var(--bg-surface-elevated); border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <th style="padding: 12px 16px;">Incident ID</th>
+                    <th style="padding: 12px 16px;">Traveler Profile</th>
+                    <th style="padding: 12px 16px;">Route</th>
+                    <th style="padding: 12px 16px;">Disruption Trigger</th>
+                    <th style="padding: 12px 16px;">Autonomous Action</th>
+                    <th style="padding: 12px 16px;">Resolution SLA</th>
+                    <th style="padding: 12px 16px;">Status</th>
+                    <th style="padding: 12px 16px;">Tx Hash</th>
+                  </tr>
+                </thead>
+                <tbody style="divide-y: 1px solid var(--border-color);">
+                  <tr class="audit-table-row" style="border-bottom: 1px solid var(--border-color); background: rgba(16, 185, 129, 0.03);">
+                    <td style="padding: 12px 16px; font-weight: 600;" class="font-mono">PROOF-REC-994821</td>
+                    <td style="padding: 12px 16px; color: var(--text-primary);">Sarah Jenkins</td>
+                    <td style="padding: 12px 16px;" class="font-mono">SFO ➔ LHR</td>
+                    <td style="padding: 12px 16px; color: #F59E0B;">DL-1402 Flight Delay (+150m)</td>
+                    <td style="padding: 12px 16px; color: #10B981;">Amtrak Acela Express Switch</td>
+                    <td style="padding: 12px 16px;" class="font-mono">392ms</td>
+                    <td style="padding: 12px 16px;"><span class="badge status-tag-green">SELF_HEALED</span></td>
+                    <td style="padding: 12px 16px;" class="font-mono" style="color:var(--accent);">0x8f4b2c1e</td>
+                  </tr>
+                  <tr class="audit-table-row" style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px 16px; font-weight: 600;" class="font-mono">PROOF-REC-883102</td>
+                    <td style="padding: 12px 16px; color: var(--text-primary);">Marcus Vance</td>
+                    <td style="padding: 12px 16px;" class="font-mono">JFK ➔ CDG</td>
+                    <td style="padding: 12px 16px; color: var(--text-muted);">None (On Schedule)</td>
+                    <td style="padding: 12px 16px; color: var(--text-muted);">Buffer Optimization</td>
+                    <td style="padding: 12px 16px;" class="font-mono">180ms</td>
+                    <td style="padding: 12px 16px;"><span class="badge status-tag-blue">SCHEDULED</span></td>
+                    <td style="padding: 12px 16px;" class="font-mono" style="color:var(--accent);">0x4a91c0df</td>
+                  </tr>
+                  <tr class="audit-table-row" style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px 16px; font-weight: 600;" class="font-mono">PROOF-REC-771904</td>
+                    <td style="padding: 12px 16px; color: var(--text-primary);">Elena Rostova</td>
+                    <td style="padding: 12px 16px;" class="font-mono">ORD ➔ HND</td>
+                    <td style="padding: 12px 16px; color: #F59E0B;">Shinkansen Gate Adjustment</td>
+                    <td style="padding: 12px 16px; color: #10B981;">Seat Reservation Auto-Sync</td>
+                    <td style="padding: 12px 16px;" class="font-mono">415ms</td>
+                    <td style="padding: 12px 16px;"><span class="badge status-tag-purple">IN_TRANSIT</span></td>
+                    <td style="padding: 12px 16px;" class="font-mono" style="color:var(--accent);">0x9c3f1e82</td>
+                  </tr>
+                  <tr class="audit-table-row">
+                    <td style="padding: 12px 16px; font-weight: 600;" class="font-mono">PROOF-REC-660233</td>
+                    <td style="padding: 12px 16px; color: var(--text-primary);">David Chen</td>
+                    <td style="padding: 12px 16px;" class="font-mono">MIA ➔ LHR</td>
+                    <td style="padding: 12px 16px; color: #F59E0B;">Connecting Flight Re-Route</td>
+                    <td style="padding: 12px 16px; color: #10B981;">Hotel Check-In Extended</td>
+                    <td style="padding: 12px 16px;" class="font-mono">310ms</td>
+                    <td style="padding: 12px 16px;"><span class="badge status-tag-green">SELF_HEALED</span></td>
+                    <td style="padding: 12px 16px;" class="font-mono" style="color:var(--accent);">0x3b8a1c90</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

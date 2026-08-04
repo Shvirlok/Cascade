@@ -347,11 +347,58 @@ header.app-header {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  padding: 16px 20px 60px 20px !important;
-  gap: 16px;
+  padding: 20px 24px 80px 24px !important;
+  gap: 18px;
   min-height: auto !important;
   height: auto !important;
   box-sizing: border-box !important;
+}
+
+.audit-kpi-banner {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 1200px) {
+  .audit-kpi-banner {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .audit-kpi-banner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.audit-kpi-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.audit-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+}
+
+.audit-table-row {
+  transition: background-color 0.15s ease;
+}
+
+.audit-table-row:hover {
+  background-color: rgba(99, 102, 241, 0.06) !important;
 }
 
 @media (max-width: 1100px) {
