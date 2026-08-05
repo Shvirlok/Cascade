@@ -9,6 +9,7 @@ import { simulateFlightDisruption } from '../services/disruption_emulator.js';
 import { CDCListenerService, cdcEventEmitter } from '../services/cdc_listener.js';
 import { CascadeAgentEngine } from '../services/agent_engine.js';
 import { generateAuditReport, exportAuditReportMarkdown } from '../services/audit_report_generator.js';
+import { generateAuditPdf } from '../services/pdf_report_generator.js';
 import { sendTelegramAlert } from '../services/telegram_service.js';
 
 dotenv.config();
@@ -948,6 +949,49 @@ app.get('/api/audit-report/:incidentId/markdown', async (req: Request, res: Resp
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="${incidentId}_audit_report.md"`);
   res.send(markdown);
+});
+
+/**
+ * Feature 3: Post-Incident Executive Audit Report PDF Export
+ */
+app.get('/api/audit-report/:incidentId/pdf', async (req: Request, res: Response) => {
+  const incidentId = req.params.incidentId || 'PROOF-REC-994821';
+  const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || 'itin-101';
+  const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
+
+  const report = generateAuditReport({
+    incidentId,
+    travelerProfile: {
+      name: profile.name,
+      email: profile.email,
+      preferredCabin: profile.preferredCabin || 'Business Class',
+      seatPreference: 'Aisle (Quiet Car / Front Row)',
+      hnswVectorScore: 0.984,
+      vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
+    },
+    originalItinerary: {
+      tripTitle: `${profile.name} — ${profile.route}`,
+      origin: profile.originCode,
+      destination: profile.destinationCode,
+      segments: (profile.legs || []).map((leg: any, i: number) => ({
+        type: leg.type,
+        provider: leg.provider,
+        referenceCode: leg.referenceCode || `SEG-0${i + 1}`,
+        route: leg.route,
+        status: leg.status,
+      })),
+    },
+  });
+
+  try {
+    const pdfBuffer = await generateAuditPdf(report);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${incidentId}_audit_report.pdf"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('PDF generation failed', error);
+    res.status(500).json({ error: 'Unable to generate PDF report' });
+  }
 });
 
 /**

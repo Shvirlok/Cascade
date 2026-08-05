@@ -12,7 +12,8 @@
     "cdc:listener": "tsx src/services/cdc_listener.ts",
     "emulator": "tsx src/services/disruption_emulator.ts",
     "seed": "tsx src/db/seed_runner.ts",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "generate-pdf": "tsx src/tools/generate-pdf.ts -- --output out/beautiful-report.pdf"
   },
   "keywords": [
     "cockroachdb",
@@ -27,12 +28,12 @@
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.500.0",
-    "@cockroachlabs/crdb-pg": "^1.0.0",
     "@modelcontextprotocol/sdk": "^1.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "pg": "^8.11.5",
+    "pdfkit": "^0.19.1",
+    "pg": "^8.22.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -40,6 +41,7 @@
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",
+    "@types/pdfkit": "^0.12.12",
     "@types/pg": "^8.11.5",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.2",

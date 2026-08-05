@@ -2838,13 +2838,36 @@
 
     async function downloadAuditPdf() {
       const incidentId = latestAuditData?.incidentId || 'PROOF-REC-994821';
+      const travelerId = typeof currentActiveTravelerId !== 'undefined' ? currentActiveTravelerId : 'itin-101';
       showToast('Generating Executive Audit PDF Report...', 'info', 2500);
 
-      const travelerName = latestAuditData?.travelerProfile?.name || document.getElementById('itin-subtitle')?.textContent?.split('—')[0]?.trim() || 'Sarah Jenkins';
+      try {
+        const response = await fetch(`/api/audit-report/${incidentId}/pdf?travelerId=${travelerId}`);
+        if (!response.ok) throw new Error(`Server returned ${response.status}`);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `audit-report-${incidentId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Executive PDF Audit downloaded successfully!', 'success', 3000);
+      } catch (err) {
+        console.error('PDF download failed:', err);
+        showToast('Failed to generate PDF audit report.', 'error');
+      }
+    }
+
+    // ── legacy html2pdf stub (kept for reference, not used) ──
+    async function _legacyDownloadAuditPdf_unused() {
+      const incidentId = latestAuditData?.incidentId || 'PROOF-REC-994821';
+      const travelerName = latestAuditData?.travelerProfile?.name || 'Sarah Jenkins';
       const travelerEmail = latestAuditData?.travelerProfile?.email || 'sarah.jenkins@acme.com';
       const origin = latestAuditData?.originalItinerary?.origin || 'SFO';
       const destination = latestAuditData?.originalItinerary?.destination || 'LHR';
-      const txHash = latestAuditData?.cockroachDbTelemetry?.txHash || '0x8f4b2c1e9a' + Math.random().toString(16).substring(2, 8);
+      const txHash = latestAuditData?.cockroachDbTelemetry?.txHash || '0x8f4b2c1e9a';
       const timestamp = latestAuditData?.timestamp ? new Date(latestAuditData.timestamp).toUTCString() : new Date().toUTCString();
       const preferredCabin = latestAuditData?.travelerProfile?.preferredCabin || 'Business Class Quiet Car';
       const vectorScore = latestAuditData?.travelerProfile?.hnswVectorScore || 0.984;
