@@ -135,7 +135,7 @@ let inMemoryGraphCache: any = {
 app.get('/api/dashboard', async (_req: Request, res: Response) => {
   res.json({
     metrics: {
-      active_itineraries: activeFleetData.length + 1416,
+      active_itineraries: activeFleetData.length,
       self_healed_rate: '99.4%',
       crdb_p99_latency: '18ms',
       bedrock_uptime: '100%',

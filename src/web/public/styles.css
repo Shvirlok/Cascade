@@ -1412,36 +1412,20 @@ footer.app-footer {
 }
 
 .modal-dialog {
-  max-width: 600px !important;
-  width: 90% !important;
+  max-width: 640px !important;
+  width: 92% !important;
   margin: auto !important;
-  border-radius: 12px !important;
-  background: #161924 !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  padding: 24px !important;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
-  max-height: 90vh !important;
-  overflow-y: auto !important;
+  border-radius: 16px !important;
+  background: #141724 !important;
+  border: 1px solid rgba(99, 102, 241, 0.35) !important;
+  padding: 0 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85) !important;
+  max-height: 88vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
   position: relative !important;
   z-index: 1000000 !important;
-}
-
-.modal-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-dialog {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  max-width: 620px;
-  width: 90%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
   transform: scale(0.95);
   transition: transform 0.2s ease, background-color 200ms ease;
 }
