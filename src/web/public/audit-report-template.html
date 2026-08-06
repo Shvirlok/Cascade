@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CASCADE — Executive Audit Report · PROOF-REC-994821</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset ─────────────────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ─── Print Canvas ───────────────────────────────────────────────── */
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    /* ─── Body ───────────────────────────────────────────────────────── */
+    body {
+      background: #0B0F17;
+      color: #F8FAFC;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      line-height: 1.5;
+      padding: 14mm 15mm 14mm 15mm;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ─── Mono Font ──────────────────────────────────────────────────── */
+    .mono {
+      font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+    }
+
+    /* ─── Card Base ──────────────────────────────────────────────────── */
+    .card {
+      background: #151C2C;
+      border: 1px solid #1E293B;
+      border-radius: 10px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 1 — HEADER
+    ══════════════════════════════════════════════════════════════════ */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: linear-gradient(135deg, rgba(99,102,241,0.14) 0%, rgba(16,185,129,0.07) 100%);
+      border: 1px solid rgba(99,102,241,0.30);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 5px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.05em;
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: #F8FAFC;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-size: 7.5px;
+      font-weight: 700;
+      color: #818CF8;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .header-tagline {
+      font-size: 10.5px;
+      color: #64748B;
+      padding-left: 49px;
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+    }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #10B981;
+      border: 1px solid rgba(16, 185, 129, 0.40);
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 8.5px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .verified-badge::before {
+      content: '\2713';
+      font-size: 9px;
+      font-weight: 900;
+    }
+
+    .header-incident-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+
+    .header-timestamp {
+      font-size: 9px;
+      color: #475569;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-report-label {
+      font-size: 8.5px;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 2 — METRICS ROW
+    ══════════════════════════════════════════════════════════════════ */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric-card {
+      padding: 13px 14px;
+      border-radius: 10px;
+      text-align: center;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .metric-card--sla    { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.28); }
+    .metric-card--time   { background: rgba(6,182,212,0.07);  border: 1px solid rgba(6,182,212,0.28);  }
+    .metric-card--cost   { background: rgba(34,197,94,0.07);  border: 1px solid rgba(34,197,94,0.28);  }
+    .metric-card--vector { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.28); }
+
+    .metric-label {
+      font-size: 7.5px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .metric-card--sla    .metric-label { color: #10B981; }
+    .metric-card--time   .metric-label { color: #06B6D4; }
+    .metric-card--cost   .metric-label { color: #22C55E; }
+    .metric-card--vector .metric-label { color: #818CF8; }
+
+    .metric-value {
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 3px;
+      letter-spacing: -0.03em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-card--sla    .metric-value { color: #10B981; }
+    .metric-card--time   .metric-value { color: #06B6D4; }
+    .metric-card--cost   .metric-value { color: #22C55E; }
+    .metric-card--vector .metric-value { color: #818CF8; }
+
+    .metric-sub {
+      font-size: 8px;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 3 — TWO-COLUMN GRID
+    ══════════════════════════════════════════════════════════════════ */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+      margin-bottom: 14px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-bottom: 1px solid #1E293B;
+    }
+
+    .card-header-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .card-header-dot--indigo  { background: #6366F1; box-shadow: 0 0 6px rgba(99,102,241,0.7); }
+    .card-header-dot--emerald { background: #10B981; box-shadow: 0 0 6px rgba(16,185,129,0.7); }
+    .card-header-dot--cyan    { background: #06B6D4; box-shadow: 0 0 6px rgba(6,182,212,0.7);  }
+
+    .card-title {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94A3B8;
+    }
+
+    .card-body {
+      padding: 13px 14px;
+    }
+
+    /* ─── Key-Value List ─────────────────────────────────────────────── */
+    .kv-list { display: flex; flex-direction: column; gap: 0; }
+
+    .kv-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6.5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      gap: 10px;
+    }
+
+    .kv-row:last-child  { border-bottom: none; padding-bottom: 0; }
+    .kv-row:first-child { padding-top: 0; }
+
+    .kv-key { font-size: 9.5px; color: #64748B; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+    .kv-val { font-size: 9.5px; font-weight: 700; color: #E2E8F0; text-align: right; }
+
+    /* ─── Pipeline Stepper ───────────────────────────────────────────── */
+    .pipeline { display: flex; flex-direction: column; gap: 0; }
+
+    .pipeline-step {
+      display: flex;
+      gap: 11px;
+      padding: 8px 0;
+      position: relative;
+    }
+
+    .pipeline-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: 29px;
+      bottom: -3px;
+      width: 1px;
+      background: rgba(99,102,241,0.22);
+    }
+
+    .step-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(99,102,241,0.14);
+      border: 1.5px solid rgba(99,102,241,0.50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 7.5px;
+      font-weight: 800;
+      color: #818CF8;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-dot--last {
+      background: rgba(16,185,129,0.14);
+      border-color: rgba(16,185,129,0.50);
+      color: #10B981;
+    }
+
+    .step-body { flex: 1; padding-top: 1px; }
+
+    .step-header {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      margin-bottom: 2px;
+    }
+
+    .step-stage {
+      font-size: 7.5px;
+      font-weight: 800;
+      color: #6366F1;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .step-stage--last { color: #10B981; }
+
+    .step-timing {
+      font-size: 7.5px;
+      color: #475569;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .step-name { font-size: 10px; font-weight: 700; color: #F8FAFC; margin-bottom: 2px; }
+    .step-name--last { color: #10B981; }
+    .step-desc { font-size: 8.5px; color: #64748B; line-height: 1.45; }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 4 — ITINERARY SEGMENTS TABLE
+    ══════════════════════════════════════════════════════════════════ */
+    .section-label {
+      font-size: 8px;
+      font-weight: 800;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+
+    .segments-section { margin-bottom: 14px; }
+
+    .segments-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .segments-table thead tr {
+      background: rgba(99,102,241,0.10);
+      border-bottom: 1px solid rgba(99,102,241,0.28);
+    }
+
+    .segments-table th {
+      padding: 7px 10px;
+      text-align: left;
+      font-size: 7.5px;
+      font-weight: 800;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .segments-table th:last-child { text-align: right; }
+
+    .segments-table tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .segments-table tbody tr:last-child { border-bottom: none; }
+
+    .segments-table tbody tr:nth-child(odd) {
+      background: rgba(255,255,255,0.015);
+    }
+
+    .segments-table td {
+      padding: 7px 10px;
+      vertical-align: middle;
+    }
+
+    .segments-table td:last-child { text-align: right; }
+
+    .seg-type-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 7.5px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    .seg-type-badge--flight { background: rgba(56,189,248,0.12); color: #38BDF8; }
+    .seg-type-badge--rail   { background: rgba(16,185,129,0.12); color: #10B981; }
+    .seg-type-badge--hotel  { background: rgba(245,158,11,0.12); color: #F59E0B; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 7.5px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .status-badge--delayed   { background: rgba(245,158,11,0.15); color: #F59E0B; }
+    .status-badge--rebooked  { background: rgba(16,185,129,0.15); color: #10B981; }
+    .status-badge--confirmed { background: rgba(99,102,241,0.15); color: #818CF8; }
+    .status-badge--schedule  { background: rgba(34,197,94,0.12);  color: #22C55E; }
+
+    .seg-provider { color: #E2E8F0; font-weight: 600; }
+    .seg-ref      { font-family: 'JetBrains Mono', monospace; color: #64748B; font-size: 8.5px; }
+    .seg-route    { font-family: 'JetBrains Mono', monospace; color: #94A3B8; font-size: 8.5px; }
+    .seg-action            { font-size: 8.5px; color: #94A3B8; }
+    .seg-action--healed    { color: #10B981; font-weight: 700; }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 5 — COCKROACHDB TELEMETRY STRIP
+    ══════════════════════════════════════════════════════════════════ */
+    .crdb-strip {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      background: rgba(16,185,129,0.04);
+      border: 1px solid rgba(16,185,129,0.18);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      text-align: center;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .crdb-item-label {
+      font-size: 7px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+
+    .crdb-item-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      color: #34D399;
+    }
+
+    .crdb-item-val--sm { font-size: 8.5px; }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 6 — COMPLIANCE TWIN CARDS
+    ══════════════════════════════════════════════════════════════════ */
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+      margin-bottom: 14px;
+    }
+
+    .compliance-kv {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 9.5px;
+    }
+
+    .compliance-kv:last-child { border-bottom: none; }
+    .compliance-kv:first-child { padding-top: 0; }
+
+    .compliance-key { color: #64748B; font-weight: 500; }
+    .compliance-val { font-weight: 700; }
+
+    .compliance-val--green { color: #10B981; }
+    .compliance-val--blue  { color: #38BDF8; }
+    .compliance-val--amber { color: #F59E0B; }
+    .compliance-val--total {
+      color: #22C55E;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 900;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 7 — CRYPTOGRAPHIC PROOF CARD
+    ══════════════════════════════════════════════════════════════════ */
+    .proof-card {
+      background: #090D16;
+      border: 1px solid rgba(99,102,241,0.30);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .proof-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(99,102,241,0.15);
+    }
+
+    .proof-card-title {
+      font-size: 8px;
+      font-weight: 800;
+      color: #6366F1;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+    }
+
+    .proof-card-subtitle {
+      font-size: 7.5px;
+      color: #475569;
+      margin-left: auto;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .proof-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+
+    .proof-line {
+      display: flex;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      line-height: 1.5;
+    }
+
+    .proof-line-key {
+      color: #475569;
+      white-space: nowrap;
+      min-width: 110px;
+      font-weight: 500;
+    }
+
+    .proof-line-val--hash  { color: #818CF8; font-weight: 700; }
+    .proof-line-val--sha   { color: #A78BFA; font-weight: 600; }
+    .proof-line-val--iso   { color: #34D399; font-weight: 600; }
+    .proof-line-val--agent { color: #38BDF8; font-weight: 600; }
+    .proof-line-val--cdc   { color: #64748B; font-weight: 500; }
+    .proof-line-val--reg   { color: #34D399; font-weight: 600; }
+
+    .proof-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .proof-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 7.5px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .proof-badge::before { content: '\2713'; font-size: 8px; }
+
+    .proof-badge--soc2   { background: rgba(16,185,129,0.12); color: #10B981; border: 1px solid rgba(16,185,129,0.35); }
+    .proof-badge--aws    { background: rgba(56,189,248,0.10); color: #38BDF8; border: 1px solid rgba(56,189,248,0.30); }
+    .proof-badge--serial { background: rgba(99,102,241,0.12); color: #818CF8; border: 1px solid rgba(99,102,241,0.35); }
+    .proof-badge--gdpr   { background: rgba(245,158,11,0.10); color: #F59E0B; border: 1px solid rgba(245,158,11,0.30); }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SECTION 8 — DOCUMENT FOOTER
+    ══════════════════════════════════════════════════════════════════ */
+    .doc-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #1E293B;
+      padding-top: 10px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .doc-footer-brand {
+      font-size: 10px;
+      font-weight: 800;
+      color: #6366F1;
+      letter-spacing: 0.02em;
+      margin-bottom: 2px;
+    }
+
+    .doc-footer-stack {
+      font-size: 8px;
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .doc-footer-right { text-align: right; }
+
+    .doc-footer-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: #334155;
+      margin-bottom: 2px;
+    }
+
+    .doc-footer-page {
+      font-size: 8px;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ 1. HEADER ══════════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div>
+      <div class="header-brand">
+        <div class="brand-mark">C</div>
+        <div>
+          <div class="brand-title">CASCADE</div>
+          <div class="brand-sub">Autonomous Executive Travel Recovery Engine</div>
+        </div>
+      </div>
+      <div class="header-tagline">Post-Incident B2B Audit Report &mdash; Enterprise Compliance Export</div>
+    </div>
+    <div class="header-right">
+      <div class="verified-badge">Verified Audit Proof</div>
+      <div class="header-incident-id">PROOF-REC-994821</div>
+      <div class="header-timestamp">Tue, 04 Aug 2026 18:41:32 GMT</div>
+      <div class="header-report-label">Post-Mortem Compliance Document</div>
+    </div>
+  </div>
+
+  <!-- ══ 2. METRICS ROW ════════════════════════════════════════════════ -->
+  <div class="metrics-row">
+    <div class="metric-card metric-card--sla">
+      <div class="metric-label">Resolution SLA</div>
+      <div class="metric-value">392ms</div>
+      <div class="metric-sub">Sub-500ms target</div>
+    </div>
+    <div class="metric-card metric-card--time">
+      <div class="metric-label">Time Restored</div>
+      <div class="metric-value">4.5h</div>
+      <div class="metric-sub">Productivity saved</div>
+    </div>
+    <div class="metric-card metric-card--cost">
+      <div class="metric-label">Cost Delta</div>
+      <div class="metric-value">$0.00</div>
+      <div class="metric-sub">Zero liability</div>
+    </div>
+    <div class="metric-card metric-card--vector">
+      <div class="metric-label">Vector Match</div>
+      <div class="metric-value">98.4%</div>
+      <div class="metric-sub">HNSW cosine sim.</div>
+    </div>
+  </div>
+
+  <!-- ══ 3. TWO-COLUMN GRID ════════════════════════════════════════════ -->
+  <div class="main-grid">
+
+    <!-- LEFT: Executive Traveler Profile -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-dot card-header-dot--indigo"></div>
+        <div class="card-title">Executive Traveler Profile &amp; Preferences</div>
+      </div>
+      <div class="card-body">
+        <div class="kv-list">
+          <div class="kv-row">
+            <span class="kv-key">Passenger</span>
+            <span class="kv-val">Sarah Jenkins</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Email</span>
+            <span class="kv-val mono" style="color:#38BDF8;font-size:8.5px;">sarah.jenkins@acme.com</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Active Route</span>
+            <span class="kv-val mono" style="color:#06B6D4;font-size:10px;">SFO &rarr; LHR</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Policy Tier</span>
+            <span class="kv-val" style="color:#818CF8;">Executive Tier ($300 Limit)</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Preferred Cabin</span>
+            <span class="kv-val">Business Class Quiet Car</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Seat Preference</span>
+            <span class="kv-val">Aisle &mdash; Front Row</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Auto-Rebook Threshold</span>
+            <span class="kv-val mono">30 min delay</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Hotel Min Stars</span>
+            <span class="kv-val">4-star minimum</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Vector Index</span>
+            <span class="kv-val mono" style="color:#38BDF8;font-size:8.5px;">idx_users_preference_embedding</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Embedding Dimension</span>
+            <span class="kv-val mono" style="color:#818CF8;">1536-dim (HNSW)</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Top Match Candidate</span>
+            <span class="kv-val" style="color:#10B981;">Amtrak Acela Express</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Cosine Similarity</span>
+            <span class="kv-val mono" style="color:#10B981;">0.984</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-key">Match Classification</span>
+            <span class="kv-val" style="color:#10B981;font-size:8.5px;">EXACT_PREFERENCE_MATCH</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Bedrock Chain-of-Thought Pipeline -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-dot card-header-dot--emerald"></div>
+        <div class="card-title">AWS Bedrock Claude 3.5 &mdash; Chain-of-Thought Pipeline</div>
+      </div>
+      <div class="card-body">
+        <div class="pipeline">
+
+          <div class="pipeline-step">
+            <div class="step-dot">01</div>
+            <div class="step-body">
+              <div class="step-header">
+                <span class="step-stage">Signal Ingestion</span>
+                <span class="step-timing">12ms</span>
+              </div>
+              <div class="step-name">CDC Listener &mdash; Disruption Captured</div>
+              <div class="step-desc">CockroachDB Changefeed detected DL-1402 transition
+                <span class="mono" style="color:#38BDF8;">SCHEDULED &rarr; DELAYED (+150min)</span>.
+                Event forwarded to orchestration layer.
+              </div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-dot">02</div>
+            <div class="step-body">
+              <div class="step-header">
+                <span class="step-stage">Policy Evaluation</span>
+                <span class="step-timing">18ms</span>
+              </div>
+              <div class="step-name">Guardrail Check &mdash; Auto-Approved</div>
+              <div class="step-desc">Cost delta validated as
+                <span class="mono" style="color:#10B981;">$0.00</span>
+                against Executive Tier limit
+                <span class="mono" style="color:#818CF8;">$300.00</span>.
+                Fully compliant &mdash; no Human-in-the-Loop required.
+              </div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-dot">03</div>
+            <div class="step-body">
+              <div class="step-header">
+                <span class="step-stage">Vector Search</span>
+                <span class="step-timing">45ms</span>
+              </div>
+              <div class="step-name">HNSW Retrieval &mdash; Preference Matched</div>
+              <div class="step-desc">1536-dim cosine similarity ranked Amtrak Acela Express #1 at
+                <span class="mono" style="color:#10B981;">0.984</span>
+                &mdash; EXACT_PREFERENCE_MATCH for aisle + quiet car preference vector.
+              </div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-dot step-dot--last">04</div>
+            <div class="step-body">
+              <div class="step-header">
+                <span class="step-stage step-stage--last">State Settlement</span>
+                <span class="step-timing">32ms</span>
+              </div>
+              <div class="step-name step-name--last">CockroachDB SERIALIZABLE Commit</div>
+              <div class="step-desc">Distributed transaction committed across
+                <span class="mono" style="color:#34D399;">us-east-1 / eu-west-1 / ap-northeast-1</span>.
+                Saga status: <span class="mono" style="color:#10B981;font-weight:700;">COMPLETED</span>.
+                Push alert dispatched to traveler.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 4. ITINERARY SEGMENTS TABLE ════════════════════════════════════ -->
+  <div class="segments-section">
+    <div class="section-label">Full Itinerary Segment Recovery Timeline</div>
+    <div class="card">
+      <table class="segments-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Type</th>
+            <th>Provider / Reference</th>
+            <th>Route</th>
+            <th>Status</th>
+            <th>Agent Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono" style="color:#475569;font-weight:700;">01</td>
+            <td><span class="seg-type-badge seg-type-badge--flight">FLIGHT</span></td>
+            <td>
+              <span class="seg-provider">Delta Air Lines</span>
+              <span class="seg-ref">&nbsp; DL-1402</span>
+            </td>
+            <td><span class="seg-route">SFO &rarr; JFK</span></td>
+            <td><span class="status-badge status-badge--delayed">DELAYED +150m</span></td>
+            <td><span class="seg-action">Disruption trigger event</span></td>
+          </tr>
+          <tr>
+            <td class="mono" style="color:#475569;font-weight:700;">02</td>
+            <td><span class="seg-type-badge seg-type-badge--rail">RAIL</span></td>
+            <td>
+              <span class="seg-provider">Amtrak Acela Express</span>
+              <span class="seg-ref">&nbsp; AMT-2158</span>
+            </td>
+            <td><span class="seg-route">NY Moynihan &rarr; PHL 30th St</span></td>
+            <td><span class="status-badge status-badge--rebooked">AUTO-REBOOKED</span></td>
+            <td><span class="seg-action seg-action--healed">Healed in 392ms</span></td>
+          </tr>
+          <tr>
+            <td class="mono" style="color:#475569;font-weight:700;">03</td>
+            <td><span class="seg-type-badge seg-type-badge--hotel">HOTEL</span></td>
+            <td>
+              <span class="seg-provider">Ritz-Carlton Philadelphia</span>
+              <span class="seg-ref">&nbsp; HTL-9921</span>
+            </td>
+            <td><span class="seg-route">Philadelphia Downtown</span></td>
+            <td><span class="status-badge status-badge--confirmed">CONFIRMED</span></td>
+            <td><span class="seg-action">Late check-in guaranteed</span></td>
+          </tr>
+          <tr>
+            <td class="mono" style="color:#475569;font-weight:700;">04</td>
+            <td><span class="seg-type-badge seg-type-badge--flight">FLIGHT</span></td>
+            <td>
+              <span class="seg-provider">British Airways</span>
+              <span class="seg-ref">&nbsp; BA-178</span>
+            </td>
+            <td><span class="seg-route">PHL &rarr; LHR</span></td>
+            <td><span class="status-badge status-badge--schedule">ON SCHEDULE</span></td>
+            <td><span class="seg-action">No change required</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ 5. COCKROACHDB TELEMETRY STRIP ════════════════════════════════ -->
+  <div class="crdb-strip">
+    <div>
+      <div class="crdb-item-label">Isolation</div>
+      <div class="crdb-item-val crdb-item-val--sm">SERIAL.</div>
+    </div>
+    <div>
+      <div class="crdb-item-label">P99 Latency</div>
+      <div class="crdb-item-val">18ms</div>
+    </div>
+    <div>
+      <div class="crdb-item-label">Cache Hit</div>
+      <div class="crdb-item-val">98.6%</div>
+    </div>
+    <div>
+      <div class="crdb-item-label">TPS</div>
+      <div class="crdb-item-val">1,250</div>
+    </div>
+    <div>
+      <div class="crdb-item-label">Connections</div>
+      <div class="crdb-item-val">12/20</div>
+    </div>
+    <div>
+      <div class="crdb-item-label">Regions</div>
+      <div class="crdb-item-val crdb-item-val--sm">3 nodes</div>
+    </div>
+  </div>
+
+  <!-- ══ 6. COMPLIANCE TWIN CARDS ══════════════════════════════════════ -->
+  <div class="compliance-grid">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-dot card-header-dot--cyan"></div>
+        <div class="card-title">Financial Impact Analysis</div>
+      </div>
+      <div class="card-body">
+        <div class="compliance-kv">
+          <span class="compliance-key">Original Arrival</span>
+          <span class="compliance-val">Jul 25, 2026 &mdash; 05:00 PM</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key">Actual Arrival</span>
+          <span class="compliance-val compliance-val--green">Jul 25, 2026 &mdash; 07:30 PM</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key">Time Offset</span>
+          <span class="compliance-val compliance-val--amber">+2h 30m</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key">Rebooking Fee</span>
+          <span class="compliance-val compliance-val--green">$0.00 (Carrier Covered)</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key">Hotel Adjustment</span>
+          <span class="compliance-val compliance-val--green">$0.00 (Executive Voucher)</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key" style="color:#F8FAFC;font-weight:700;">Total Cost Delta</span>
+          <span class="compliance-val compliance-val--total">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-dot card-header-dot--emerald"></div>
+        <div class="card-title">Compliance &amp; Verification Status</div>
+      </div>
+      <div class="card-body">
+        <div class="compliance-kv">
+          <span class="compliance-key">SOC2 Type II</span>
+          <span class="compliance-val compliance-val--green">VERIFIED</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key">Policy Guardrail</span>
+          <span class="compliance-val compliance-val--green">WITHIN LIMIT</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key">GDPR / Data Privacy</span>
+          <span class="compliance-val compliance-val--green">ENFORCED</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key">Zero-Trust RBAC</span>
+          <span class="compliance-val compliance-val--blue">ACTIVE</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key">Bedrock Hallucination Filter</span>
+          <span class="compliance-val compliance-val--green">ENABLED</span>
+        </div>
+        <div class="compliance-kv">
+          <span class="compliance-key" style="color:#F8FAFC;font-weight:700;">Saga Resolution Status</span>
+          <span class="compliance-val compliance-val--green" style="font-size:11px;">COMPLETED</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ 7. CRYPTOGRAPHIC PROOF CARD ════════════════════════════════════ -->
+  <div class="proof-card">
+    <div class="proof-card-header">
+      <div class="proof-card-title">Cryptographic Immutability Proof &mdash; CockroachDB SERIALIZABLE Transaction</div>
+      <div class="proof-card-subtitle">Integrity Layer v2.4.0</div>
+    </div>
+    <div class="proof-lines">
+      <div class="proof-line">
+        <span class="proof-line-key">TX_HASH:</span>
+        <span class="proof-line-val--hash">0x8f4b2c1e9abf51c3</span>
+      </div>
+      <div class="proof-line">
+        <span class="proof-line-key">PROOF_SIG:</span>
+        <span class="proof-line-val--sha">sha256-cockroach-bedrock-0x8f4b2c1e9a3d7b4c0e</span>
+      </div>
+      <div class="proof-line">
+        <span class="proof-line-key">ISOLATION:</span>
+        <span class="proof-line-val--iso">SERIALIZABLE &nbsp;|&nbsp; CONSENSUS: AGREED</span>
+      </div>
+      <div class="proof-line">
+        <span class="proof-line-key">AGENT_SWARM:</span>
+        <span class="proof-line-val--agent">Disruption Recovery Agent + Preference Guard Agent + Policy Guardrail Agent</span>
+      </div>
+      <div class="proof-line">
+        <span class="proof-line-key">CDC_EVENT_ID:</span>
+        <span class="proof-line-val--cdc">cdc-evt-itinerary_segments-1754344892341</span>
+      </div>
+      <div class="proof-line">
+        <span class="proof-line-key">REGIONS:</span>
+        <span class="proof-line-val--reg">us-east-1 &nbsp;/&nbsp; eu-west-1 &nbsp;/&nbsp; ap-northeast-1</span>
+      </div>
+    </div>
+    <div class="proof-badges">
+      <div class="proof-badge proof-badge--soc2">SOC2 Type II Verified</div>
+      <div class="proof-badge proof-badge--aws">AWS Bedrock Privacy Enforced</div>
+      <div class="proof-badge proof-badge--serial">Serializable Isolation</div>
+      <div class="proof-badge proof-badge--gdpr">GDPR Compliant</div>
+    </div>
+  </div>
+
+  <!-- ══ 8. DOCUMENT FOOTER ══════════════════════════════════════════════ -->
+  <div class="doc-footer">
+    <div>
+      <div class="doc-footer-brand">CASCADE &mdash; Autonomous Executive Travel Recovery Engine</div>
+      <div class="doc-footer-stack">Powered by CockroachDB SERIALIZABLE &amp; AWS Bedrock Claude 3.5 Sonnet &nbsp;&middot;&nbsp; Engine v2.4.0</div>
+    </div>
+    <div class="doc-footer-right">
+      <div class="doc-footer-id">PROOF-REC-994821</div>
+      <div class="doc-footer-page">Page 1 of 1 &nbsp;&middot;&nbsp; Tue, 04 Aug 2026 18:41:32 GMT</div>
+    </div>
+  </div>
+
+</body>
+</html>
