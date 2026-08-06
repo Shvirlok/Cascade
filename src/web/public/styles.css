@@ -1829,3 +1829,473 @@ footer.app-footer {
   backdrop-filter: blur(4px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   TELEGRAM EXECUTIVE CONTROL CENTER & PHONE SIMULATOR STYLES
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tg-blue: #2AABEE;
+  --tg-cyan: #38BDF8;
+  --tg-dark-bg: #0E1621;
+  --tg-header-bg: #17212B;
+  --tg-bubble-bg: #182533;
+  --tg-bubble-accent: #2B5278;
+}
+
+#tab-pane-telegram {
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.telegram-layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 20px;
+  padding: 0;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .telegram-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Phone Mockup Wrapper */
+.telegram-phone-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.telegram-phone {
+  width: 380px;
+  height: 680px;
+  background: var(--tg-dark-bg);
+  border-radius: 40px;
+  border: 10px solid #1E2530;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(56, 189, 248, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Phone Notch */
+.telegram-phone-notch {
+  width: 140px;
+  height: 18px;
+  background: #1E2530;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  margin: 0 auto;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.telegram-phone-camera {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0B0E14;
+}
+
+.telegram-phone-speaker {
+  width: 32px;
+  height: 3px;
+  border-radius: 2px;
+  background: #0B0E14;
+}
+
+/* Phone Top App Bar */
+.telegram-phone-header {
+  background: var(--tg-header-bg);
+  padding: 24px 14px 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 10;
+}
+
+.telegram-bot-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2AABEE, #0284C7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(42, 171, 238, 0.4);
+  position: relative;
+}
+
+.telegram-bot-avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10B981;
+  border: 2px solid var(--tg-header-bg);
+}
+
+.telegram-header-info {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.telegram-header-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.telegram-verified-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  background: #2AABEE;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.telegram-header-status {
+  font-size: 10.5px;
+  color: #2AABEE;
+  font-weight: 500;
+}
+
+/* Chat Scroll View */
+.telegram-chat-body {
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--tg-dark-bg);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
+  background-size: 16px 16px;
+  scroll-behavior: smooth;
+}
+
+.telegram-date-divider {
+  align-self: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin: 4px 0;
+}
+
+/* Telegram Message Bubble */
+.telegram-bubble {
+  max-width: 90%;
+  background: var(--tg-bubble-bg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  border-top-left-radius: 3px;
+  padding: 12px 14px;
+  color: #E2E8F0;
+  font-size: 12px;
+  line-height: 1.45;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: tgSlideIn 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tgSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.telegram-bubble-header {
+  font-weight: 700;
+  color: #38BDF8;
+  font-size: 12.5px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.telegram-bubble-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.telegram-bubble-label {
+  color: #94A3B8;
+  font-size: 11px;
+}
+
+.telegram-bubble-val {
+  color: #F8FAFC;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.telegram-bubble-code {
+  background: #090D14;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #34D399;
+  word-break: break-all;
+  margin: 6px 0;
+}
+
+/* Telegram Interactive Buttons in Message */
+.telegram-bubble-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.telegram-btn-pill {
+  background: rgba(42, 171, 238, 0.15);
+  border: 1px solid rgba(42, 171, 238, 0.4);
+  color: #38BDF8;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.telegram-btn-pill:hover {
+  background: rgba(42, 171, 238, 0.3);
+  border-color: #38BDF8;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.telegram-bubble-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  color: #64748B;
+  margin-top: 4px;
+}
+
+.telegram-bubble-ticks {
+  color: #38BDF8;
+  font-weight: 700;
+}
+
+/* Telegram Input Footer Bar in Phone */
+.telegram-phone-footer {
+  background: var(--tg-header-bg);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.telegram-input-fake {
+  flex: 1;
+  background: #0E1621;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.telegram-send-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2AABEE;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.telegram-send-btn:hover {
+  background: #0284C7;
+  transform: scale(1.05);
+}
+
+.telegram-send-btn:active {
+  transform: scale(0.95);
+}
+
+/* Floating Quick Launcher Badge Button (bottom right) */
+.telegram-floating-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 850;
+  background: linear-gradient(135deg, #0284C7, #2563EB);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 24px rgba(2, 132, 199, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.telegram-floating-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(2, 132, 199, 0.65);
+}
+
+.telegram-floating-btn:active {
+  transform: scale(0.96);
+}
+
+.telegram-count-badge {
+  background: #EF4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+/* Slide-over Drawer for Telegram Live Monitor */
+.telegram-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 9, 15, 0.7);
+  backdrop-filter: blur(6px);
+  z-index: 990;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+
+.telegram-drawer-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.telegram-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 440px;
+  max-width: 95vw;
+  background: #0E1621;
+  border-left: 1px solid var(--border-color);
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.7);
+}
+
+.telegram-drawer.active {
+  transform: translateX(0);
+}
+
+.telegram-drawer-header {
+  padding: 16px 20px;
+  background: #17212B;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.telegram-drawer-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease;
+}
+
+.telegram-drawer-close:hover {
+  background: rgba(239, 68, 68, 0.4);
+}
+
+.telegram-glowing-dot {
+  background: #38BDF8;
+  box-shadow: 0 0 10px #38BDF8, 0 0 20px #38BDF8;
+  animation: tgPulse 2s infinite;
+}
+
+@keyframes tgPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.telegram-telemetry-badge {
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.telegram-telemetry-badge:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.4);
+}
