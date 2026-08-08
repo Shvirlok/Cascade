@@ -2191,13 +2191,6 @@
       const fromCity = getCityName(seg.from.code);
       const toCity = getCityName(seg.to.code);
 
-      if (!isFilterActive) {
-        const renderSegsInactive = splitArcAtAntiMeridian(arc);
-        L.polyline(renderSegsInactive, { color: segColor, weight: 1.5, opacity: 0.12, dashArray: '4, 8' }).addTo(routeLayerGroup);
-        return null;
-      }
-
-      const renderSegs = splitArcAtAntiMeridian(arc);
       let polyline;
 
       // Detect long-haul flights (>8000 km) for enhanced visual style
@@ -2206,18 +2199,18 @@
 
       if (m === 'RAIL' || m === 'TRAIN') {
         // 🚆 RAILWAY: Emerald track + white railroad-tie dashes
-        L.polyline(renderSegs, { color: '#10b981', weight: 6, opacity: 0.9, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
-        polyline = L.polyline(renderSegs, { color: '#ffffff', weight: 2.2, dashArray: '6, 10', opacity: 0.95, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
+        L.polyline(arc, { color: '#10b981', weight: 6, opacity: 0.9, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
+        polyline = L.polyline(arc, { color: '#ffffff', weight: 2.2, dashArray: '6, 10', opacity: 0.95, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
       } else if (m === 'BUS' || m === 'CAR' || m === 'SHUTTLE' || m === 'TAXI') {
         // 🚗 ROAD: Amber road line — real geometry fetched via OSRM
-        L.polyline(renderSegs, { color: '#f59e0b', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
-        polyline = L.polyline(renderSegs, { color: '#fef08a', weight: 1.8, dashArray: '5, 8', opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
+        L.polyline(arc, { color: '#f59e0b', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
+        polyline = L.polyline(arc, { color: '#fef08a', weight: 1.8, dashArray: '5, 8', opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
       } else if (isLongHaul) {
-        // ✈️ LONG-HAUL FLIGHT: Wide glow + bright core + animated dash
-        L.polyline(renderSegs, { color: segColor, weight: 18, opacity: 0.08, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
-        L.polyline(renderSegs, { color: segColor, weight: 8, opacity: 0.18, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
-        L.polyline(renderSegs, { color: segColor, weight: 3.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
-        polyline = L.polyline(renderSegs, { color: '#ffffff', weight: 1.2, dashArray: '10, 18', opacity: 0.7, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        // ✈️ LONG-HAUL FLIGHT: Wide glow + bright core + animated dash — single unbroken arc
+        L.polyline(arc, { color: segColor, weight: 18, opacity: 0.08, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        L.polyline(arc, { color: segColor, weight: 8, opacity: 0.18, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        L.polyline(arc, { color: segColor, weight: 3.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        polyline = L.polyline(arc, { color: '#ffffff', weight: 1.2, dashArray: '10, 18', opacity: 0.7, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
 
         // Midpoint altitude / distance badge for long-haul arcs
         const midIdx = Math.floor(arc.length / 2);
@@ -2249,8 +2242,8 @@
         }
       } else {
         // ✈️ SHORT/MEDIUM FLIGHT: Standard glowing arc
-        L.polyline(renderSegs, { color: segColor, weight: 8, opacity: 0.22, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
-        polyline = L.polyline(renderSegs, { color: segColor, weight: 3, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        L.polyline(arc, { color: segColor, weight: 8, opacity: 0.22, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        polyline = L.polyline(arc, { color: segColor, weight: 3, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
       }
 
       if (polyline && profile && seg) {
@@ -2325,11 +2318,19 @@
       ));
 
       // Now render all segments
+      const profileRefLngs = {};
       segTasks.forEach(({ profile, idx, seg, sIdx }, taskIdx) => {
         const m = String(seg.mode || 'FLIGHT').toUpperCase();
         const isFilterActive = isSegmentActive(seg.mode, currentModeFilter);
         const segColor = seg.color || (m === 'RAIL' ? '#10b981' : (m === 'BUS' || m === 'CAR' ? '#f59e0b' : '#6366f1'));
-        const arc = arcResults[taskIdx];
+        let arc = arcResults[taskIdx];
+
+        if (arc && arc.length > 0) {
+          if (profileRefLngs[profile.id] !== undefined) {
+            arc = alignArcLongitudes(arc, profileRefLngs[profile.id]);
+          }
+          profileRefLngs[profile.id] = arc[arc.length - 1][1];
+        }
 
         const rendered = renderSegmentArc(arc, m, segColor, profile, seg, isFilterActive);
 
@@ -2355,8 +2356,15 @@
             });
           }
 
-          // Hub Station Markers with Real City Labels
-          [seg.from, seg.to].forEach((node) => {
+          // Hub Station Markers with Real City Labels aligned to arc endpoints
+          const startPt = arc[0];
+          const endPt = arc[arc.length - 1];
+          const nodesToDraw = [
+            { code: seg.from.code, lat: startPt[0], lng: startPt[1] },
+            { code: seg.to.code, lat: endPt[0], lng: endPt[1] }
+          ];
+
+          nodesToDraw.forEach((node) => {
             const nodeCode = node.code || 'HUB';
             const fullCity = getCityName(nodeCode);
             const dotIcon = L.divIcon({
@@ -2450,11 +2458,19 @@
         waypoints.map(seg => buildRouteGeometryAsync(seg.from, seg.to, seg.mode, 80))
       );
 
+      let lastRefLng = null;
       waypoints.forEach((seg, sIdx) => {
         const m = String(seg.mode || 'FLIGHT').toUpperCase();
         const isFilterActive = isSegmentActive(seg.mode, currentModeFilter);
         const segColor = seg.color || (m === 'RAIL' ? '#10b981' : (m === 'BUS' || m === 'CAR' ? '#f59e0b' : '#6366f1'));
-        const arc = arcResults[sIdx];
+        let arc = arcResults[sIdx];
+
+        if (arc && arc.length > 0) {
+          if (lastRefLng !== null) {
+            arc = alignArcLongitudes(arc, lastRefLng);
+          }
+          lastRefLng = arc[arc.length - 1][1];
+        }
 
         const rendered = renderSegmentArc(arc, m, segColor, activeProfile, seg, isFilterActive);
 
@@ -2467,8 +2483,15 @@
         const fromCity = getCityName(seg.from.code);
         const toCity = getCityName(seg.to.code);
 
-        // Add Station / Hub Markers with Real City Badges
-        [seg.from, seg.to].forEach((node, nIdx) => {
+        // Add Station / Hub Markers at unwrapped arc endpoints
+        const startPt = arc[0];
+        const endPt = arc[arc.length - 1];
+        const nodesToDraw = [
+          { code: seg.from.code, lat: startPt[0], lng: startPt[1] },
+          { code: seg.to.code, lat: endPt[0], lng: endPt[1] }
+        ];
+
+        nodesToDraw.forEach((node, nIdx) => {
           const isFinalDest = (sIdx === waypoints.length - 1 && nIdx === 1);
           const isOrigin = (sIdx === 0 && nIdx === 0);
           const nodeCode = node.code || (isFinalDest ? (activeProfile.destCode || activeProfile.destinationCode || 'DEST') : (activeProfile.originCode || 'ORIG'));
@@ -2519,15 +2542,8 @@
 
       setElInner('map-telemetry-badge', `⚡ OSRM Road API & Geodesic Arcs | Mode: <strong>${currentModeFilter}</strong> · ${activeSegCount} Segments · ${Math.round(totalDistanceKm).toLocaleString()} km`);
 
-      if (isPacificItinerary) {
-        // Pacific itineraries: center on the Pacific ocean with world zoom
-        leafletMap.setView([40, -175], 2);
-      } else if (allCoords.length > 0) {
-        // Filter out unwrapped longitudes for bounds (keep within ±360)
-        const validCoords = allCoords.filter(c => c[1] >= -360 && c[1] <= 360);
-        if (validCoords.length > 0) {
-          leafletMap.fitBounds(L.latLngBounds(validCoords), { padding: [40, 50] });
-        }
+      if (allCoords.length > 0) {
+        leafletMap.fitBounds(L.latLngBounds(allCoords), { padding: [50, 60] });
       }
       if (fleetPlanesData.length > 0) {
         fleetAnimFrame = requestAnimationFrame(animateFleetPlanes);
@@ -3794,6 +3810,17 @@
       return result;
     }
 
+    function alignArcLongitudes(arc, refLng) {
+      if (!arc || arc.length === 0 || typeof refLng !== 'number') return arc;
+      const startLng = arc[0][1];
+      let diff = startLng - refLng;
+      let offset = 0;
+      while (diff > 180) { offset -= 360; diff -= 360; }
+      while (diff < -180) { offset += 360; diff += 360; }
+      if (offset === 0) return arc;
+      return arc.map(([lat, lng]) => [lat, lng + offset]);
+    }
+
     function extractTurfCoords(feature) {
       if (!feature || !feature.geometry) return null;
       const geom = feature.geometry;
@@ -4054,7 +4081,7 @@
           const posB = p.arc[Math.min(idx + 1, total)];
           const pos = lerpLatLng(posA, posB, frac);
           const bearing = calcBearing(posA, posB);
-          p.marker.setLatLng([pos[0], normalizeLng(pos[1])]);
+          p.marker.setLatLng([pos[0], pos[1]]);
           const icon = makeVehicleIcon(p.mode, bearing);
           if (icon) p.marker.setIcon(icon);
         });
@@ -4097,8 +4124,6 @@
             worldCopyJump: true,
             minZoom: 2,
             maxZoom: 18,
-            maxBounds: [[-85, -210], [85, 210]],
-            maxBoundsViscosity: 1.0,
           });
 
           leafletTileLayer = L.tileLayer(isDark ? TILE_DARK : TILE_LIGHT, {
