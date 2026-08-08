@@ -150,10 +150,11 @@
           <!-- Leaflet Map Container -->
           <div class="map-wrapper">
             <div class="map-header-overlay">
-              <div class="floating-glass-badge">
-                <span style="color: var(--accent); font-weight: 700;">Active Route:</span>
-                <span id="map-route-title">San Francisco (SFO) ➔ London (LHR)</span>
-                (<span id="map-route-subtitle">Sarah Jenkins</span>)
+              <div class="floating-glass-badge" style="display:inline-flex; align-items:center; gap:8px;">
+                <span style="color: var(--accent); font-weight: 700; text-transform:uppercase; font-size:10px; letter-spacing:0.05em;">Active Route:</span>
+                <span id="map-route-title" style="font-weight:700; color:#f8fafc;">San Francisco (SFO) ➔ Tokyo (HND)</span>
+                <span style="color:rgba(255,255,255,0.3);">•</span>
+                <span id="map-route-subtitle" style="color:#94a3b8; font-size:12px; font-weight:500;">Elena Rostova</span>
                 <div id="itin-subtitle" style="display:none;"></div>
               </div>
               <div class="map-mode-toggle-group">
@@ -1596,7 +1597,7 @@
         id: 'itin-103',
         name: 'Elena Rostova',
         email: 'elena.rostova@acme.com',
-        route: 'Chicago (ORD) ➔ Tokyo Haneda (HND)',
+        route: 'San Francisco (SFO) ➔ Tokyo Haneda (HND)',
         status: 'IN_TRANSIT',
         loyaltyTier: 'ANA Diamond Service · Star Alliance Gold',
         preferredCabin: 'Business Class / Shinkansen Gran Class',
@@ -1604,18 +1605,18 @@
         policyTier: 'Executive Tier ($300 Limit)',
         policyLimitUsd: 300,
         riskScore: 'Low Risk (Score: 0.15)',
-        originCode: 'ORD', originLat: 41.9742, originLng: -87.9073,
+        originCode: 'SFO', originLat: 37.6213, originLng: -122.3790,
         destCode: 'HND', destinationCode: 'HND', destLat: 35.5494, destLng: 139.7798,
-        centerLat: 45.0, centerLng: -170.0, zoom: 2,
+        centerLat: 38.0, centerLng: 170.0, zoom: 2,
         legs: [
-          { provider: 'ANA All Nippon Airways (NH-111)', route: 'Chicago (ORD) → Tokyo (HND)', status: 'IN_TRANSIT', mode: 'FLIGHT' },
-          { provider: 'Shinkansen Nozomi (NK-309)', route: 'Tokyo (TYO) → Kyoto (KYT)', status: 'SCHEDULED', mode: 'RAIL' },
-          { provider: 'Park Hyatt Tokyo', route: 'Shinjuku Tokyo', status: 'CONFIRMED', mode: 'HOTEL' }
+          { provider: 'Executive Sedan Transfer', route: 'SF Downtown (SFC) → San Francisco (SFO)', status: 'CONFIRMED', mode: 'CAR' },
+          { provider: 'ANA All Nippon Airways (NH-107)', route: 'San Francisco (SFO) → Tokyo Haneda (HND)', status: 'IN_TRANSIT', mode: 'FLIGHT' },
+          { provider: 'Executive Transfer Shuttle', route: 'Tokyo Haneda (HND) → Shinjuku Tokyo (TYO)', status: 'SCHEDULED', mode: 'CAR' }
         ],
         multiModalWaypoints: [
-          { mode: 'FLIGHT', provider: 'ANA All Nippon Airways (NH-111)', from: { code: 'ORD', label: 'Chicago O\'Hare (ORD)', lat: 41.9742, lng: -87.9073 }, to: { code: 'HND', label: 'Tokyo Haneda (HND)', lat: 35.5494, lng: 139.7798 }, color: '#6366f1' },
-          { mode: 'RAIL', provider: 'Shinkansen Bullet Train (NK-309)', from: { code: 'HND', label: 'Tokyo Station (HND)', lat: 35.5494, lng: 139.7798 }, to: { code: 'KYT', label: 'Kyoto Station (KYT)', lat: 34.9858, lng: 135.7588 }, color: '#10b981' },
-          { mode: 'BUS', provider: 'Executive Airport Bus Express', from: { code: 'KYT', label: 'Kyoto Transfer (KYT)', lat: 34.9858, lng: 135.7588 }, to: { code: 'TYO', label: 'Shinjuku Tokyo (TYO)', lat: 35.6905, lng: 139.6995 }, color: '#f59e0b' }
+          { mode: 'CAR', provider: 'Executive Transfer to SFO Airport', from: { code: 'SFC', label: 'SF Downtown (SFC)', lat: 37.7749, lng: -122.4194 }, to: { code: 'SFO', label: 'San Francisco (SFO)', lat: 37.6213, lng: -122.3790 }, color: '#f59e0b' },
+          { mode: 'FLIGHT', provider: 'ANA All Nippon Airways (NH-107)', from: { code: 'SFO', label: 'San Francisco (SFO)', lat: 37.6213, lng: -122.3790 }, to: { code: 'HND', label: 'Tokyo Haneda (HND)', lat: 35.5494, lng: 139.7798 }, color: '#6366f1' },
+          { mode: 'CAR', provider: 'Executive Transfer to Hotel / District', from: { code: 'HND', label: 'Tokyo Haneda (HND)', lat: 35.5494, lng: 139.7798 }, to: { code: 'TYO', label: 'Shinjuku Tokyo (TYO)', lat: 35.6905, lng: 139.6995 }, color: '#f59e0b' }
         ]
       },
       'itin-104': {
@@ -2185,7 +2186,97 @@
     // ── Render All Active Fleet Flights on Leaflet Map ───────────────
     let mapDisplayMode = 'route'; // 'route' or 'fleet'
 
-    function renderAllFleetRoutes() {
+    // Helper: render a single segment arc onto the map
+    function renderSegmentArc(arc, m, segColor, profile, seg, isFilterActive) {
+      const fromCity = getCityName(seg.from.code);
+      const toCity = getCityName(seg.to.code);
+
+      if (!isFilterActive) {
+        const renderSegsInactive = splitArcAtAntiMeridian(arc);
+        L.polyline(renderSegsInactive, { color: segColor, weight: 1.5, opacity: 0.12, dashArray: '4, 8' }).addTo(routeLayerGroup);
+        return null;
+      }
+
+      const renderSegs = splitArcAtAntiMeridian(arc);
+      let polyline;
+
+      // Detect long-haul flights (>8000 km) for enhanced visual style
+      const distKm = calcTotalPathDistanceKm(arc);
+      const isLongHaul = (m === 'FLIGHT' && distKm > 8000);
+
+      if (m === 'RAIL' || m === 'TRAIN') {
+        // 🚆 RAILWAY: Emerald track + white railroad-tie dashes
+        L.polyline(renderSegs, { color: '#10b981', weight: 6, opacity: 0.9, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
+        polyline = L.polyline(renderSegs, { color: '#ffffff', weight: 2.2, dashArray: '6, 10', opacity: 0.95, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
+      } else if (m === 'BUS' || m === 'CAR' || m === 'SHUTTLE' || m === 'TAXI') {
+        // 🚗 ROAD: Amber road line — real geometry fetched via OSRM
+        L.polyline(renderSegs, { color: '#f59e0b', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
+        polyline = L.polyline(renderSegs, { color: '#fef08a', weight: 1.8, dashArray: '5, 8', opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
+      } else if (isLongHaul) {
+        // ✈️ LONG-HAUL FLIGHT: Wide glow + bright core + animated dash
+        L.polyline(renderSegs, { color: segColor, weight: 18, opacity: 0.08, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        L.polyline(renderSegs, { color: segColor, weight: 8, opacity: 0.18, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        L.polyline(renderSegs, { color: segColor, weight: 3.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        polyline = L.polyline(renderSegs, { color: '#ffffff', weight: 1.2, dashArray: '10, 18', opacity: 0.7, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+
+        // Midpoint altitude / distance badge for long-haul arcs
+        const midIdx = Math.floor(arc.length / 2);
+        const midPt = arc[midIdx];
+        if (midPt) {
+          const distLabel = Math.round(distKm).toLocaleString();
+          L.marker([midPt[0], midPt[1]], {
+            icon: L.divIcon({
+              className: '',
+              html: `<div style="
+                background:rgba(15,15,30,0.82);
+                border:1.5px solid ${segColor};
+                border-radius:6px;
+                padding:3px 8px;
+                font-family:Inter,sans-serif;
+                font-size:10px;
+                font-weight:700;
+                color:${segColor};
+                white-space:nowrap;
+                box-shadow:0 2px 12px rgba(0,0,0,0.5);
+                letter-spacing:0.04em;
+              ">✈ ${fromCity.split(' ')[0]} → ${toCity.split(' ')[0]} · ${distLabel} km</div>`,
+              iconSize: [180, 22],
+              iconAnchor: [90, 11],
+            }),
+            interactive: false,
+            zIndexOffset: 200,
+          }).addTo(routeLayerGroup);
+        }
+      } else {
+        // ✈️ SHORT/MEDIUM FLIGHT: Standard glowing arc
+        L.polyline(renderSegs, { color: segColor, weight: 8, opacity: 0.22, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+        polyline = L.polyline(renderSegs, { color: segColor, weight: 3, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
+      }
+
+      if (polyline && profile && seg) {
+        const popupHtml = `
+          <div style="font-family:Inter,sans-serif; padding:4px; min-width:210px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; margin-bottom:6px;">
+              <strong style="font-size:13px; color:#f8fafc;">${profile.name}</strong>
+              <span style="font-size:10px; background:rgba(99,102,241,0.2); color:${segColor}; padding:2px 6px; border-radius:4px; font-weight:700;">[${seg.mode}]</span>
+            </div>
+            <div style="font-size:11px; color:#94a3b8; line-height:1.6;">
+              <div><strong>Provider:</strong> <span style="color:#f8fafc; font-weight:600;">${seg.provider}</span></div>
+              <div><strong>Route:</strong> <span style="color:#38bdf8; font-weight:700;">${fromCity} ➔ ${toCity}</span></div>
+              <div><strong>Full Itinerary:</strong> ${profile.route}</div>
+            </div>
+            <button onclick="selectTraveler('${profile.id}'); openPassengerDetailsModal('${profile.id}');" style="margin-top:8px; width:100%; padding:6px; background:${segColor}; color:#fff; border:none; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer;">
+              Inspect Passenger Profile
+            </button>
+          </div>
+        `;
+        polyline.bindPopup(popupHtml, { maxWidth: 260 });
+      }
+
+      return arc;
+    }
+
+    async function renderAllFleetRoutes() {
       if (!leafletMap) return;
       mapDisplayMode = 'fleet';
 
@@ -2210,9 +2301,10 @@
       let totalDistanceKm = 0;
       const profiles = Object.values(TRAVELER_PROFILES);
 
+      // Build all segment promises in parallel
+      const segTasks = [];
       profiles.forEach((profile, idx) => {
         if (!profile.originLat || !profile.destLat) return;
-
         const waypoints = profile.multiModalWaypoints || [
           {
             mode: 'FLIGHT',
@@ -2222,67 +2314,31 @@
             color: colors[idx % colors.length]
           }
         ];
-
         waypoints.forEach((seg, sIdx) => {
-          const m = String(seg.mode || 'FLIGHT').toUpperCase();
-          const isFilterActive = isSegmentActive(seg.mode, currentModeFilter);
-          const segColor = seg.color || (m === 'RAIL' ? '#10b981' : (m === 'BUS' || m === 'CAR' ? '#f59e0b' : '#6366f1'));
-          const arc = buildRouteGeometry(seg.from, seg.to, seg.mode, 60);
+          segTasks.push({ profile, idx, seg, sIdx });
+        });
+      });
 
-          if (!isFilterActive) {
-            // Render subtle background guide polyline for filtered-out segments
-            L.polyline(arc, { color: segColor, weight: 1.5, opacity: 0.12, dashArray: '4, 8' }).addTo(routeLayerGroup);
-            return;
-          }
+      // Fetch all road geometries in parallel
+      const arcResults = await Promise.all(segTasks.map(({ seg }) =>
+        buildRouteGeometryAsync(seg.from, seg.to, seg.mode, 60)
+      ));
 
+      // Now render all segments
+      segTasks.forEach(({ profile, idx, seg, sIdx }, taskIdx) => {
+        const m = String(seg.mode || 'FLIGHT').toUpperCase();
+        const isFilterActive = isSegmentActive(seg.mode, currentModeFilter);
+        const segColor = seg.color || (m === 'RAIL' ? '#10b981' : (m === 'BUS' || m === 'CAR' ? '#f59e0b' : '#6366f1'));
+        const arc = arcResults[taskIdx];
+
+        const rendered = renderSegmentArc(arc, m, segColor, profile, seg, isFilterActive);
+
+        if (isFilterActive && arc) {
           activeSegCount++;
           allCoords.push(...arc);
           totalDistanceKm += calcTotalPathDistanceKm(arc);
 
-          let polyline;
-          if (m === 'RAIL' || m === 'TRAIN') {
-            // 🚆 RAILWAY TRACK RENDERING: Emerald track base + White railroad tie dashes
-            L.polyline(arc, { color: '#10b981', weight: 6, opacity: 0.9, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
-            polyline = L.polyline(arc, { color: '#ffffff', weight: 2.2, dashArray: '6, 10', opacity: 0.95, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
-          } else if (m === 'BUS' || m === 'CAR' || m === 'SHUTTLE' || m === 'TAXI') {
-            // 🚗 REAL ROAD & HIGHWAY RENDERING (OSRM GeoJSON Route API)
-            const roadBase = L.polyline(arc, { color: '#f59e0b', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
-            polyline = L.polyline(arc, { color: '#fef08a', weight: 1.8, dashArray: '5, 8', opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
-
-            fetchRealOSRMRoute(seg.from, seg.to).then(realCoords => {
-              if (realCoords && realCoords.length > 2) {
-                roadBase.setLatLngs(realCoords);
-                polyline.setLatLngs(realCoords);
-              }
-            });
-          } else {
-            // ✈️ FLIGHT RENDERING: Bowed high-altitude arc with glowing indigo style
-            L.polyline(arc, { color: segColor, weight: 8, opacity: 0.22, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
-            polyline = L.polyline(arc, { color: segColor, weight: 3, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
-          }
-
-          const fromCity = getCityName(seg.from.code);
-          const toCity = getCityName(seg.to.code);
-
-          const popupHtml = `
-            <div style="font-family:Inter,sans-serif; padding:4px; min-width:210px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; margin-bottom:6px;">
-                <strong style="font-size:13px; color:#f8fafc;">${profile.name}</strong>
-                <span style="font-size:10px; background:rgba(99,102,241,0.2); color:${segColor}; padding:2px 6px; border-radius:4px; font-weight:700;">[${seg.mode}]</span>
-              </div>
-              <div style="font-size:11px; color:#94a3b8; line-height:1.6;">
-                <div><strong>Provider:</strong> <span style="color:#f8fafc; font-weight:600;">${seg.provider}</span></div>
-                <div><strong>Route:</strong> <span style="color:#38bdf8; font-weight:700;">${fromCity} ➔ ${toCity}</span></div>
-                <div><strong>Full Itinerary:</strong> ${profile.route}</div>
-              </div>
-              <button onclick="selectTraveler('${profile.id}'); openPassengerDetailsModal('${profile.id}');" style="margin-top:8px; width:100%; padding:6px; background:${segColor}; color:#fff; border:none; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer;">
-                Inspect Passenger Profile
-              </button>
-            </div>
-          `;
-          polyline.bindPopup(popupHtml, { maxWidth: 260 });
-
-          // Vehicle animation
+          // Vehicle marker animation
           if (arc.length > 5) {
             const startProgress = (sIdx * 0.3 + idx * 0.2) % 1;
             const posA = arc[0];
@@ -2290,7 +2346,6 @@
             const bearing = calcBearing(posA, posB);
             const vIcon = makeVehicleIcon(seg.mode, bearing);
             const vMkr = L.marker(posA, { icon: vIcon, zIndexOffset: 1000, interactive: false }).addTo(routeLayerGroup);
-
             fleetPlanesData.push({
               marker: vMkr,
               arc: arc,
@@ -2301,27 +2356,18 @@
           }
 
           // Hub Station Markers with Real City Labels
-          [seg.from, seg.to].forEach((node, nIdx) => {
+          [seg.from, seg.to].forEach((node) => {
             const nodeCode = node.code || 'HUB';
             const fullCity = getCityName(nodeCode);
             const dotIcon = L.divIcon({
               className: '',
-              html: `<div style="
-                width:12px;height:12px;
-                border-radius:50%;
-                background:${segColor};
-                border:2.5px solid #ffffff;
-                box-shadow:0 0 10px ${segColor};
-              "></div>`,
+              html: `<div style="width:12px;height:12px;border-radius:50%;background:${segColor};border:2.5px solid #ffffff;box-shadow:0 0 10px ${segColor};"></div>`,
               iconSize: [12, 12],
               iconAnchor: [6, 6],
             });
-
             L.marker([node.lat, node.lng], { icon: dotIcon })
               .addTo(routeLayerGroup)
               .bindPopup(`<strong>${fullCity}</strong><br/>Passenger: ${profile.name}<br/>Itinerary: ${profile.route}`);
-
-            // Real City Pin Label Badge
             L.marker([node.lat, node.lng], {
               icon: L.divIcon({
                 className: '',
@@ -2333,13 +2379,19 @@
               zIndexOffset: 50,
             }).addTo(routeLayerGroup);
           });
-        });
+        }
       });
 
       setElInner('map-telemetry-badge', `⚡ OSRM Road API & Geodesic Arcs | Mode: <strong>${currentModeFilter}</strong> · ${activeSegCount} Segments · ${Math.round(totalDistanceKm).toLocaleString()} km`);
 
       if (allCoords.length > 0) {
-        leafletMap.fitBounds(L.latLngBounds(allCoords), { padding: [40, 40] });
+        // For mixed transpacific fleets, zoom to world view
+        const hasPacific = allCoords.some(c => c[1] > 100 || c[1] < -200);
+        if (hasPacific) {
+          leafletMap.setView([30, 10], 2);
+        } else {
+          leafletMap.fitBounds(L.latLngBounds(allCoords), { padding: [40, 40] });
+        }
       }
       if (fleetPlanesData.length > 0) {
         fleetAnimFrame = requestAnimationFrame(animateFleetPlanes);
@@ -2349,7 +2401,7 @@
     // ── Render a specific traveler's route on the Leaflet map ─────────
     let routeLayerGroup;   // declared here; initialised in initLeafletMap
 
-    function renderTravelerRoute(route) {
+    async function renderTravelerRoute(route) {
       if (!leafletMap) return;
       mapDisplayMode = 'route';
 
@@ -2361,10 +2413,10 @@
       const activeProfile = TRAVELER_PROFILES[currentActiveTravelerId || 'itin-101'] || TRAVELER_PROFILES['itin-101'];
 
       // Update map title elements
-      const nameStr = activeProfile.name || (route.label && route.label.includes('—') ? route.label.split('—')[0].trim() : route.label);
+      const nameStr = activeProfile.name || 'Executive Traveler';
       const routeStr = activeProfile.route || (route.label && route.label.includes('—') ? route.label.split('—')[1].trim() : route.label);
       setElText('map-route-title', routeStr);
-      setElText('map-route-subtitle', `${nameStr} (Multi-Modal Itinerary)`);
+      setElText('map-route-subtitle', nameStr);
 
       // Clear all existing route layers
       if (routeLayerGroup) routeLayerGroup.clearLayers();
@@ -2384,57 +2436,36 @@
         }
       ];
 
+      // Detect if itinerary crosses the Pacific (Americas ↔ Asia)
+      const hasAmericas = waypoints.some(w => (w.from && w.from.lng < -40) || (w.to && w.to.lng < -40));
+      const hasAsia = waypoints.some(w => (w.from && w.from.lng > 100) || (w.to && w.to.lng > 100));
+      const isPacificItinerary = hasAmericas && hasAsia;
+
       const allCoords = [];
       let activeSegCount = 0;
       let totalDistanceKm = 0;
+
+      // Fetch all geometries in parallel (road segments get real OSRM routes)
+      const arcResults = await Promise.all(
+        waypoints.map(seg => buildRouteGeometryAsync(seg.from, seg.to, seg.mode, 80))
+      );
 
       waypoints.forEach((seg, sIdx) => {
         const m = String(seg.mode || 'FLIGHT').toUpperCase();
         const isFilterActive = isSegmentActive(seg.mode, currentModeFilter);
         const segColor = seg.color || (m === 'RAIL' ? '#10b981' : (m === 'BUS' || m === 'CAR' ? '#f59e0b' : '#6366f1'));
-        const arc = buildRouteGeometry(seg.from, seg.to, seg.mode, 60);
+        const arc = arcResults[sIdx];
 
-        if (!isFilterActive) {
-          L.polyline(arc, { color: segColor, weight: 1.5, opacity: 0.12, dashArray: '4, 8' }).addTo(routeLayerGroup);
-          return;
-        }
+        const rendered = renderSegmentArc(arc, m, segColor, activeProfile, seg, isFilterActive);
+
+        if (!isFilterActive) return;
 
         activeSegCount++;
         allCoords.push(...arc);
         totalDistanceKm += calcTotalPathDistanceKm(arc);
 
-        let polyline;
-        if (m === 'RAIL' || m === 'TRAIN') {
-          // 🚆 RAILWAY TRACK RENDERING
-          L.polyline(arc, { color: '#10b981', weight: 7, opacity: 0.9, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
-          polyline = L.polyline(arc, { color: '#ffffff', weight: 2.5, dashArray: '6, 10', opacity: 0.95, lineCap: 'square', lineJoin: 'round' }).addTo(routeLayerGroup);
-        } else if (m === 'BUS' || m === 'CAR' || m === 'SHUTTLE' || m === 'TAXI') {
-          // 🚗 REAL ROAD & HIGHWAY RENDERING (OSRM GeoJSON Route API)
-          const roadBase = L.polyline(arc, { color: '#f59e0b', weight: 7, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
-          polyline = L.polyline(arc, { color: '#fef08a', weight: 2, dashArray: '5, 8', opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(routeLayerGroup);
-
-          fetchRealOSRMRoute(seg.from, seg.to).then(realCoords => {
-            if (realCoords && realCoords.length > 2) {
-              roadBase.setLatLngs(realCoords);
-              polyline.setLatLngs(realCoords);
-            }
-          });
-        } else {
-          // ✈️ FLIGHT RENDERING
-          L.polyline(arc, { color: segColor, weight: 8, opacity: 0.22, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
-          polyline = L.polyline(arc, { color: segColor, weight: 3, opacity: 0.95, lineCap: 'round', lineJoin: 'round', smoothFactor: 1 }).addTo(routeLayerGroup);
-        }
-
         const fromCity = getCityName(seg.from.code);
         const toCity = getCityName(seg.to.code);
-
-        polyline.bindPopup(`
-          <div style="padding:4px; font-family:Inter,sans-serif;">
-            <div style="font-size:10px; font-weight:700; color:${segColor}; text-transform:uppercase;">[${seg.mode}] Segment</div>
-            <div style="font-size:13px; font-weight:700; color:#f8fafc; margin-top:2px;">${seg.provider}</div>
-            <div style="font-size:11px; color:#94a3b8; margin-top:3px;">Route: <span style="color:#38bdf8; font-weight:700;">${fromCity} ➔ ${toCity}</span></div>
-          </div>
-        `, { maxWidth: 240 });
 
         // Add Station / Hub Markers with Real City Badges
         [seg.from, seg.to].forEach((node, nIdx) => {
@@ -2446,13 +2477,7 @@
 
           const dotIcon = L.divIcon({
             className: '',
-            html: `<div style="
-              width:13px;height:13px;
-              border-radius:50%;
-              background:${dotColor};
-              border:2.5px solid #ffffff;
-              box-shadow: 0 0 10px ${dotColor};
-            "></div>`,
+            html: `<div style="width:13px;height:13px;border-radius:50%;background:${dotColor};border:2.5px solid #ffffff;box-shadow:0 0 10px ${dotColor};"></div>`,
             iconSize: [13, 13],
             iconAnchor: [6.5, 6.5],
           });
@@ -2461,7 +2486,6 @@
             .addTo(routeLayerGroup)
             .bindPopup(`<strong>${fullCity}</strong><br/>Location Code: <span style="font-family:monospace; color:#38bdf8;">${nodeCode}</span>`);
 
-          // City Pin Label Badge
           L.marker([node.lat, node.lng], {
             icon: L.divIcon({
               className: '',
@@ -2495,8 +2519,15 @@
 
       setElInner('map-telemetry-badge', `⚡ OSRM Road API & Geodesic Arcs | Mode: <strong>${currentModeFilter}</strong> · ${activeSegCount} Segments · ${Math.round(totalDistanceKm).toLocaleString()} km`);
 
-      if (allCoords.length > 0) {
-        leafletMap.fitBounds(L.latLngBounds(allCoords), { padding: [36, 48] });
+      if (isPacificItinerary) {
+        // Pacific itineraries: center on the Pacific ocean with world zoom
+        leafletMap.setView([40, -175], 2);
+      } else if (allCoords.length > 0) {
+        // Filter out unwrapped longitudes for bounds (keep within ±360)
+        const validCoords = allCoords.filter(c => c[1] >= -360 && c[1] <= 360);
+        if (validCoords.length > 0) {
+          leafletMap.fitBounds(L.latLngBounds(validCoords), { padding: [40, 50] });
+        }
       }
       if (fleetPlanesData.length > 0) {
         fleetAnimFrame = requestAnimationFrame(animateFleetPlanes);
@@ -3699,29 +3730,153 @@
       return total;
     }
 
+    function normalizeLng(lng) {
+      let l = Number(lng);
+      while (l > 180) l -= 360;
+      while (l < -180) l += 360;
+      return l;
+    }
+
+    function splitArcAtAntiMeridian(coords) {
+      if (!coords || coords.length === 0) return [];
+      const segments = [];
+      let currentSeg = [];
+
+      for (let i = 0; i < coords.length; i++) {
+        const point = coords[i];
+        const lat = point[0];
+        const normLng = normalizeLng(point[1]);
+
+        if (currentSeg.length > 0) {
+          const prevNormLng = currentSeg[currentSeg.length - 1][1];
+          const diff = normLng - prevNormLng;
+
+          if (Math.abs(diff) > 180) {
+            const boundaryPrev = diff > 0 ? -180 : 180;
+            const boundaryNext = diff > 0 ? 180 : -180;
+            const midLat = (currentSeg[currentSeg.length - 1][0] + lat) / 2;
+
+            currentSeg.push([midLat, boundaryPrev]);
+            segments.push(currentSeg);
+
+            currentSeg = [[midLat, boundaryNext], [lat, normLng]];
+            continue;
+          }
+        }
+        currentSeg.push([lat, normLng]);
+      }
+
+      if (currentSeg.length > 0) {
+        segments.push(currentSeg);
+      }
+
+      return segments;
+    }
+
+    function unwrapLongitudes(coords) {
+      if (!coords || coords.length === 0) return coords;
+      const result = [[coords[0][0], coords[0][1]]];
+      let offset = 0;
+      for (let i = 1; i < coords.length; i++) {
+        const lat = coords[i][0];
+        let lng = coords[i][1] + offset;
+        const prevLng = result[i - 1][1];
+        const diff = lng - prevLng;
+        if (diff > 180) {
+          offset -= 360;
+          lng -= 360;
+        } else if (diff < -180) {
+          offset += 360;
+          lng += 360;
+        }
+        result.push([lat, lng]);
+      }
+      return result;
+    }
+
+    function extractTurfCoords(feature) {
+      if (!feature || !feature.geometry) return null;
+      const geom = feature.geometry;
+      let raw = [];
+      if (geom.type === 'LineString') {
+        raw = geom.coordinates.map(([lng, lat]) => [lat, lng]);
+      } else if (geom.type === 'MultiLineString') {
+        geom.coordinates.forEach(part => {
+          part.forEach(([lng, lat]) => {
+            raw.push([lat, lng]);
+          });
+        });
+      }
+      if (raw.length > 0) {
+        return unwrapLongitudes(raw);
+      }
+      return null;
+    }
+
+    function interpolateGreatCircle(from, to, steps = 80) {
+      const toRad = d => d * Math.PI / 180;
+      const toDeg = r => r * 180 / Math.PI;
+
+      const lat1 = toRad(from.lat);
+      let lon1 = toRad(from.lng);
+      const lat2 = toRad(to.lat);
+      let lon2 = toRad(to.lng);
+
+      let dLon = lon2 - lon1;
+      if (dLon > Math.PI) lon2 -= 2 * Math.PI;
+      if (dLon < -Math.PI) lon2 += 2 * Math.PI;
+      dLon = lon2 - lon1;
+
+      const d = Math.acos(
+        Math.max(-1, Math.min(1,
+          Math.sin(lat1) * Math.sin(lat2) +
+          Math.cos(lat1) * Math.cos(lat2) * Math.cos(dLon)
+        ))
+      );
+
+      if (isNaN(d) || d < 1e-6) {
+        return unwrapLongitudes([[from.lat, from.lng], [to.lat, to.lng]]);
+      }
+
+      const raw = [];
+      const numSteps = steps || 80;
+
+      for (let i = 0; i <= numSteps; i++) {
+        const f = i / numSteps;
+        const A = Math.sin((1 - f) * d) / Math.sin(d);
+        const B = Math.sin(f * d) / Math.sin(d);
+
+        const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
+        const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
+        const z = A * Math.sin(lat1) + B * Math.sin(lat2);
+
+        const lat = Math.atan2(z, Math.sqrt(x * x + y * y));
+        const lon = Math.atan2(y, x);
+
+        raw.push([toDeg(lat), toDeg(lon)]);
+      }
+
+      return unwrapLongitudes(raw);
+    }
+
     function buildGreatCircleArc(from, to, steps = 80) {
-      if (typeof turf !== 'undefined' && turf.greatCircle && turf.point) {
+      // Detect transpacific: one point in Americas (lng < -40), other in Asia/Pacific (lng > 100)
+      const isTranspacific = (from.lng < -40 && to.lng > 100) || (from.lng > 100 && to.lng < -40);
+      if (!isTranspacific && typeof turf !== 'undefined' && turf.greatCircle && turf.point) {
         try {
           const line = turf.greatCircle(
             turf.point([from.lng, from.lat]),
             turf.point([to.lng, to.lat]),
             { npoints: steps }
           );
-          return line.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+          const coords = extractTurfCoords(line);
+          if (coords && coords.length > 1) return coords;
         } catch (_err) {
           // fallback
         }
       }
-      const coords = [];
-      const numSteps = steps || 50;
-      for (let i = 0; i <= numSteps; i++) {
-        const t = i / numSteps;
-        coords.push([
-          from.lat + (to.lat - from.lat) * t,
-          from.lng + (to.lng - from.lng) * t
-        ]);
-      }
-      return coords;
+      // For transpacific routes use interpolateGreatCircle which handles unwrapping correctly
+      return interpolateGreatCircle(from, to, steps);
     }
 
     const ROAD_GEOMETRY_CACHE = {};
@@ -3757,20 +3912,13 @@
       return fallback;
     }
 
-    function buildRoadPath(from, to, steps = 60) {
+    function buildRoadPath(from, to, steps = 15) {
       const coords = [];
-      const numSteps = steps || 60;
-      const midLat = (from.lat + to.lat) / 2;
-      const midLng = (from.lng + to.lng) / 2;
-      const dx = (to.lng - from.lng);
-      const dy = (to.lat - from.lat);
-      const perpLat = midLat + (dx * 0.09);
-      const perpLng = midLng - (dy * 0.09);
-
+      const numSteps = Math.max(steps || 15, 2);
       for (let i = 0; i <= numSteps; i++) {
         const t = i / numSteps;
-        const lat = (1 - t) * (1 - t) * from.lat + 2 * (1 - t) * t * perpLat + t * t * to.lat;
-        const lng = (1 - t) * (1 - t) * from.lng + 2 * (1 - t) * t * perpLng + t * t * to.lng;
+        const lat = from.lat + t * (to.lat - from.lat);
+        const lng = from.lng + t * (to.lng - from.lng);
         coords.push([lat, lng]);
       }
       return coords;
@@ -3801,7 +3949,21 @@
         return buildRailPath(from, to, steps);
       }
       if (m === 'BUS' || m === 'CAR' || m === 'SHUTTLE' || m === 'TAXI') {
+        // Sync fallback — async callers use buildRouteGeometryAsync instead
         return buildRoadPath(from, to, steps);
+      }
+      return buildGreatCircleArc(from, to, steps);
+    }
+
+    // Async version: resolves actual OSRM road geometry for ground modes
+    async function buildRouteGeometryAsync(from, to, mode, steps = 60) {
+      const m = String(mode || 'FLIGHT').toUpperCase();
+      if (m === 'RAIL' || m === 'TRAIN') {
+        return buildRailPath(from, to, steps);
+      }
+      if (m === 'BUS' || m === 'CAR' || m === 'SHUTTLE' || m === 'TAXI') {
+        // Fetch real road geometry from OSRM
+        return await fetchRealOSRMRoute(from, to);
       }
       return buildGreatCircleArc(from, to, steps);
     }
@@ -3892,7 +4054,7 @@
           const posB = p.arc[Math.min(idx + 1, total)];
           const pos = lerpLatLng(posA, posB, frac);
           const bearing = calcBearing(posA, posB);
-          p.marker.setLatLng(pos);
+          p.marker.setLatLng([pos[0], normalizeLng(pos[1])]);
           const icon = makeVehicleIcon(p.mode, bearing);
           if (icon) p.marker.setIcon(icon);
         });
@@ -4302,7 +4464,7 @@
       const defaultFleetData = [
         { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'SFO ➔ LHR', status: 'SELF_HEALED', legs: 'Flight · Train · Hotel · Flight', last_event: 'Flight delayed +150m — automatically rebooked to Amtrak Acela Express' },
         { id: 'itin-102', traveler: 'Marcus Vance', route: 'JFK ➔ CDG', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer' },
-        { id: 'itin-103', traveler: 'Elena Rostova', route: 'ORD ➔ HND', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time' },
+        { id: 'itin-103', traveler: 'Elena Rostova', route: 'SFO ➔ HND', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time' },
         { id: 'itin-104', traveler: 'David Chen', route: 'MIA ➔ LHR', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival' },
       ];
 
