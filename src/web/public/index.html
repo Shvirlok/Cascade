@@ -188,40 +188,8 @@
               </div>
             </div>
 
-            <!-- Multi-Modal Sequence Builder & Transport Mode Bar -->
-            <div class="map-filter-subbar" style="flex-direction: column; align-items: stretch; padding: 10px 14px; gap: 8px;">
-              <!-- Row 1: Journey Sequence -->
-              <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 5px; margin-right: 4px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 12l4-4m-4 4 4 4"/></svg>
-                  <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;">Journey Sequence</span>
-                </div>
-                <button id="seq-btn-car-plane" class="mode-filter-btn active" onclick="applyJourneySequence('CAR_PLANE')">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="13" width="22" height="8" rx="2"/><path d="m9 13-4-8h12l2 8"/><circle cx="7" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>
-                  Car &rarr; Flight
-                </button>
-                <button id="seq-btn-car-plane-car" class="mode-filter-btn" onclick="applyJourneySequence('CAR_PLANE_CAR')">
-                  Car &rarr; Flight &rarr; Car
-                </button>
-                <button id="seq-btn-car-plane-rail" class="mode-filter-btn" onclick="applyJourneySequence('CAR_PLANE_RAIL')">
-                  Car &rarr; Flight &rarr; Rail
-                </button>
-                <button id="seq-btn-rail-plane-car" class="mode-filter-btn" onclick="applyJourneySequence('RAIL_PLANE_CAR')">
-                  Rail &rarr; Flight &rarr; Car
-                </button>
-                <button id="seq-btn-plane-rail" class="mode-filter-btn" onclick="applyJourneySequence('PLANE_RAIL')">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z"/></svg>
-                  Flight &rarr; Rail
-                </button>
-                <button id="seq-btn-plane-only" class="mode-filter-btn" onclick="applyJourneySequence('PLANE_ONLY')">
-                  Direct Flight
-                </button>
-              </div>
-
-              <!-- Divider -->
-              <div style="height: 1px; background: rgba(255,255,255,0.07); margin: 0 -2px;"></div>
-
-              <!-- Row 2: Mode Filter -->
+            <!-- Transport Mode Filter Bar -->
+            <div class="map-filter-subbar" style="padding: 8px 14px;">
               <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 5px; margin-right: 4px;">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
@@ -916,275 +884,230 @@
   <!-- Create Itinerary Modal -->
   <div id="createItineraryModal" class="modal-backdrop">
     <div class="modal-dialog"
-      style="max-width: 640px; padding: 0; overflow: hidden; border-radius: 16px; background: #141724; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);">
+      style="max-width: 660px; padding: 0; overflow: hidden; border-radius: 16px; background: #141724; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);">
+      
+      <!-- Header with Dynamic Route Breadcrumb Preview -->
       <div class="modal-header"
-        style="background: linear-gradient(180deg, #1B1F32 0%, #141724 100%); padding: 20px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div
-            style="width: 38px; height: 38px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35); display: flex; align-items: center; justify-content: center; color: #818CF8;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="modal-title"
-              style="font-size: 16.5px; font-weight: 700; color: #F8FAFC; margin: 0; letter-spacing: -0.01em;">Create
-              Multi-Modal Executive Trip</h3>
-            <div style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Configure passenger, mode (Flight, Rail, Car,
-              Bus), schedule & ground transfers</div>
-          </div>
+        style="background: linear-gradient(180deg, #1B1F32 0%, #141724 100%); padding: 18px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h3 class="modal-title"
+            style="font-size: 16px; font-weight: 700; color: #F8FAFC; margin: 0; letter-spacing: -0.01em;">Create Multi-Modal Executive Trip</h3>
+          <button id="btn-close-modal" class="modal-close"
+            style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #E2E8F0; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 6px; cursor: pointer;">Close</button>
         </div>
-        <button id="btn-close-modal" class="modal-close"
-          style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #E2E8F0; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;">✕
-          Close</button>
+        <!-- Real-Time Dynamic Route Breadcrumb Preview Bar -->
+        <div style="margin-top: 10px; padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 10px; font-weight: 800; color: #818CF8; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;">Route Pipeline:</span>
+          <div id="modal-route-preview-bar" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"></div>
+        </div>
       </div>
 
-      <form id="form-create-itinerary" style="padding: 24px; max-height: 82vh; overflow-y: auto;">
-        <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px; padding: 0;">
+      <form id="form-create-itinerary" style="padding: 20px 24px; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px; padding: 0;">
 
-          <!-- Preset Combination Buttons -->
-          <div>
-            <label
-              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
-              Select Travel Mode Combination Preset
-            </label>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
-              <button type="button" class="preset-btn active" data-preset="FLIGHT_ONLY"
-                style="padding: 10px 8px; background: rgba(99,102,241,0.25); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                Flight Only
-              </button>
-              <button type="button" class="preset-btn" data-preset="TRAIN_ONLY"
-                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                Train Only
-              </button>
-              <button type="button" class="preset-btn" data-preset="CAR_ONLY"
-                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                Car / Drive Only
-              </button>
-              <button type="button" class="preset-btn" data-preset="CAR_FLIGHT"
-                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                Car &rarr; Flight
-              </button>
-              <button type="button" class="preset-btn" data-preset="FLIGHT_CAR"
-                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                Flight &rarr; Car
-              </button>
-              <button type="button" class="preset-btn" data-preset="TRAIN_FLIGHT"
-                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                Rail &rarr; Flight
-              </button>
-              <button type="button" class="preset-btn" data-preset="FULL_MULTIMODAL"
-                style="padding: 10px 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                Car &rarr; Flight &rarr; Car
-              </button>
-            </div>
-          </div>
-
-          <!-- Mode Selector Buttons -->
-          <div>
-            <label
-              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 8px; display: block;">
-              Main Travel Mode (Hub ➔ Hub)
-            </label>
-            <input type="hidden" id="modal-travel-mode" value="FLIGHT">
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
-              <button type="button" class="mode-select-btn active" data-mode="FLIGHT"
-                style="padding: 10px; background: rgba(99,102,241,0.2); border: 1px solid #6366f1; border-radius: 8px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z"/></svg>
-                Flight
-              </button>
-              <button type="button" class="mode-select-btn" data-mode="RAIL"
-                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h0"/><path d="M16 15h0"/></svg>
-                Train / Rail
-              </button>
-              <button type="button" class="mode-select-btn" data-mode="CAR"
-                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="13" width="22" height="8" rx="2"/><path d="m9 13-4-8h12l2 8"/><circle cx="7" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>
-                Car / Drive
-              </button>
-              <button type="button" class="mode-select-btn" data-mode="BUS"
-                style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
-                Bus Express
-              </button>
-            </div>
-          </div>
-
-          <!-- Traveler Details -->
+          <!-- Executive Traveler Information (2-Column Row) -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="form-group" style="margin: 0;">
               <label for="modal-traveler-name"
-                style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
+                style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 4px; display: block;">
                 Executive Traveler Name
               </label>
               <input id="modal-traveler-name" class="form-control" placeholder="e.g. Sarah Jenkins" required
-                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
+                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px 11px; color: #F8FAFC; font-size: 12px;">
             </div>
 
             <div class="form-group" style="margin: 0;">
               <label for="modal-traveler-email"
-                style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
+                style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 4px; display: block;">
                 Corporate Email Address
               </label>
               <input id="modal-traveler-email" class="form-control" type="email"
                 placeholder="e.g. sarah.jenkins@acme.com" required
-                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
+                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px 11px; color: #F8FAFC; font-size: 12px;">
             </div>
           </div>
 
-          <!-- First-Mile Connection Section (Small Town / Home Station -> Main Hub) -->
+          <!-- Step 1: First Mile (Ground Transfer) -->
           <div
             style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 12px;">
             <div
-              style="font-size: 11px; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
-              Step 1: First Mile (Small Town / Local Station ➔ Main Hub)
+              style="font-size: 10.5px; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+              Step 1: First Mile (Ground Transfer)
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
                 <label
-                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">First-Mile
-                  Transport</label>
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Transport Type</label>
                 <select id="modal-first-mile-mode"
-                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
-                  <option value="RAIL">Regional Train (Small Town to Hub)</option>
-                  <option value="CAR">Driving / Private Car Transfer</option>
-                  <option value="BUS">Airport Shuttle / Express Bus</option>
-                  <option value="NONE">Direct (Start at Main Hub)</option>
+                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 7px; padding: 7px 9px; color: #F8FAFC; font-size: 11.5px;">
+                  <option value="CAR" selected>Car / Taxi</option>
+                  <option value="BUS">Bus Express</option>
+                  <option value="RAIL">Regional Rail</option>
+                  <option value="NONE">None</option>
                 </select>
               </div>
               <div>
                 <label
-                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Local
-                  Small Town / Origin Station</label>
-                <input id="modal-first-mile-origin" placeholder="e.g. San Jose Station / Reading / Versailles"
-                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Origin Station / Address</label>
+                <input id="modal-first-mile-origin" placeholder="e.g. San Jose Station / 100 Embarcadero"
+                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 7px; padding: 7px 9px; color: #F8FAFC; font-size: 11.5px;">
               </div>
             </div>
           </div>
 
-          <!-- Where: Main Origin & Destination Hubs -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group" style="position: relative; margin: 0;">
-              <label for="modal-origin-input"
-                style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-                Step 2: Main Origin Hub
-              </label>
-              <input id="modal-origin-input" class="form-control" placeholder="e.g. SFO (San Francisco)"
-                autocomplete="off" required
-                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
-              <div id="modal-origin-suggestions" class="autocomplete-dropdown"></div>
-            </div>
-
-            <div class="form-group" style="position: relative; margin: 0;">
-              <label for="modal-dest-input"
-                style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-                Step 2: Main Destination Hub
-              </label>
-              <input id="modal-dest-input" class="form-control" placeholder="e.g. LHR (London Heathrow)"
-                autocomplete="off" required
-                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px;">
-              <div id="modal-dest-suggestions" class="autocomplete-dropdown"></div>
-            </div>
-          </div>
-
-          <!-- When: Schedule Departure & Arrival -->
+          <!-- Step 2: Main Hub-to-Hub Transport (Main Leg) -->
           <div
-            style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-            <div>
-              <label
-                style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38BDF8; margin-bottom: 4px; display: block;">
-                 Departure Schedule
-              </label>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                <input id="modal-dep-date" type="date" value="2026-08-10"
-                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
-                <input id="modal-dep-time" type="time" value="09:00"
-                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
+            style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 10px; padding: 12px;">
+            <div
+              style="font-size: 10.5px; font-weight: 800; color: #818CF8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+              Step 2: Main Hub-to-Hub Transport (Main Leg)
+            </div>
+            
+            <!-- Mode Selector Buttons -->
+            <input type="hidden" id="modal-travel-mode" value="FLIGHT">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
+              <button type="button" class="mode-select-btn active" data-mode="FLIGHT"
+                style="padding: 7px 4px; background: rgba(99,102,241,0.25); border: 1px solid #6366f1; border-radius: 6px; color: #fff; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.5-.1-1 .1-1.3.5l-.5.7c-.3.4-.2 1 .2 1.3l5.5 4.3-3.2 3.2-2.3-.6c-.4-.1-.8 0-1.1.3l-.3.3c-.3.3-.3.8 0 1.1l2.5 2.5c.3.3.8.3 1.1 0l.3-.3c.3-.3.4-.7.3-1.1l-.6-2.3 3.2-3.2 4.3 5.5c.3.4.9.5 1.3.2l.7-.5c.4-.3.6-.8.5-1.3z"/></svg>
+                Flight
+              </button>
+              <button type="button" class="mode-select-btn" data-mode="RAIL"
+                style="padding: 7px 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #94a3b8; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h0"/><path d="M16 15h0"/></svg>
+                Train / Rail
+              </button>
+              <button type="button" class="mode-select-btn" data-mode="CAR"
+                style="padding: 7px 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #94a3b8; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="13" width="22" height="8" rx="2"/><path d="m9 13-4-8h12l2 8"/><circle cx="7" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>
+                Car / Drive
+              </button>
+              <button type="button" class="mode-select-btn" data-mode="BUS"
+                style="padding: 7px 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #94a3b8; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>
+                Bus Express
+              </button>
+            </div>
+
+            <!-- Origin & Destination Hub Inputs -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <div class="form-group" style="position: relative; margin: 0;">
+                <label for="modal-origin-input"
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; margin-bottom: 4px; display: block;">
+                  Main Origin Hub
+                </label>
+                <input id="modal-origin-input" class="form-control" placeholder="e.g. SFO (San Francisco)"
+                  autocomplete="off" required value="SFO — San Francisco"
+                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 7px; padding: 7px 9px; color: #F8FAFC; font-size: 11.5px;">
+                <div id="modal-origin-suggestions" class="autocomplete-dropdown"></div>
+              </div>
+
+              <div class="form-group" style="position: relative; margin: 0;">
+                <label for="modal-dest-input"
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; margin-bottom: 4px; display: block;">
+                  Main Destination Hub
+                </label>
+                <input id="modal-dest-input" class="form-control" placeholder="e.g. LHR (London Heathrow)"
+                  autocomplete="off" required value="LHR — London Heathrow"
+                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 7px; padding: 7px 9px; color: #F8FAFC; font-size: 11.5px;">
+                <div id="modal-dest-suggestions" class="autocomplete-dropdown"></div>
               </div>
             </div>
 
-            <div>
-              <label
-                style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #10B981; margin-bottom: 4px; display: block;">
-                 Arrival Schedule
-              </label>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                <input id="modal-arr-date" type="date" value="2026-08-10"
-                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
-                <input id="modal-arr-time" type="time" value="17:30"
-                  style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 7px; color: #F8FAFC; font-size: 11.5px;">
+            <!-- Schedule Departure & Arrival -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label
+                  style="font-size: 10px; font-weight: 700; color: #38BDF8; margin-bottom: 4px; display: block;">
+                  Departure Schedule
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                  <input id="modal-dep-date" type="date" value="2026-08-10"
+                    style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 6px 7px; color: #F8FAFC; font-size: 11px;">
+                  <input id="modal-dep-time" type="time" value="09:00"
+                    style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 6px 7px; color: #F8FAFC; font-size: 11px;">
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style="font-size: 10px; font-weight: 700; color: #10B981; margin-bottom: 4px; display: block;">
+                  Arrival Schedule
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                  <input id="modal-arr-date" type="date" value="2026-08-10"
+                    style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 6px 7px; color: #F8FAFC; font-size: 11px;">
+                  <input id="modal-arr-time" type="time" value="17:30"
+                    style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 6px; padding: 6px 7px; color: #F8FAFC; font-size: 11px;">
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Last-Mile Connection Section (Destination Hub -> Hotel/Office) -->
+          <!-- Step 3: Last Mile (Destination Ground Transfer) -->
           <div
             style="background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 10px; padding: 12px;">
             <div
-              style="font-size: 11px; font-weight: 700; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
-              Step 3: Last Mile (Destination Hub ➔ Final Hotel / Office)
+              style="font-size: 10.5px; font-weight: 800; color: #F59E0B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+              Step 3: Last Mile (Destination Ground Transfer)
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
                 <label
-                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Last-Mile
-                  Transport</label>
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Transport Type</label>
                 <select id="modal-transfer-mode"
-                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
-                  <option value="CAR_TRANSFER">Private Executive Sedan / Chauffeur</option>
-                  <option value="BUS_TRANSFER">Airport Express Shuttle</option>
-                  <option value="RAIL_TRANSFER">City Metro / High-Speed Rail Transfer</option>
-                  <option value="DIRECT">Direct Hotel Check-In</option>
+                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 7px; padding: 7px 9px; color: #F8FAFC; font-size: 11.5px;">
+                  <option value="CAR_TRANSFER" selected>Car / Taxi</option>
+                  <option value="BUS_TRANSFER">Bus Express</option>
+                  <option value="RAIL_TRANSFER">Regional Rail</option>
+                  <option value="NONE">None</option>
                 </select>
               </div>
               <div>
                 <label
-                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Destination
-                  Hotel / Office Name</label>
-                <input id="modal-last-mile-dest" placeholder="e.g. Ritz-Carlton Downtown / Four Seasons"
-                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 8px; padding: 8px; color: #F8FAFC; font-size: 11.5px;">
+                  style="font-size: 10px; font-weight: 700; color: #94A3B8; display: block; margin-bottom: 4px;">Destination Hotel / Office Name</label>
+                <input id="modal-last-mile-dest" placeholder="e.g. Ritz-Carlton Downtown / 500 Park Ave"
+                  style="width: 100%; background: #0D0F18; border: 1px solid #292D3E; border-radius: 7px; padding: 7px 9px; color: #F8FAFC; font-size: 11.5px;">
               </div>
             </div>
           </div>
 
-          <div class="form-group" style="margin: 0;">
-            <label for="modal-cabin-pref"
-              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-              Cabin / Vehicle Comfort Preference
-            </label>
-            <select id="modal-cabin-pref" class="form-control"
-              style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px; cursor: pointer;">
-              <option value="Business Class Quiet Car">Quiet Car / Business Class (Window)</option>
-              <option value="First Class Gran Class">First Class / Gran Class Suite</option>
-              <option value="Private Executive Sedan">Private Executive Sedan</option>
-              <option value="Luxury Suite Guarantee">Luxury Executive Suite Stay</option>
-            </select>
+          <!-- Preferences & Strategy (2-Column Row) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group" style="margin: 0;">
+              <label for="modal-cabin-pref"
+                style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 4px; display: block;">
+                Comfort Preference
+              </label>
+              <select id="modal-cabin-pref" class="form-control"
+                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 7px; padding: 7px 9px; color: #F8FAFC; font-size: 11.5px; cursor: pointer;">
+                <option value="Business Class Quiet Car">Quiet Car / Business Class</option>
+                <option value="First Class Gran Class">First Class Suite</option>
+                <option value="Private Executive Sedan">Private Executive Sedan</option>
+                <option value="Luxury Suite Guarantee">Luxury Executive Suite</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label for="modal-strategy"
+                style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 4px; display: block;">
+                Recovery Policy Tier
+              </label>
+              <select id="modal-strategy" class="form-control"
+                style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 7px; padding: 7px 9px; color: #F8FAFC; font-size: 11.5px; cursor: pointer;">
+                <option value="EXECUTIVE_SPEED">Executive Tier ($300 Limit)</option>
+                <option value="COMFORT_BUSINESS">VIP Executive ($500 Limit)</option>
+              </select>
+            </div>
           </div>
 
-          <!-- Strategy & Limit -->
-          <div class="form-group" style="margin: 0;">
-            <label for="modal-strategy"
-              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 6px; display: block;">
-              Travel Policy Tier & Autonomous Recovery Limit
-            </label>
-            <select id="modal-strategy" class="form-control"
-              style="background: #0D0F18; border: 1px solid #292D3E; border-radius: 10px; padding: 10px 12px; color: #F8FAFC; font-size: 12.5px; cursor: pointer;">
-              <option value="EXECUTIVE_SPEED">Executive Tier ($300 Limit · Auto-Rebook Flight, Rail & Car)</option>
-              <option value="COMFORT_BUSINESS">VIP Executive ($500 Limit · Priority First Class & Executive Chauffeur)
-              </option>
-            </select>
-          </div>
         </div>
 
         <div class="modal-footer"
-          style="padding: 16px 24px; background: #1B1F32; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-shrink: 0;">
+          style="padding: 14px 0 0 0; margin-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
           <button type="button" id="btn-cancel-modal" class="btn"
-            style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #94A3B8; font-weight: 600; padding: 9px 18px; border-radius: 8px; cursor: pointer;">Cancel</button>
+            style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #94A3B8; font-weight: 600; padding: 8px 16px; border-radius: 7px; font-size: 12px; cursor: pointer;">Cancel</button>
           <button type="submit" class="btn"
-            style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFFFFF; font-weight: 700; padding: 9px 20px; border-radius: 8px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); cursor: pointer;">Create
-            Multi-Modal Trip &amp; Load Route</button>
+            style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFFFFF; font-weight: 700; padding: 8px 18px; border-radius: 7px; font-size: 12px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); cursor: pointer;">Create Trip &amp; Load Route</button>
         </div>
       </form>
     </div>
@@ -1816,9 +1739,55 @@
       });
     });
 
-    // ── Modal Handlers ─────────────────────────────────────────────────────────
+    // ── Dynamic Real-Time Route Pipeline Preview ──────────────────────────────
+    function updateModalRoutePreview() {
+      const previewEl = document.getElementById('modal-route-preview-bar');
+      if (!previewEl) return;
+
+      const fMileMode = document.getElementById('modal-first-mile-mode')?.value || 'CAR';
+      const mainMode = document.getElementById('modal-travel-mode')?.value || 'FLIGHT';
+      const lMileMode = document.getElementById('modal-transfer-mode')?.value || 'CAR_TRANSFER';
+
+      const origInput = document.getElementById('modal-origin-input')?.value?.trim() || '';
+      const destInput = document.getElementById('modal-dest-input')?.value?.trim() || '';
+      const origCode = origInput ? origInput.split(' ')[0].split('—')[0].trim() : 'SFO';
+      const destCode = destInput ? destInput.split(' ')[0].split('—')[0].trim() : 'LHR';
+
+      const items = [];
+
+      // Step 1: First Mile
+      if (fMileMode === 'CAR') items.push({ text: 'Car / Taxi', isMain: false });
+      else if (fMileMode === 'BUS') items.push({ text: 'Bus Express', isMain: false });
+      else if (fMileMode === 'RAIL') items.push({ text: 'Regional Rail', isMain: false });
+
+      // Step 2: Main Hub Transport
+      let mainText = 'Flight';
+      if (mainMode === 'RAIL') mainText = 'Train / Rail';
+      else if (mainMode === 'CAR') mainText = 'Car / Drive';
+      else if (mainMode === 'BUS') mainText = 'Bus Express';
+      items.push({ text: `${mainText} (${origCode} → ${destCode})`, isMain: true });
+
+      // Step 3: Last Mile
+      if (lMileMode === 'CAR_TRANSFER' || lMileMode === 'CAR') items.push({ text: 'Car / Taxi', isMain: false });
+      else if (lMileMode === 'BUS_TRANSFER' || lMileMode === 'BUS') items.push({ text: 'Bus Express', isMain: false });
+      else if (lMileMode === 'RAIL_TRANSFER' || lMileMode === 'RAIL') items.push({ text: 'Regional Rail', isMain: false });
+
+      const html = items.map(item => {
+        const bg = item.isMain ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255, 255, 255, 0.06)';
+        const border = item.isMain ? '1px solid #6366f1' : '1px solid rgba(255, 255, 255, 0.14)';
+        const color = item.isMain ? '#38bdf8' : '#e2e8f0';
+        return `<span style="padding: 3px 9px; background: ${bg}; border: ${border}; color: ${color}; border-radius: 5px; font-size: 11px; font-weight: 700; font-family: monospace;">[ ${item.text} ]</span>`;
+      }).join(' <span style="color: #64748b; font-size: 11px; font-weight: 700;">➔</span> ');
+
+      previewEl.innerHTML = html;
+    }
+
+    // Modal open handler
     const modal = document.getElementById('createItineraryModal');
-    document.getElementById('btn-open-create-modal')?.addEventListener('click', () => modal?.classList.add('active'));
+    document.getElementById('btn-open-create-modal')?.addEventListener('click', () => {
+      modal?.classList.add('active');
+      updateModalRoutePreview();
+    });
     document.getElementById('btn-close-modal')?.addEventListener('click', () => modal?.classList.remove('active'));
     document.getElementById('btn-cancel-modal')?.addEventListener('click', () => modal?.classList.remove('active'));
     modal?.addEventListener('click', (e) => { if (e.target === modal) modal?.classList.remove('active'); });
@@ -1844,75 +1813,16 @@
       const mode = btn.getAttribute('data-mode') || 'FLIGHT';
       const modeInput = document.getElementById('modal-travel-mode');
       if (modeInput) modeInput.value = mode;
+      updateModalRoutePreview();
     });
 
-    // Preset Buttons click listener
-    document.addEventListener('click', (e) => {
-      const presetBtn = e.target.closest('.preset-btn');
-      if (!presetBtn) return;
-      e.preventDefault();
-
-      document.querySelectorAll('.preset-btn').forEach(b => {
-        b.classList.remove('active');
-        b.style.background = 'rgba(255, 255, 255, 0.05)';
-        b.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-        b.style.color = '#94a3b8';
-      });
-
-      presetBtn.classList.add('active');
-      presetBtn.style.background = 'rgba(99, 102, 241, 0.25)';
-      presetBtn.style.borderColor = '#6366f1';
-      presetBtn.style.color = '#ffffff';
-
-      const key = presetBtn.getAttribute('data-preset') || 'FLIGHT_ONLY';
-      const fMileSelect = document.getElementById('modal-first-mile-mode');
-      const mainInput = document.getElementById('modal-travel-mode');
-      const lMileSelect = document.getElementById('modal-transfer-mode');
-
-      if (key === 'FLIGHT_ONLY') {
-        if (fMileSelect) fMileSelect.value = 'NONE';
-        if (mainInput) mainInput.value = 'FLIGHT';
-        if (lMileSelect) lMileSelect.value = 'DIRECT';
-      } else if (key === 'CAR_FLIGHT') {
-        if (fMileSelect) fMileSelect.value = 'CAR';
-        if (mainInput) mainInput.value = 'FLIGHT';
-        if (lMileSelect) lMileSelect.value = 'DIRECT';
-      } else if (key === 'TRAIN_ONLY') {
-        if (fMileSelect) fMileSelect.value = 'NONE';
-        if (mainInput) mainInput.value = 'RAIL';
-        if (lMileSelect) lMileSelect.value = 'DIRECT';
-      } else if (key === 'CAR_ONLY') {
-        if (fMileSelect) fMileSelect.value = 'NONE';
-        if (mainInput) mainInput.value = 'CAR';
-        if (lMileSelect) lMileSelect.value = 'DIRECT';
-      } else if (key === 'FLIGHT_CAR') {
-        if (fMileSelect) fMileSelect.value = 'NONE';
-        if (mainInput) mainInput.value = 'FLIGHT';
-        if (lMileSelect) lMileSelect.value = 'CAR_TRANSFER';
-      } else if (key === 'TRAIN_FLIGHT') {
-        if (fMileSelect) fMileSelect.value = 'RAIL';
-        if (mainInput) mainInput.value = 'FLIGHT';
-        if (lMileSelect) lMileSelect.value = 'DIRECT';
-      } else if (key === 'FULL_MULTIMODAL') {
-        if (fMileSelect) fMileSelect.value = 'CAR';
-        if (mainInput) mainInput.value = 'FLIGHT';
-        if (lMileSelect) lMileSelect.value = 'CAR_TRANSFER';
+    // Dynamic field change/input listeners for route preview
+    ['modal-first-mile-mode', 'modal-transfer-mode', 'modal-origin-input', 'modal-dest-input'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', updateModalRoutePreview);
+        el.addEventListener('input', updateModalRoutePreview);
       }
-
-      document.querySelectorAll('.mode-select-btn').forEach(b => {
-        const mode = b.getAttribute('data-mode');
-        if (mode === (mainInput?.value || 'FLIGHT')) {
-          b.classList.add('active');
-          b.style.background = 'rgba(99, 102, 241, 0.25)';
-          b.style.borderColor = '#6366f1';
-          b.style.color = '#ffffff';
-        } else {
-          b.classList.remove('active');
-          b.style.background = 'rgba(255, 255, 255, 0.05)';
-          b.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-          b.style.color = '#94a3b8';
-        }
-      });
     });
 
     document.getElementById('form-create-itinerary')?.addEventListener('submit', async (e) => {
