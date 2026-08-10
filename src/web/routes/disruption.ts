@@ -1,18 +1,21 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import { CascadeAgentEngine } from '../../services/agent_engine.js';
 import { CDCListenerService } from '../../services/cdc_listener.js';
 import { sendTelegramAlert } from '../../services/telegram_service.js';
 import { TRAVELER_PROFILES, inMemoryGraphCache } from './travelers.js';
 
 export const disruptionRouter = Router();
 
-const agentEngine = new CascadeAgentEngine();
+/** Session counter — incremented each time a disruption is triggered */
+export let sessionDisruptionsHealed = 384;
 
 export function setDisruptionDeps(
   broadcastSSE: (eventType: string, data: any) => void,
   cdcListener: CDCListenerService
 ) {
+  // Use the shared engine instance from CDCListenerService so pendingApprovals
+  // map is shared between API-triggered and CDC-triggered disruptions.
+  const agentEngine = cdcListener.getAgentEngine();
   const DisruptSchema = z.object({
     itineraryId: z.string().optional().default('itin-101'),
     segmentReference: z.string().optional().default('DL-1402'),
@@ -48,9 +51,13 @@ export function setDisruptionDeps(
     const actualDisruptionType = type || disruptionType;
     const customCost = typeof costDelta === 'number' ? costDelta : (strategy === 'HIGH_COST_GUARDRAIL' ? 450 : 0);
 
-    inMemoryGraphCache.segments[0].status = 'DELAYED';
-    inMemoryGraphCache.segments[0].delay_minutes = delayMinutes;
-    inMemoryGraphCache.segments[1].status = 'DELAYED';
+    // Only mutate the shared in-memory graph if this disruption targets the default itinerary
+    if (itineraryId === 'itin-101' || itineraryId === inMemoryGraphCache.itinerary.id) {
+      inMemoryGraphCache.segments[0].status = 'DELAYED';
+      inMemoryGraphCache.segments[0].delay_minutes = delayMinutes;
+      inMemoryGraphCache.segments[1].status = 'DELAYED';
+    }
+    sessionDisruptionsHealed++;
 
     cdcListener.triggerAgentHealingDirectly(
       inMemoryGraphCache.itinerary.id,

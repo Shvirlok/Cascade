@@ -27,7 +27,8 @@ export async function sendTelegramAlert(data: TelegramBroadcastPayload): Promise
   }
 
   const travelerId = data.travelerId || 'itin-101';
-  const dashboardUrl = `http://localhost:3000/?traveler=${travelerId}`;
+  const port = process.env.PORT || '3000';
+  const dashboardUrl = `http://localhost:${port}/?traveler=${travelerId}`;
   const transportType = data.transportType || 'Express Rail Re-route';
   const timeSaved = data.timeSaved || '4.5 Hours';
   const newArrivalTime = data.newArrivalTime || 'Jul 25, 07:30 PM';

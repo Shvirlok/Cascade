@@ -29,7 +29,18 @@ export const ACTIVE_FLEET_TRIPS: any[] = activeFleetData;
 
 function broadcastSSE(eventType: string, data: any) {
   const payload = `event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`;
-  sseClients.forEach((client) => client.write(payload));
+  const dead: Response[] = [];
+  sseClients.forEach((client) => {
+    try {
+      client.write(payload);
+    } catch (_err) {
+      dead.push(client);
+    }
+  });
+  dead.forEach((client) => {
+    const idx = sseClients.indexOf(client);
+    if (idx !== -1) sseClients.splice(idx, 1);
+  });
 }
 
 // Forward CDC event emitter steps to SSE web clients

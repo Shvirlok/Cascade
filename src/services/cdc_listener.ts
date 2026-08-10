@@ -20,6 +20,14 @@ export class CDCListenerService {
   }
 
   /**
+   * Exposes the shared agent engine instance so route handlers can share
+   * the same pendingApprovals map (required for HITL approve/reject to work)
+   */
+  public getAgentEngine(): CascadeAgentEngine {
+    return this.agentEngine;
+  }
+
+  /**
    * Start CDC event listener loop
    */
   public startListening(): void {
@@ -139,6 +147,7 @@ export class CDCListenerService {
           strategy,
           rebookedSegments: report.rebookedSegments,
           timestamp: new Date().toISOString(),
+          report,
         });
       }
     } catch (_err) {

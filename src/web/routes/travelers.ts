@@ -59,11 +59,11 @@ export const TRAVELER_PROFILES: Record<string, any> = {
     id: 'itin-103',
     name: 'Elena Rostova',
     email: 'elena.rostova@acme.com',
-    route: 'SFO ➔ HND',
-    originCode: 'SFO',
+    route: 'ORD ➔ HND',
+    originCode: 'ORD',
     destinationCode: 'HND',
-    originLat: 37.6213,
-    originLng: -122.3790,
+    originLat: 41.9742,
+    originLng: -87.9073,
     destLat: 35.5494,
     destLng: 139.7798,
     status: 'IN_TRANSIT',
@@ -72,7 +72,7 @@ export const TRAVELER_PROFILES: Record<string, any> = {
     preferredCabin: 'Premium Economy',
     vectorScore: 0.941,
     centerLat: 38.0,
-    centerLng: 170.0,
+    centerLng: 120.0,
     zoom: 3,
     legs: [
       { type: 'FLIGHT', provider: 'ANA All Nippon Airways (NH-111)', route: 'ORD → HND', status: 'IN_TRANSIT' },
@@ -110,7 +110,7 @@ export const TRAVELER_PROFILES: Record<string, any> = {
 export const activeFleetData: any[] = [
   { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'San Francisco (SFO) ➔ London (LHR)', status: 'SELF_HEALED', legs: 'Flight · Train · Hotel · Flight', last_event: 'Flight delayed +150m — automatically rebooked to next Amtrak Acela Express', region: 'us-east-1' },
   { id: 'itin-102', traveler: 'Marcus Vance', route: 'New York (JFK) ➔ Paris (CDG)', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer', region: 'eu-west-1' },
-  { id: 'itin-103', traveler: 'Elena Rostova', route: 'San Francisco (SFO) ➔ Tokyo (HND)', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time', region: 'ap-northeast-1' },
+  { id: 'itin-103', traveler: 'Elena Rostova', route: 'Chicago (ORD) ➔ Tokyo (HND)', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time', region: 'ap-northeast-1' },
   { id: 'itin-104', traveler: 'David Chen', route: 'Miami (MIA) ➔ London (LHR)', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival — guaranteed at no extra cost', region: 'us-east-1' },
 ];
 

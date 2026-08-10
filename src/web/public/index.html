@@ -248,6 +248,23 @@
               </div>
             </div>
           </div>
+          <!-- Concierge Fallback Options Panel (shown when delay >= 600 min) -->
+          <div id="concierge-options-panel" style="display:none; margin-top: 12px; background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.08)); border: 1px solid rgba(99,102,241,0.35); border-radius: 12px; padding: 16px 20px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:36px; height:36px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:13px; font-weight:700; color:var(--text-primary);">Manual Concierge Fallback</div>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:1px;">Delay exceeds 10h — autonomous threshold exceeded. Select a premium option:</div>
+                </div>
+              </div>
+              <span class="badge status-tag-amber" style="font-size:10px;">HUMAN REQUIRED</span>
+            </div>
+            <div id="concierge-options-list" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+          </div>
+
         </main>
       </div>
 
@@ -458,7 +475,7 @@
               <span class="badge status-tag-green" style="font-size: 10px; padding: 3px 8px;">CDC CHANGEFEED ACTIVE</span>
             </div>
             <div style="display: flex; align-items: center; gap: 28px; font-size: 12px;">
-              <div><span style="color:var(--text-muted);">Total Healed:</span> <strong style="color:var(--text-primary); margin-left: 4px;" class="font-mono">384 Trips</strong></div>
+              <div><span style="color:var(--text-muted);">Total Healed:</span> <strong id="stat-total-healed" style="color:var(--text-primary); margin-left: 4px;" class="font-mono">384 Trips</strong></div>
               <div><span style="color:var(--text-muted);">Avg SLA:</span> <strong style="color:#10B981; margin-left: 4px;" class="font-mono">392ms</strong></div>
               <div><span style="color:var(--text-muted);">Cost Delta:</span> <strong style="color:#38BDF8; margin-left: 4px;" class="font-mono">$0.00</strong></div>
               <div><span style="color:var(--text-muted);">P99 Latency:</span> <strong style="color:#818CF8; margin-left: 4px;" class="font-mono">18ms</strong></div>
@@ -2118,6 +2135,10 @@
         } else {
           updateActiveCountBadge();
         }
+        if (data.metrics && data.metrics.total_disruptions_healed_24h !== undefined) {
+          const totalHealedEl = document.getElementById('stat-total-healed');
+          if (totalHealedEl) totalHealedEl.textContent = `${data.metrics.total_disruptions_healed_24h} Trips`;
+        }
         if (data.active_fleet && Array.isArray(data.active_fleet)) {
           renderFleetTable(data.active_fleet);
         }
@@ -3727,6 +3748,35 @@
           approvalType: 'AUTO_APPROVED',
           txHash: r.txHash || ('0x' + Math.random().toString(16).substring(2, 12)),
         });
+
+        // ── Concierge Fallback Panel ─────────────────────────────────
+        const conciergePanel = document.getElementById('concierge-options-panel');
+        const conciergeList = document.getElementById('concierge-options-list');
+        if (r.status === 'CONCIERGE_FALLBACK' && r.conciergeOptions && conciergePanel && conciergeList) {
+          conciergeList.innerHTML = r.conciergeOptions.map((opt, i) => `
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-color); border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.2s;"
+              onmouseover="this.style.borderColor='rgba(99,102,241,0.6)'" onmouseout="this.style.borderColor='var(--border-color)'">
+              <div style="font-size:11px; color:#818CF8; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Option ${i + 1}</div>
+              <div style="font-size:13px; font-weight:700; color:var(--text-primary); margin-bottom:2px;">${opt.title}</div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">${opt.provider}</div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:12px; color:#10B981; font-weight:700;">${opt.price}</span>
+                <span style="font-size:11px; color:var(--text-muted);">Arrives: ${opt.arrival}</span>
+              </div>
+            </div>`).join('');
+          conciergePanel.style.display = 'block';
+          appendCotLog(`[CONCIERGE_FALLBACK] Automated threshold exceeded. ${r.conciergeOptions.length} premium options presented to Corporate Admin.`);
+        } else if (conciergePanel) {
+          conciergePanel.style.display = 'none';
+        }
+
+        // Refresh live counter badge
+        fetch('/api/dashboard').then(res => res.json()).then(d => {
+          if (d.metrics && d.metrics.total_disruptions_healed_24h) {
+            const el = document.getElementById('stat-total-healed');
+            if (el) el.textContent = `${d.metrics.total_disruptions_healed_24h} Trips`;
+          }
+        }).catch(() => {});
       });
     }
 
@@ -4404,8 +4454,10 @@
       }
 
       async function dispatchTelegramTestBroadcast() {
-        const travelerId = document.getElementById('tg-select-traveler')?.value || 'itin-101';
-        const actionType = document.getElementById('tg-select-action')?.value || 'flight_delay';
+        // Read from Telegram tab dropdowns — fallback to current active traveler if not on that tab
+        const travelerId = (document.getElementById('tg-select-traveler') || {}).value
+          || currentActiveTravelerId || 'itin-101';
+        const actionType = (document.getElementById('tg-select-action') || {}).value || 'flight_delay';
         const customNote = document.getElementById('tg-custom-note')?.value || '';
         const statusEl = document.getElementById('tg-dispatch-status');
 
