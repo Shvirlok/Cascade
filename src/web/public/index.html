@@ -2659,6 +2659,35 @@
     }
 
 
+    function formatSoftLogTags(text) {
+      if (!text) return '';
+      return text.replace(/\[([A-Z0-9_ -]+)\]/g, (match, tag) => {
+        let bg = 'rgba(99, 102, 241, 0.14)';
+        let color = '#A5B4FC';
+        let border = 'rgba(99, 102, 241, 0.25)';
+
+        if (tag.includes('CDC') || tag.includes('CRDB') || tag.includes('ACID') || tag.includes('HEALED') || tag.includes('COMPLETE')) {
+          bg = 'rgba(16, 185, 129, 0.14)';
+          color = '#34D399';
+          border = 'rgba(16, 185, 129, 0.25)';
+        } else if (tag.includes('VECTOR') || tag.includes('MEMORY') || tag.includes('MCP') || tag.includes('RECALL')) {
+          bg = 'rgba(6, 182, 212, 0.14)';
+          color = '#38BDF8';
+          border = 'rgba(6, 182, 212, 0.25)';
+        } else if (tag.includes('SWITCH') || tag.includes('MODAL') || tag.includes('CHAOS') || tag.includes('FAILOVER') || tag.includes('EVALUATION')) {
+          bg = 'rgba(245, 158, 11, 0.14)';
+          color = '#FBBF24';
+          border = 'rgba(245, 158, 11, 0.25)';
+        } else if (tag.includes('GUARD') || tag.includes('HITL') || tag.includes('SAGA') || tag.includes('REJECTED')) {
+          bg = 'rgba(239, 68, 68, 0.14)';
+          color = '#F87171';
+          border = 'rgba(239, 68, 68, 0.25)';
+        }
+
+        return `<span style="background:${bg}; color:${color}; border:1px solid ${border}; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:600; display:inline-block; margin-right:4px;">[${tag}]</span>`;
+      });
+    }
+
     function appendCotLog(logText) {
       const cotBox = document.getElementById('audit-cot-timeline');
       const termBox = document.getElementById('terminal-stream-body');
@@ -2668,10 +2697,9 @@
       if (cotBox) {
         if (cotBox.innerText.includes('Initializing AWS Bedrock')) cotBox.innerHTML = '';
         const div = document.createElement('div');
-        div.style.marginBottom = '6px';
-        div.style.lineHeight = '1.5';
-        const formatted = text.replace(/(\[[A-Z0-9_ -]+\])/g, '<span style="color:#34d399; font-weight:700;">$1</span>');
-        div.innerHTML = `<span style="color:#818cf8; font-weight:600;">[${time}]</span> ${formatted}`;
+        div.className = 'soft-cot-item';
+        const formatted = formatSoftLogTags(text);
+        div.innerHTML = `<span class="soft-log-time">[${time}]</span> ${formatted}`;
         cotBox.appendChild(div);
         cotBox.scrollTop = cotBox.scrollHeight;
       }
@@ -2679,10 +2707,9 @@
       if (termBox) {
         if (termBox.innerText.includes('Connecting to CASCADE')) termBox.innerHTML = '';
         const div = document.createElement('div');
-        div.style.marginBottom = '4px';
-        div.style.lineHeight = '1.4';
-        const formatted = text.replace(/(\[[A-Z0-9_ -]+\])/g, '<span style="color:#38bdf8; font-weight:700;">$1</span>');
-        div.innerHTML = `<span style="color:var(--accent); font-weight:600;">[${time}]</span> ${formatted}`;
+        div.className = 'soft-cot-item';
+        const formatted = formatSoftLogTags(text);
+        div.innerHTML = `<span class="soft-log-time">[${time}]</span> ${formatted}`;
         termBox.appendChild(div);
         termBox.scrollTop = termBox.scrollHeight;
       }
