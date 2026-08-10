@@ -277,24 +277,26 @@ travelersRouter.post('/api/itinerary/create', (req: Request, res: Response) => {
   const multiModalWaypoints: any[] = [];
   const legs: any[] = [];
 
-  if (fMileUpper !== 'NONE') {
+  if (fMileUpper !== 'NONE' && fMileUpper !== 'NO') {
     const fMileName = firstMileOrigin || (cityCenters[origCode]?.label || `${origCode} City Center`);
     const fMileCode = cityCenters[origCode]?.code || fMileName.substring(0, 4).toUpperCase();
     const fMileLat = cityCenters[origCode]?.lat || (resolvedOrigLat + 0.08);
     const fMileLng = cityCenters[origCode]?.lng || (resolvedOrigLng + 0.08);
-    const fColor = fMileUpper === 'RAIL' ? '#10b981' : (fMileUpper === 'CAR' ? '#f59e0b' : '#38bdf8');
-    const fProvider = fMileUpper === 'RAIL' ? 'Regional Commuter Rail' : (fMileUpper === 'CAR' ? 'Executive Car Transfer' : 'Airport Bus Express');
+    const isFRail = (fMileUpper === 'RAIL' || fMileUpper === 'TRAIN');
+    const isFRoad = (fMileUpper === 'CAR' || fMileUpper === 'BUS' || fMileUpper === 'TAXI' || fMileUpper === 'SHUTTLE');
+    const fColor = isFRail ? '#10b981' : (isFRoad ? '#f59e0b' : '#38bdf8');
+    const fProvider = isFRail ? 'Regional Commuter Rail' : (isFRoad ? 'Executive Car Transfer' : 'Airport Bus Express');
 
     legs.push({
-      type: fMileUpper === 'RAIL' ? 'TRAIN' : 'CAR',
+      type: isFRail ? 'TRAIN' : 'CAR',
       provider: fProvider,
       route: `${fMileName} → ${origCode}`,
       status: 'SCHEDULED',
-      mode: fMileUpper === 'CAR' ? 'CAR' : fMileUpper
+      mode: isFRail ? 'RAIL' : (isFRoad ? 'CAR' : fMileUpper)
     });
 
     multiModalWaypoints.push({
-      mode: fMileUpper === 'CAR' ? 'CAR' : fMileUpper,
+      mode: isFRail ? 'RAIL' : (isFRoad ? 'CAR' : fMileUpper),
       provider: fProvider,
       from: { code: fMileCode, label: fMileName, lat: fMileLat, lng: fMileLng },
       to: { code: origCode, label: `${origCode} Origin Hub`, lat: resolvedOrigLat, lng: resolvedOrigLng },
@@ -302,25 +304,26 @@ travelersRouter.post('/api/itinerary/create', (req: Request, res: Response) => {
     });
   }
 
-  const mainColor = mainModeUpper === 'RAIL' ? '#10b981' : (mainModeUpper === 'CAR' || mainModeUpper === 'BUS' ? '#f59e0b' : '#6366f1');
-  const mainProvider = mainModeUpper === 'RAIL'
+  const isMainRail = (mainModeUpper === 'RAIL' || mainModeUpper === 'TRAIN');
+  const isMainRoad = (mainModeUpper === 'CAR' || mainModeUpper === 'BUS' || mainModeUpper === 'TAXI' || mainModeUpper === 'SHUTTLE');
+
+  const mainColor = isMainRail ? '#10b981' : (isMainRoad ? '#f59e0b' : '#6366f1');
+  const mainProvider = isMainRail
     ? `Amtrak / Eurostar High-Speed Rail (${origCode}-${Math.floor(100+Math.random()*899)})`
-    : (mainModeUpper === 'CAR'
+    : (isMainRoad
         ? `Long-Distance Chauffeur Sedan (${origCode}-${destCode})`
-        : (mainModeUpper === 'BUS'
-            ? `Intercity Bus Express (${origCode}-${destCode})`
-            : `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`));
+        : `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`);
 
   legs.push({
-    type: mainModeUpper === 'RAIL' ? 'TRAIN' : (mainModeUpper === 'CAR' || mainModeUpper === 'BUS' ? 'CAR' : 'FLIGHT'),
+    type: isMainRail ? 'TRAIN' : (isMainRoad ? 'CAR' : 'FLIGHT'),
     provider: mainProvider,
     route: `${origCode} → ${destCode}`,
     status: 'SCHEDULED',
-    mode: mainModeUpper
+    mode: isMainRail ? 'RAIL' : (isMainRoad ? 'CAR' : 'FLIGHT')
   });
 
   multiModalWaypoints.push({
-    mode: mainModeUpper,
+    mode: isMainRail ? 'RAIL' : (isMainRoad ? 'CAR' : 'FLIGHT'),
     provider: mainProvider,
     from: { code: origCode, label: `${origCode} Main Hub`, lat: resolvedOrigLat, lng: resolvedOrigLng },
     to: { code: destCode, label: `${destCode} Destination Hub`, lat: resolvedDestLat, lng: resolvedDestLng },
