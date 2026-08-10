@@ -3604,6 +3604,31 @@
       source.addEventListener('human_approval_required', (e) => {
         const data = JSON.parse(e.data);
         showHitlApprovalBanner(data.report);
+
+        if (data.report) {
+          const r = data.report;
+          const travelerMap = {
+            'itin-101': { name: 'Sarah Jenkins', origin: 'SFO', destination: 'LHR' },
+            'itin-102': { name: 'Marcus Vance', origin: 'JFK', destination: 'CDG' },
+            'itin-103': { name: 'Elena Rostova', origin: 'ORD', destination: 'HND' },
+            'itin-104': { name: 'David Chen', origin: 'MIA', destination: 'LHR' }
+          };
+          const tInfo = travelerMap[r.itineraryId] || { name: 'Executive Traveler', origin: 'SFO', destination: 'LHR' };
+
+          appendTelegramAlertMessage({
+            travelerId: r.itineraryId,
+            travelerName: tInfo.name,
+            origin: tInfo.origin,
+            destination: tInfo.destination,
+            newCarrier: (r.winningBranch && r.winningBranch.provider) || 'Business Upgrade Pending',
+            transportType: 'Human Approval Required (Cost Limit Exceeded)',
+            timeSaved: (r.deltaAnalytics && r.deltaAnalytics.delayFormatted) || '+150m',
+            costDeltaFormatted: r.costDeltaFormatted || '+$450.00',
+            approvalType: 'HUMAN_APPROVAL_REQUIRED',
+            customNote: 'Proposed upgrade exceeds $300 limit. Awaiting Corporate Admin confirmation.',
+            txHash: r.txHash || ('0x' + Math.random().toString(16).substring(2, 12)),
+          });
+        }
       });
 
       source.addEventListener('cascade_healed', (e) => {
@@ -3611,10 +3636,32 @@
         if (data.report && data.report.auditReport) {
           latestAuditData = data.report.auditReport;
         }
-        // If the engine triggered a First-Mile switch, surface the callout banner
         if (data.report && data.report.firstMileSwitchOccurred) {
           renderFirstMileSwitchCallout('nodes-container');
         }
+
+        const travelerMap = {
+          'itin-101': { name: 'Sarah Jenkins', origin: 'SFO', destination: 'LHR' },
+          'itin-102': { name: 'Marcus Vance', origin: 'JFK', destination: 'CDG' },
+          'itin-103': { name: 'Elena Rostova', origin: 'ORD', destination: 'HND' },
+          'itin-104': { name: 'David Chen', origin: 'MIA', destination: 'LHR' }
+        };
+        const itinId = data.itineraryId || (data.report && data.report.itineraryId) || 'itin-101';
+        const tInfo = travelerMap[itinId] || { name: 'Executive Traveler', origin: 'SFO', destination: 'LHR' };
+        const r = data.report || {};
+
+        appendTelegramAlertMessage({
+          travelerId: itinId,
+          travelerName: tInfo.name,
+          origin: tInfo.origin,
+          destination: tInfo.destination,
+          newCarrier: (r.winningBranch && r.winningBranch.provider) || 'Amtrak Acela Express (AMT-2158)',
+          transportType: data.strategy === 'EXECUTIVE_SPEED' ? 'Express Rail Re-route' : (data.strategy || 'Autonomous Self-Healing'),
+          timeSaved: (r.deltaAnalytics && r.deltaAnalytics.delayFormatted) || '4.5 Hours',
+          costDeltaFormatted: r.costDeltaFormatted || '$0.00 Net Delta',
+          approvalType: 'AUTO_APPROVED',
+          txHash: r.txHash || ('0x' + Math.random().toString(16).substring(2, 12)),
+        });
       });
     }
 
@@ -4204,10 +4251,26 @@
         }
       }
 
+      let lastAppendedTxHash = '';
+      let lastAppendedTime = 0;
+
       function appendTelegramAlertMessage(data) {
+        if (data.txHash && data.txHash === lastAppendedTxHash && (Date.now() - lastAppendedTime) < 2000) {
+          return;
+        }
+        if (data.txHash) {
+          lastAppendedTxHash = data.txHash;
+          lastAppendedTime = Date.now();
+        }
+
         const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
         const travelerId = data.travelerId || 'itin-101';
         const companionUrl = `${window.location.origin}/?mobile=true&traveler=${travelerId}`;
+        const noteHtml = data.customNote ? `
+          <div style="font-size:11px; color:#A7F3D0; margin:6px 0; background:rgba(16,185,129,0.12); padding:6px 10px; border-radius:6px; border-left:3px solid #10B981;">
+            <b>Control Room Note:</b> ${data.customNote}
+          </div>
+        ` : '';
 
         const messageHtml = `
           <div class="telegram-bubble">
@@ -4234,7 +4297,7 @@
               <span class="telegram-bubble-label">Financial Delta:</span>
               <span class="telegram-bubble-val">${data.costDeltaFormatted || '$0.00 Net Delta'}</span>
             </div>
-
+            ${noteHtml}
             <div style="font-size:10px; color:#94A3B8; margin-top:4px;">CockroachDB Proof:</div>
             <div class="telegram-bubble-code">${data.txHash || '0x8f4b2c1e9a'}</div>
 
@@ -4286,6 +4349,39 @@
 
         if (statusEl) statusEl.innerHTML = '<span style="color:#38BDF8;">Dispatching to Telegram Bot...</span>';
 
+        const actionMap = {
+          flight_delay: {
+            newCarrier: 'Amtrak Acela Express (AMT-2158)',
+            transportType: 'Express Rail Re-route',
+            timeSaved: '4.5 Hours',
+            costDeltaFormatted: '$0.00 Net Delta',
+            approvalType: 'AUTO_APPROVED',
+          },
+          train_strike: {
+            newCarrier: 'Eurostar High-Speed Express (ES-9001)',
+            transportType: 'Multimodal Airport Rail Failover',
+            timeSaved: '5.2 Hours',
+            costDeltaFormatted: '$0.00 Net Delta',
+            approvalType: 'AUTO_APPROVED',
+          },
+          hotel_guarantee: {
+            newCarrier: 'Ritz-Carlton Executive Suite (HTL-9921)',
+            transportType: 'Late Check-in Guarantee & Voucher',
+            timeSaved: 'Overnight Buffer Preserved',
+            costDeltaFormatted: '$0.00 (Carrier Covered)',
+            approvalType: 'AUTO_APPROVED',
+          },
+          vip_auto: {
+            newCarrier: 'Delta Air Lines First Class (DL-1990)',
+            transportType: 'VIP Direct Re-flight',
+            timeSaved: '6.0 Hours',
+            costDeltaFormatted: '$0.00 (VIP Executive Policy)',
+            approvalType: 'AUTO_APPROVED',
+          },
+        };
+
+        const actionData = actionMap[actionType] || actionMap.flight_delay;
+
         try {
           const res = await fetch('/api/telegram/test', {
             method: 'POST',
@@ -4301,18 +4397,20 @@
             'itin-104': { name: 'David Chen', origin: 'MIA', destination: 'LHR' }
           };
           const tInfo = travelerMap[travelerId] || travelerMap['itin-101'];
+          const txHash = (json.payload && json.payload.txHash) || ('0x' + Math.random().toString(16).substring(2, 12));
 
           appendTelegramAlertMessage({
             travelerId,
             travelerName: tInfo.name,
             origin: tInfo.origin,
             destination: tInfo.destination,
-            newCarrier: 'Amtrak Acela Express (AMT-2158)',
-            transportType: 'Express Rail Re-route',
-            timeSaved: '4.5 Hours',
-            costDeltaFormatted: '$0.00 Net Delta',
-            approvalType: 'AUTO_APPROVED',
-            txHash: '0x' + Math.random().toString(16).substring(2, 12),
+            newCarrier: actionData.newCarrier,
+            transportType: actionData.transportType,
+            timeSaved: actionData.timeSaved,
+            costDeltaFormatted: actionData.costDeltaFormatted,
+            approvalType: actionData.approvalType,
+            customNote: customNote || undefined,
+            txHash,
           });
 
           if (statusEl) {

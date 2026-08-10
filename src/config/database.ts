@@ -258,6 +258,16 @@ function getFallbackQueryResult<T extends QueryResultRow = any>(
     };
   }
 
+  if (sql.includes('from disruption_events')) {
+    return {
+      rows: [] as any,
+      command: 'SELECT',
+      rowCount: 0,
+      oid: 0,
+      fields: [],
+    };
+  }
+
   // Default empty result for updates / inserts
   return {
     rows: [{ id: 'mock-id-' + Date.now() }] as any,

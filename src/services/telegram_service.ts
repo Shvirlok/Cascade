@@ -13,6 +13,7 @@ export interface TelegramBroadcastPayload {
   newArrivalTime?: string;
   costDeltaFormatted?: string;
   approvalType?: string;
+  customNote?: string;
   txHash: string;
   resolutionSLA?: number;
 }
@@ -33,6 +34,7 @@ export async function sendTelegramAlert(data: TelegramBroadcastPayload): Promise
   const costDelta = data.costDeltaFormatted || '$0.00 Net Delta';
   const approvalType = data.approvalType || 'AUTO_APPROVED';
   const slaMs = data.resolutionSLA || 392;
+  const noteLine = data.customNote ? `\n<b>Control Room Note:</b> <i>${data.customNote}</i>` : '';
 
   const message =
     `<b>CASCADE Executive Control Room Alert</b>\n` +
@@ -41,7 +43,8 @@ export async function sendTelegramAlert(data: TelegramBroadcastPayload): Promise
     `<b>Disrupted Segment:</b> ${data.origin} ➔ ${data.destination}\n` +
     `<b>Resolution Action:</b> ${data.newCarrier} (${transportType})\n\n` +
     `<b>Time Saved:</b> ${timeSaved} (New Arrival: ${newArrivalTime})\n` +
-    `<b>Financial Impact:</b> ${costDelta} [${approvalType}]\n` +
+    `<b>Financial Impact:</b> ${costDelta} [${approvalType}]` +
+    `${noteLine}\n` +
     `<b>CockroachDB Proof:</b> <code>${data.txHash}</code>\n` +
     `━━━━━━━━━━━━━━━━━━━━━━\n` +
     `<i>Autonomous Self-Healing Completed in ${slaMs}ms</i>\n` +
