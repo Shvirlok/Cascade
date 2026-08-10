@@ -29,8 +29,9 @@ describe('Enterprise Broadcast Channel Payload Resolution Unit Tests', () => {
     expect(result.sent).toBe(true);
     expect(capturedBody).not.toBeNull();
     expect(capturedBody.text).toContain('Elena Rostova');
-    expect(capturedBody.text).toContain('ORD ➔ HND');
+    expect(capturedBody.text).toContain('ORD ──▶ HND');   // new arrow format
     expect(capturedBody.text).toContain('4.5 Hours');
+    expect(capturedBody.reply_markup).toBeDefined();
 
     global.fetch = globalFetch;
   });
