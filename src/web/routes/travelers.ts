@@ -105,6 +105,70 @@ export const TRAVELER_PROFILES: Record<string, any> = {
       { type: 'HOTEL', provider: 'The Savoy London', route: 'Strand London', status: 'CONFIRMED' },
     ],
   },
+  'itin-105': {
+    id: 'itin-105',
+    name: 'Yaroslav Vane',
+    email: 'yaroslav.vane@acme.com',
+    route: 'FRA ➔ SIN',
+    originCode: 'FRA',
+    destinationCode: 'SIN',
+    originLat: 50.0379,
+    originLng: 8.5622,
+    destLat: 1.3644,
+    destLng: 103.9915,
+    status: 'SCHEDULED',
+    policyTier: 'VIP Executive ($500 Limit)',
+    policyLimitUsd: 500,
+    preferredCabin: 'First Class Quiet Car & SkySuite',
+    vectorScore: 0.991,
+    centerLat: 25.0,
+    centerLng: 56.0,
+    zoom: 3,
+    legs: [
+      { type: 'CAR', provider: 'Executive Limousine Transfer', route: 'Frankfurt Center → Frankfurt (FRA)', status: 'CONFIRMED', mode: 'CAR' },
+      { type: 'FLIGHT', provider: 'Lufthansa First Class (LH-778)', route: 'FRA → SIN', status: 'SCHEDULED', mode: 'FLIGHT' },
+      { type: 'TRAIN', provider: 'Singapore MRT High-Speed Express', route: 'Changi SIN → Marina Bay Hub', status: 'SCHEDULED', mode: 'RAIL' },
+      { type: 'HOTEL', provider: 'Marina Bay Sands Executive Suite', route: 'Marina Bay District', status: 'CONFIRMED', mode: 'HOTEL' },
+    ],
+    multiModalWaypoints: [
+      { mode: 'CAR', provider: 'Executive Limousine Transfer', from: { code: 'FRK', label: 'Frankfurt Financial Center (FRK)', lat: 50.1109, lng: 8.6821 }, to: { code: 'FRA', label: 'Frankfurt Airport (FRA)', lat: 50.0379, lng: 8.5622 }, color: '#f59e0b' },
+      { mode: 'FLIGHT', provider: 'Lufthansa First Class (LH-778)', from: { code: 'FRA', label: 'Frankfurt Airport (FRA)', lat: 50.0379, lng: 8.5622 }, to: { code: 'SIN', label: 'Singapore Changi (SIN)', lat: 1.3644, lng: 103.9915 }, color: '#6366f1' },
+      { mode: 'RAIL', provider: 'Singapore MRT High-Speed Express', from: { code: 'SIN', label: 'Singapore Changi (SIN)', lat: 1.3644, lng: 103.9915 }, to: { code: 'MRN', label: 'Marina Bay Rail (MRN)', lat: 1.2815, lng: 103.8591 }, color: '#10b981' },
+      { mode: 'HOTEL', provider: 'Marina Bay Sands Executive Suite', from: { code: 'MRN', label: 'Marina Bay Rail (MRN)', lat: 1.2815, lng: 103.8591 }, to: { code: 'SND', label: 'Marina Bay Sands (SND)', lat: 1.2834, lng: 103.8607 }, color: '#8b5cf6' }
+    ]
+  },
+  'itin-106': {
+    id: 'itin-106',
+    name: 'Alexander Wright',
+    email: 'alexander.wright@acme.com',
+    route: 'LHR ➔ FRA',
+    originCode: 'LHR',
+    destinationCode: 'FRA',
+    originLat: 51.4700,
+    originLng: -0.4543,
+    destLat: 50.0379,
+    destLng: 8.5622,
+    status: 'SELF_HEALED',
+    policyTier: 'Executive Tier ($300 Limit)',
+    policyLimitUsd: 300,
+    preferredCabin: 'Business Class Quiet Car',
+    vectorScore: 0.982,
+    centerLat: 51.0,
+    centerLng: 4.0,
+    zoom: 5,
+    legs: [
+      { type: 'CAR', provider: 'London Mayfair Chauffeur', route: 'Mayfair London → Heathrow (LHR)', status: 'CONFIRMED', mode: 'CAR' },
+      { type: 'FLIGHT', provider: 'British Airways Club Europe (BA-910)', route: 'LHR → FRA', status: 'DELAYED', mode: 'FLIGHT' },
+      { type: 'TRAIN', provider: 'Deutsche Bahn ICE High-Speed Rail (ICE-721)', route: 'Frankfurt Fernbf → Stuttgart Hbf', status: 'REBOOKED', mode: 'RAIL' },
+      { type: 'HOTEL', provider: 'Steigenberger Grandhotel Suite', route: 'Stuttgart City Center', status: 'CONFIRMED', mode: 'HOTEL' },
+    ],
+    multiModalWaypoints: [
+      { mode: 'CAR', provider: 'London Mayfair Chauffeur', from: { code: 'MAY', label: 'London Mayfair (MAY)', lat: 51.5098, lng: -0.1478 }, to: { code: 'LHR', label: 'London Heathrow (LHR)', lat: 51.4700, lng: -0.4543 }, color: '#f59e0b' },
+      { mode: 'FLIGHT', provider: 'British Airways Club Europe (BA-910)', from: { code: 'LHR', label: 'London Heathrow (LHR)', lat: 51.4700, lng: -0.4543 }, to: { code: 'FRA', label: 'Frankfurt Airport (FRA)', lat: 50.0379, lng: 8.5622 }, color: '#6366f1' },
+      { mode: 'RAIL', provider: 'Deutsche Bahn ICE High-Speed Rail', from: { code: 'FRA', label: 'Frankfurt Airport (FRA)', lat: 50.0379, lng: 8.5622 }, to: { code: 'STR', label: 'Stuttgart Hbf Rail (STR)', lat: 48.7833, lng: 9.1833 }, color: '#10b981' },
+      { mode: 'HOTEL', provider: 'Steigenberger Grandhotel Suite', from: { code: 'STR', label: 'Stuttgart Hbf Rail (STR)', lat: 48.7833, lng: 9.1833 }, to: { code: 'STG', label: 'Steigenberger Hotel (STG)', lat: 48.7780, lng: 9.1790 }, color: '#8b5cf6' }
+    ]
+  },
 };
 
 export const activeFleetData: any[] = [
@@ -112,6 +176,8 @@ export const activeFleetData: any[] = [
   { id: 'itin-102', traveler: 'Marcus Vance', route: 'New York (JFK) ➔ Paris (CDG)', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer', region: 'eu-west-1' },
   { id: 'itin-103', traveler: 'Elena Rostova', route: 'Chicago (ORD) ➔ Tokyo (HND)', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time', region: 'ap-northeast-1' },
   { id: 'itin-104', traveler: 'David Chen', route: 'Miami (MIA) ➔ London (LHR)', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival — guaranteed at no extra cost', region: 'us-east-1' },
+  { id: 'itin-105', traveler: 'Yaroslav Vane', route: 'Frankfurt (FRA) ➔ Singapore (SIN)', status: 'SCHEDULED', legs: 'Car · Flight · Train · Hotel', last_event: 'Multi-modal itinerary active across air, rail, limousine & hotel', region: 'eu-central-1' },
+  { id: 'itin-106', traveler: 'Alexander Wright', route: 'London (LHR) ➔ Frankfurt (FRA)', status: 'SELF_HEALED', legs: 'Car · Flight · Train · Hotel', last_event: 'Flight delay auto-recovered via Deutsche Bahn ICE Express rail transfer', region: 'eu-west-1' },
 ];
 
 export const inMemoryGraphCache: any = {
