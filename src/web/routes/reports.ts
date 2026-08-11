@@ -1,10 +1,40 @@
 import { Router, Request, Response } from 'express';
-import { generateAuditReport, exportAuditReportMarkdown } from '../../services/audit_report_generator.js';
+import { generateAuditReport, AuditReportData, exportAuditReportMarkdown } from '../../services/audit_report_generator.js';
 import { generateAuditPdf } from '../../services/pdf_report_generator.js';
 import { CDCListenerService } from '../../services/cdc_listener.js';
 import { TRAVELER_PROFILES } from './travelers.js';
 
 export const reportsRouter = Router();
+
+function resolveAuditReport(req: Request, incidentId: string): AuditReportData {
+  const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
+  const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || (req.body?.itineraryId as string) || (req.body?.travelerId as string) || defaultKey;
+  const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES[defaultKey] || { name: 'Sarah Jenkins', email: 'sarah.jenkins@acme.com', route: 'SFO ➔ LHR', originCode: 'SFO', destinationCode: 'LHR' };
+
+  return generateAuditReport({
+    incidentId,
+    travelerProfile: {
+      name: profile?.name || 'Executive Traveler',
+      email: profile?.email || 'traveler@acme.com',
+      preferredCabin: profile?.preferredCabin || 'Business Class',
+      seatPreference: 'Aisle (Quiet Car / Front Row)',
+      hnswVectorScore: 0.984,
+      vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
+    },
+    originalItinerary: {
+      tripTitle: `${profile?.name || 'Traveler'} — ${profile?.route || 'Executive Route'}`,
+      origin: profile?.originCode || 'SFO',
+      destination: profile?.destinationCode || 'LHR',
+      segments: (profile?.legs || []).map((leg: any, i: number) => ({
+        type: leg?.type,
+        provider: leg?.provider,
+        referenceCode: leg?.referenceCode || `SEG-0${i + 1}`,
+        route: leg?.route,
+        status: leg?.status,
+      })),
+    },
+  });
+}
 
 export function setReportsDeps(cdcListener: CDCListenerService) {
   reportsRouter.get('/api/itinerary/artifact', (req: Request, res: Response) => {
@@ -44,107 +74,24 @@ export function setReportsDeps(cdcListener: CDCListenerService) {
   });
 
   reportsRouter.get('/api/audit-report/:incidentId', (req: Request, res: Response) => {
-    const incidentId = req.params.incidentId || 'PROOF-REC-994821';
-    const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
-    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || (req.body?.itineraryId as string) || (req.body?.travelerId as string) || defaultKey;
-    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES[defaultKey] || { name: 'Sarah Jenkins', email: 'sarah.jenkins@acme.com', route: 'SFO ➔ LHR', originCode: 'SFO', destinationCode: 'LHR' };
-
-    const report = generateAuditReport({
-      incidentId,
-      travelerProfile: {
-        name: profile?.name || 'Executive Traveler',
-        email: profile?.email || 'traveler@acme.com',
-        preferredCabin: profile?.preferredCabin || 'Business Class',
-        seatPreference: 'Aisle (Quiet Car / Front Row)',
-        hnswVectorScore: 0.984,
-        vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
-      },
-      originalItinerary: {
-        tripTitle: `${profile?.name || 'Traveler'} — ${profile?.route || 'Executive Route'}`,
-        origin: profile?.originCode || 'SFO',
-        destination: profile?.destinationCode || 'LHR',
-        segments: (profile?.legs || []).map((leg: any, i: number) => ({
-          type: leg?.type,
-          provider: leg?.provider,
-          referenceCode: leg?.referenceCode || `SEG-0${i + 1}`,
-          route: leg?.route,
-          status: leg?.status,
-        })),
-      },
-    });
+    const report = resolveAuditReport(req, req.params.incidentId || 'PROOF-REC-994821');
     res.json(report);
   });
 
   reportsRouter.get('/api/audit-report/:incidentId/markdown', (req: Request, res: Response) => {
-    const incidentId = req.params.incidentId || 'PROOF-REC-994821';
-    const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
-    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || (req.body?.itineraryId as string) || (req.body?.travelerId as string) || defaultKey;
-    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES[defaultKey] || { name: 'Sarah Jenkins', email: 'sarah.jenkins@acme.com', route: 'SFO ➔ LHR', originCode: 'SFO', destinationCode: 'LHR' };
-
-    const report = generateAuditReport({
-      incidentId,
-      travelerProfile: {
-        name: profile?.name || 'Executive Traveler',
-        email: profile?.email || 'traveler@acme.com',
-        preferredCabin: profile?.preferredCabin || 'Business Class',
-        seatPreference: 'Aisle (Quiet Car / Front Row)',
-        hnswVectorScore: 0.984,
-        vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
-      },
-      originalItinerary: {
-        tripTitle: `${profile?.name || 'Traveler'} — ${profile?.route || 'Executive Route'}`,
-        origin: profile?.originCode || 'SFO',
-        destination: profile?.destinationCode || 'LHR',
-        segments: (profile?.legs || []).map((leg: any, i: number) => ({
-          type: leg?.type,
-          provider: leg?.provider,
-          referenceCode: leg?.referenceCode || `SEG-0${i + 1}`,
-          route: leg?.route,
-          status: leg?.status,
-        })),
-      },
-    });
-
+    const report = resolveAuditReport(req, req.params.incidentId || 'PROOF-REC-994821');
     const markdown = exportAuditReportMarkdown(report);
     res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="${incidentId}_audit_report.md"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${req.params.incidentId}_audit_report.md"`);
     res.send(markdown);
   });
 
   reportsRouter.get('/api/audit-report/:incidentId/pdf', async (req: Request, res: Response) => {
-    const incidentId = req.params.incidentId || 'PROOF-REC-994821';
-    const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
-    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || (req.body?.itineraryId as string) || (req.body?.travelerId as string) || defaultKey;
-    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES[defaultKey] || { name: 'Sarah Jenkins', email: 'sarah.jenkins@acme.com', route: 'SFO ➔ LHR', originCode: 'SFO', destinationCode: 'LHR' };
-
-    const report = generateAuditReport({
-      incidentId,
-      travelerProfile: {
-        name: profile?.name || 'Executive Traveler',
-        email: profile?.email || 'traveler@acme.com',
-        preferredCabin: profile?.preferredCabin || 'Business Class',
-        seatPreference: 'Aisle (Quiet Car / Front Row)',
-        hnswVectorScore: 0.984,
-        vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
-      },
-      originalItinerary: {
-        tripTitle: `${profile?.name || 'Traveler'} — ${profile?.route || 'Executive Route'}`,
-        origin: profile?.originCode || 'SFO',
-        destination: profile?.destinationCode || 'LHR',
-        segments: (profile?.legs || []).map((leg: any, i: number) => ({
-          type: leg?.type,
-          provider: leg?.provider,
-          referenceCode: leg?.referenceCode || `SEG-0${i + 1}`,
-          route: leg?.route,
-          status: leg?.status,
-        })),
-      },
-    });
-
+    const report = resolveAuditReport(req, req.params.incidentId || 'PROOF-REC-994821');
     try {
       const pdfBuffer = await generateAuditPdf(report);
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${incidentId}_audit_report.pdf"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${req.params.incidentId}_audit_report.pdf"`);
       res.send(pdfBuffer);
     } catch (error) {
       console.error('PDF generation failed', error);

@@ -19,10 +19,6 @@ import {
 
 dotenv.config();
 
-/**
- * CASCADE Model Context Protocol (MCP) Server
- * Exposes CockroachDB graph & vector tools to AWS Bedrock multi-agent orchestrator.
- */
 const mcpServer = new Server(
   {
     name: 'cascade-mcp-server',
@@ -35,7 +31,6 @@ const mcpServer = new Server(
   }
 );
 
-// Define registered tools
 mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
@@ -128,7 +123,6 @@ mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
-// Handle tool executions
 mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
@@ -210,9 +204,6 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-/**
- * Start Stdio transport
- */
 export async function startMcpServer() {
   const transport = new StdioServerTransport();
   await mcpServer.connect(transport);

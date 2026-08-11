@@ -368,7 +368,6 @@ travelersRouter.post('/api/itinerary/create', (req: Request, res: Response) => {
     email: travelerEmail || 'executive@acme.com',
     route: routeStr,
     originCode: origCode,
-    destCode: destCode,
     destinationCode: destCode,
     originLat: resolvedOrigLat,
     originLng: resolvedOrigLng,

@@ -6,15 +6,12 @@ import { TRAVELER_PROFILES, inMemoryGraphCache } from './travelers.js';
 
 export const disruptionRouter = Router();
 
-/** Session counter — incremented each time a disruption is triggered */
 export let sessionDisruptionsHealed = 384;
 
 export function setDisruptionDeps(
   broadcastSSE: (eventType: string, data: any) => void,
   cdcListener: CDCListenerService
 ) {
-  // Use the shared engine instance from CDCListenerService so pendingApprovals
-  // map is shared between API-triggered and CDC-triggered disruptions.
   const agentEngine = cdcListener.getAgentEngine();
   const DisruptSchema = z.object({
     itineraryId: z.string().optional(),
@@ -56,7 +53,6 @@ export function setDisruptionDeps(
     const actualDisruptionType = type || disruptionType;
     const customCost = typeof costDelta === 'number' ? costDelta : (strategy === 'HIGH_COST_GUARDRAIL' ? 450 : 0);
 
-    // Safe optional chaining for in-memory graph cache mutation
     if (inMemoryGraphCache?.segments?.[0]) {
       inMemoryGraphCache.segments[0].status = 'DELAYED';
       inMemoryGraphCache.segments[0].delay_minutes = delayMinutes;

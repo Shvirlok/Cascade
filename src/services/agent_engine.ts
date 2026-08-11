@@ -370,25 +370,25 @@ export class CascadeAgentEngine {
       const actionLogs: AgentActionLog[] = [];
       const rebookedSegments: any[] = [];
       let usedFallback = false;
-    let sagaStatus: 'COMPLETED' | 'ROLLBACK_EXECUTED' = 'COMPLETED';
+      let sagaStatus: 'COMPLETED' | 'ROLLBACK_EXECUTED' = 'COMPLETED';
 
-    const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
-    const proofArtifactId = 'PROOF-REC-' + Math.floor(100000 + Math.random() * 900000);
+      const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
+      const proofArtifactId = 'PROOF-REC-' + Math.floor(100000 + Math.random() * 900000);
 
-    const logStep = (step: string, tag: string, agent: string, action: string, details: any) => {
-      const entry: AgentActionLog = {
-        timestamp: new Date().toISOString(),
-        step,
-        tag,
-        agent,
-        action,
-        details,
+      const logStep = (step: string, tag: string, agent: string, action: string, details: any) => {
+        const entry: AgentActionLog = {
+          timestamp: new Date().toISOString(),
+          step,
+          tag,
+          agent,
+          action,
+          details,
+        };
+        actionLogs.push(entry);
+        if (onStepCallback) {
+          onStepCallback(entry);
+        }
       };
-      actionLogs.push(entry);
-      if (onStepCallback) {
-        onStepCallback(entry);
-      }
-    };
 
     logStep('0', 'MCP_CONNECT', 'COCKROACH_MCP', '[MCP_CONNECT] Connected to Managed CockroachDB Cloud MCP Server (cockroachlabs.cloud/mcp)', {
       endpoint: 'https://cockroachlabs.cloud/mcp',
@@ -780,7 +780,7 @@ export class CascadeAgentEngine {
     });
 
     logStep('2', 'BEDROCK_AGENT', 'ITERATION_LOOP_1', '[CoT Iteration 1/3]: Resolving Flight DL-1402 delay (+180m). Rerouting to Direct Flight DL-1990.', { loop: 1 });
-    logStep('3', 'BEDROCK_AGENT', 'ITERATION_LOOP_2', '[CoT Iteration 2/3]: Resolving Train Cancel AMT-2150. Rebooking Amtrak Acela 2158 First Class.', { loop: 3 });
+    logStep('3', 'BEDROCK_AGENT', 'ITERATION_LOOP_2', '[CoT Iteration 2/3]: Resolving Train Cancel AMT-2150. Rebooking Amtrak Acela 2158 First Class.', { loop: 2 });
     logStep('4', 'BEDROCK_AGENT', 'ITERATION_LOOP_3', '[CoT Iteration 3/3]: Resolving Ritz-Carlton Overbook. Upgrading to Executive Suite Late Check-in.', { loop: 3 });
 
     return await this.processDisruption(

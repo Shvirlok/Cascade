@@ -1,7 +1,3 @@
-/**
- * Enterprise Control Room Broadcast Telegram Alert Service for CASCADE
- */
-
 export interface TelegramBroadcastPayload {
   travelerId?: string;
   travelerName: string;
@@ -64,9 +60,6 @@ export async function sendTelegramAlert(data: TelegramBroadcastPayload): Promise
     return { sent: false, reason: 'TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not configured' };
   }
 
-  const travelerId = data.travelerId || 'itin-101';
-  const port = process.env.PORT || '3000';
-  const dashboardUrl = `http://localhost:${port}/?traveler=${travelerId}`;
   const transportType = data.transportType || 'Express Rail Re-route';
   const timeSaved = data.timeSaved || '4.5 Hours';
   const newArrivalTime = data.newArrivalTime || 'Jul 25, 07:30 PM';

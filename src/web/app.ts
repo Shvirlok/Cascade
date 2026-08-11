@@ -17,14 +17,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), 'src', 'web', 'public')));
 
-// Initialize CockroachDB CDC Listener
 const cdcListener = new CDCListenerService(parseInt(process.env.CDC_POLL_INTERVAL_MS || '3000', 10));
 cdcListener.startListening();
 
-// Active SSE client connections
 const sseClients: Response[] = [];
 
-// Export active fleet trips reference
 export const ACTIVE_FLEET_TRIPS: any[] = activeFleetData;
 
 function broadcastSSE(eventType: string, data: any) {
@@ -43,25 +40,19 @@ function broadcastSSE(eventType: string, data: any) {
   });
 }
 
-// Forward CDC event emitter steps to SSE web clients
 cdcEventEmitter.on('cdc_event', (data) => broadcastSSE('cdc_event', data));
 cdcEventEmitter.on('agent_step', (data) => broadcastSSE('agent_step', data));
 cdcEventEmitter.on('cascade_healed', (data) => broadcastSSE('cascade_healed', data));
 cdcEventEmitter.on('human_approval_required', (data) => broadcastSSE('human_approval_required', data));
 
-// Initialize module dependencies
 setDisruptionDeps(broadcastSSE, cdcListener);
 setReportsDeps(cdcListener);
 
-// Mount Modular Express Routers
 app.use(travelersRouter);
 app.use(disruptionRouter);
 app.use(systemRouter);
 app.use(reportsRouter);
 
-/**
- * Server-Sent Events (SSE) Stream Endpoint for real-time dashboard UI
- */
 app.get('/api/stream', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
@@ -77,7 +68,6 @@ app.get('/api/stream', (req: Request, res: Response) => {
 
   sseClients.push(res);
 
-  // Periodic heartbeat timer to keep socket alive and detect dead connections early
   const heartbeatTimer = setInterval(() => {
     try {
       if (!res.writableEnded && !res.destroyed) {
@@ -101,9 +91,7 @@ app.get('/api/stream', (req: Request, res: Response) => {
       if (!res.writableEnded && !res.destroyed) {
         res.end();
       }
-    } catch (_err) {
-      // Ignore socket termination errors
-    }
+    } catch (_err) {}
   };
 
   req.on('close', cleanup);
@@ -118,21 +106,18 @@ app.get('/api/stream', (req: Request, res: Response) => {
   });
 });
 
-// Wildcard fallback to serve index.html for Single Page Application navigation
 app.get('*', (_req: Request, res: Response) => {
   res.sendFile(path.join(process.cwd(), 'src', 'web', 'public', 'index.html'));
 });
 
-// Centralized Express Error Handling Middleware
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('[CASCADE Centralized Error Handler]:', err);
+  console.error('[CASCADE Error]:', err);
   res.status(err.status || 500).json({
     error: err.message || 'Internal Server Error',
     timestamp: new Date().toISOString(),
   });
 });
 
-// Port listener with fallback if occupied
 function startServer(portToTry: number) {
   const server = app.listen(portToTry, () => {
     console.log(`=======================================================`);

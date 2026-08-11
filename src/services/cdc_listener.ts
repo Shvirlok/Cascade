@@ -4,10 +4,6 @@ import { CascadeAgentEngine, AgentActionLog } from './agent_engine.js';
 
 export const cdcEventEmitter = new EventEmitter();
 
-/**
- * CockroachDB Changefeed (CDC) Listener Service
- * Listens for pending disruption events in CockroachDB and triggers multi-agent resolution.
- */
 export class CDCListenerService {
   private agentEngine: CascadeAgentEngine;
   private isPolling: boolean = false;
@@ -20,29 +16,18 @@ export class CDCListenerService {
     this.pollIntervalMs = pollIntervalMs;
   }
 
-  /**
-   * Exposes the shared agent engine instance so route handlers can share
-   * the same pendingApprovals map (required for HITL approve/reject to work)
-   */
   public getAgentEngine(): CascadeAgentEngine {
     return this.agentEngine;
   }
 
-  /**
-   * Start CDC event listener loop
-   */
   public startListening(): void {
     if (this.isPolling) return;
     this.isPolling = true;
-
     this.pollTimer = setInterval(async () => {
       await this.checkPendingDisruptions();
     }, this.pollIntervalMs);
   }
 
-  /**
-   * Stop CDC event listener loop
-   */
   public stopListening(): void {
     this.isPolling = false;
     if (this.pollTimer) {
@@ -51,24 +36,16 @@ export class CDCListenerService {
     }
   }
 
-  /**
-   * Process direct webhook event payload
-   */
   public async handleWebhookPayload(payload: any): Promise<void> {
     const updatedRecord = payload?.after || payload;
-    
     if (updatedRecord && (updatedRecord.status === 'DELAYED' || updatedRecord.status === 'CANCELLED')) {
       const segmentId = updatedRecord.id;
       const itineraryId = updatedRecord.itinerary_id;
       const delayMinutes = updatedRecord.delay_minutes || 150;
-
       await this.triggerAgentHealingDirectly(itineraryId, segmentId, delayMinutes, 'FLIGHT_DELAY', 'EXECUTIVE_SPEED');
     }
   }
 
-  /**
-   * Poll CockroachDB for newly inserted pending disruption events (silently ignores connection errors)
-   */
   private async checkPendingDisruptions(): Promise<void> {
     try {
       const pendingRes = await query(
@@ -80,9 +57,7 @@ export class CDCListenerService {
       );
 
       for (const row of pendingRes.rows) {
-        if (this.inFlightHealings.has(row.itinerary_id)) {
-          continue;
-        }
+        if (this.inFlightHealings.has(row.itinerary_id)) continue;
 
         await query(
           `UPDATE disruption_events SET status = 'PROCESSING' WHERE id = $1`,
@@ -100,13 +75,10 @@ export class CDCListenerService {
         this.triggerAgentHealingDirectly(row.itinerary_id, row.segment_id, row.delay_minutes, 'FLIGHT_DELAY', 'EXECUTIVE_SPEED').catch(() => {});
       }
     } catch (_err) {
-      // Completely silent catch to ensure zero terminal noise when DB is offline
+      // Silent — no noise when DB is offline
     }
   }
 
-  /**
-   * Directly trigger AWS Bedrock Multi-Agent engine self-healing cycle and emit steps over SSE
-   */
   public async triggerAgentHealingDirectly(
     itineraryId: string,
     segmentId: string,
@@ -120,7 +92,7 @@ export class CDCListenerService {
     const safeDelayMinutes = (typeof delayMinutes === 'number' && !isNaN(delayMinutes)) ? delayMinutes : 150;
 
     if (this.inFlightHealings.has(defaultItinId)) {
-      console.warn(`[CDCListener] In-flight execution lock active for itinerary ${defaultItinId}. Skipping duplicate resolution.`);
+      console.warn(`[CDCListener] In-flight lock active for ${defaultItinId}. Skipping duplicate.`);
       return;
     }
 
@@ -134,10 +106,7 @@ export class CDCListenerService {
         disruptionType,
         strategy,
         (actionLog: AgentActionLog) => {
-          cdcEventEmitter.emit('agent_step', {
-            itineraryId: defaultItinId,
-            ...actionLog,
-          });
+          cdcEventEmitter.emit('agent_step', { itineraryId: defaultItinId, ...actionLog });
         },
         customCostDelta
       );
@@ -163,101 +132,24 @@ export class CDCListenerService {
         });
       }
     } catch (_err) {
-      // Dynamic CoT step generator based on severity and strategy
       const isMinor = safeDelayMinutes < 60 && disruptionType === 'FLIGHT_DELAY';
       const isMajor = safeDelayMinutes > 180 || disruptionType === 'TRAIN_CANCEL' || disruptionType === 'HOTEL_OVERBOOK';
 
       const simulatedSteps: AgentActionLog[] = [
-        {
-          timestamp: new Date().toISOString(),
-          step: '1',
-          tag: 'CDC_EVENT',
-          agent: 'CDC_LISTENER',
-          action: `CockroachDB Changefeed captured: Type=${disruptionType}, Delay=+${safeDelayMinutes}m, Strategy=${strategy}`,
-          details: { delayMinutes: safeDelayMinutes, disruptionType, strategy },
-        },
-        {
-          timestamp: new Date().toISOString(),
-          step: '2',
-          tag: 'GRAPH_RECOVERY',
-          agent: 'GRAPH_AGENT',
-          action: 'Fetching CockroachDB transactional itinerary graph nodes & edges',
-          details: { itineraryId: defaultItinId, nodes: 4 },
-        },
-        {
-          timestamp: new Date().toISOString(),
-          step: '3',
-          tag: 'VECTOR_SEARCH',
-          agent: 'VECTOR_AGENT',
-          action: `Querying CockroachDB HNSW index (1536-dim cosine ops) with strategy filter: ${strategy}`,
-          details: { user: 'Sarah Jenkins', strategy, index: 'idx_users_preference_embedding' },
-        },
-        {
-          timestamp: new Date().toISOString(),
-          step: '4',
-          tag: 'VECTOR_SEARCH',
-          agent: 'VECTOR_AGENT',
-          action: `Match confirmed: Sarah Jenkins (Filter: ${strategy})`,
-          details: { priority: strategy === 'EXECUTIVE_SPEED' ? ['FLIGHT', 'TRAIN'] : ['TRAIN', 'HOTEL'] },
-        },
-        {
-          timestamp: new Date().toISOString(),
-          step: '5',
-          tag: 'BEDROCK_AGENT',
-          agent: 'CASCADE_ANALYZER',
-          action: isMinor
-            ? `Evaluating slack (+${safeDelayMinutes}m delay): Minor buffer adjustment. Layover window preserved (+45m slack)`
-            : isMajor
-            ? `CRITICAL CASCADE FAILURE (+${safeDelayMinutes}m delay / ${disruptionType}): Overlap -195m! Emergency re-route required.`
-            : `Evaluating slack (+${safeDelayMinutes}m delay): Overlap -60m detected on Amtrak Train 2150.`,
-          details: { delayMinutes: safeDelayMinutes, isMinor, isMajor },
-        },
-        {
-          timestamp: new Date().toISOString(),
-          step: '6',
-          tag: 'MCP_TOOL',
-          agent: 'TRANSIT_MCP_TOOL',
-          action: isMajor
-            ? "Executing MCP tool 'query_transit_availability' for Emergency Direct Flight DL-1990 Re-route"
-            : "Executing MCP tool 'query_transit_availability' for Amtrak Express alternatives",
-          details: { transitType: isMajor ? 'FLIGHT' : 'TRAIN', strategy },
-        },
-        {
-          timestamp: new Date().toISOString(),
-          step: '7',
-          tag: 'BEDROCK_AGENT',
-          agent: 'CLAUDE_3.5_SONNET',
-          action: isMinor
-            ? 'AWS Bedrock (Claude 3.5 Sonnet): Minor delay within layover buffer. Maintained original travel graph schedule.'
-            : isMajor
-            ? 'AWS Bedrock (Claude 3.5 Sonnet): Executed Emergency Re-route DL-1990 + Ritz-Carlton Executive Suite Upgrade.'
-            : 'AWS Bedrock (Claude 3.5 Sonnet): Rebooked Amtrak Express Train 2158 at 18:30 (+90m buffer restored).',
-          details: { strategy, delayMinutes: safeDelayMinutes },
-        },
-        {
-          timestamp: new Date().toISOString(),
-          step: '8',
-          tag: 'CRDB_ACID',
-          agent: 'COCKROACH_TRANSACTION',
-          action: `Executing CockroachDB serializable transaction retry block: Committed rebooked segments for strategy ${strategy}`,
-          details: { status: 'COMMITTED', retryCount: 0 },
-        },
-        {
-          timestamp: new Date().toISOString(),
-          step: '9',
-          tag: 'CASCADE_COMPLETE',
-          agent: 'ORCHESTRATOR',
-          action: `CASCADE Route Graph self-healed in 392ms! Strategy ${strategy} executed under <1000ms SLA.`,
-          details: { executionTimeMs: 392, status: 'SELF_HEALED' },
-        },
+        { timestamp: new Date().toISOString(), step: '1', tag: 'CDC_EVENT', agent: 'CDC_LISTENER', action: `CockroachDB Changefeed captured: Type=${disruptionType}, Delay=+${safeDelayMinutes}m, Strategy=${strategy}`, details: { delayMinutes: safeDelayMinutes, disruptionType, strategy } },
+        { timestamp: new Date().toISOString(), step: '2', tag: 'GRAPH_RECOVERY', agent: 'GRAPH_AGENT', action: 'Fetching CockroachDB transactional itinerary graph nodes & edges', details: { itineraryId: defaultItinId, nodes: 4 } },
+        { timestamp: new Date().toISOString(), step: '3', tag: 'VECTOR_SEARCH', agent: 'VECTOR_AGENT', action: `Querying CockroachDB HNSW index (1536-dim cosine ops) with strategy filter: ${strategy}`, details: { user: 'Sarah Jenkins', strategy, index: 'idx_users_preference_embedding' } },
+        { timestamp: new Date().toISOString(), step: '4', tag: 'VECTOR_SEARCH', agent: 'VECTOR_AGENT', action: `Match confirmed: Sarah Jenkins (Filter: ${strategy})`, details: { priority: strategy === 'EXECUTIVE_SPEED' ? ['FLIGHT', 'TRAIN'] : ['TRAIN', 'HOTEL'] } },
+        { timestamp: new Date().toISOString(), step: '5', tag: 'BEDROCK_AGENT', agent: 'CASCADE_ANALYZER', action: isMinor ? `Evaluating slack (+${safeDelayMinutes}m delay): Minor buffer adjustment. Layover window preserved (+45m slack)` : isMajor ? `CRITICAL CASCADE FAILURE (+${safeDelayMinutes}m delay / ${disruptionType}): Overlap -195m! Emergency re-route required.` : `Evaluating slack (+${safeDelayMinutes}m delay): Overlap -60m detected on Amtrak Train 2150.`, details: { delayMinutes: safeDelayMinutes, isMinor, isMajor } },
+        { timestamp: new Date().toISOString(), step: '6', tag: 'MCP_TOOL', agent: 'TRANSIT_MCP_TOOL', action: isMajor ? "Executing MCP tool 'query_transit_availability' for Emergency Direct Flight DL-1990 Re-route" : "Executing MCP tool 'query_transit_availability' for Amtrak Express alternatives", details: { transitType: isMajor ? 'FLIGHT' : 'TRAIN', strategy } },
+        { timestamp: new Date().toISOString(), step: '7', tag: 'BEDROCK_AGENT', agent: 'CLAUDE_3.5_SONNET', action: isMinor ? 'AWS Bedrock (Claude 3.5 Sonnet): Minor delay within layover buffer. Maintained original travel graph schedule.' : isMajor ? 'AWS Bedrock (Claude 3.5 Sonnet): Executed Emergency Re-route DL-1990 + Ritz-Carlton Executive Suite Upgrade.' : 'AWS Bedrock (Claude 3.5 Sonnet): Rebooked Amtrak Express Train 2158 at 18:30 (+90m buffer restored).', details: { strategy, delayMinutes: safeDelayMinutes } },
+        { timestamp: new Date().toISOString(), step: '8', tag: 'CRDB_ACID', agent: 'COCKROACH_TRANSACTION', action: `Executing CockroachDB serializable transaction retry block: Committed rebooked segments for strategy ${strategy}`, details: { status: 'COMMITTED', retryCount: 0 } },
+        { timestamp: new Date().toISOString(), step: '9', tag: 'CASCADE_COMPLETE', agent: 'ORCHESTRATOR', action: `CASCADE Route Graph self-healed in 392ms! Strategy ${strategy} executed under <1000ms SLA.`, details: { executionTimeMs: 392, status: 'SELF_HEALED' } },
       ];
 
       for (let i = 0; i < simulatedSteps.length; i++) {
         await new Promise((res) => setTimeout(res, 200));
-        cdcEventEmitter.emit('agent_step', {
-          itineraryId: defaultItinId,
-          ...simulatedSteps[i],
-        });
+        cdcEventEmitter.emit('agent_step', { itineraryId: defaultItinId, ...simulatedSteps[i] });
       }
 
       cdcEventEmitter.emit('cascade_healed', {
