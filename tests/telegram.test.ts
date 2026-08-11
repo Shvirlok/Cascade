@@ -51,11 +51,15 @@ describe('Enterprise Control Room Broadcast Telegram Unit Tests', () => {
 
     expect(result.sent).toBe(true);
     expect(capturedBody).not.toBeNull();
-    expect(capturedBody.text).toContain('🚨 <b>CASCADE Executive Control Room Alert</b>');
+    // New beautiful format checks
+    expect(capturedBody.text).toContain('CASCADE SELF-HEALED');
     expect(capturedBody.text).toContain('Marcus Vance');
-    expect(capturedBody.text).toContain('JFK ➔ CDG');
+    expect(capturedBody.text).toContain('JFK ──▶ CDG');
     expect(capturedBody.text).toContain('Air France (AF-007)');
     expect(capturedBody.text).toContain('0xabc123456789');
+    // Inline keyboard should be present
+    expect(capturedBody.reply_markup).toBeDefined();
+    expect(capturedBody.reply_markup.inline_keyboard[0][0].text).toContain('CascadeAWS_bot');
 
     global.fetch = globalFetch;
   });

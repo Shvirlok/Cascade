@@ -19,25 +19,19 @@ export class CockroachMcpClient {
     this.clusterId = config?.clusterId || process.env.COCKROACH_CLUSTER_ID || 'cascade-cluster-892';
   }
 
-  /**
-   * Connect to Managed CockroachDB Cloud MCP Server (https://cockroachlabs.cloud/mcp)
-   */
   async connect(): Promise<boolean> {
     try {
-      console.log(`[MCP_CONNECT] Connecting to Managed CockroachDB Cloud MCP Server (${this.endpoint})...`);
+      console.log(`[MCP_CONNECT] Connecting to CockroachDB Cloud MCP Server (${this.endpoint})...`);
       this.isConnected = true;
-      console.log(`[MCP_CONNECT] Connected to Managed CockroachDB Cloud MCP Server (cockroachlabs.cloud/mcp) [Cluster: ${this.clusterId}]`);
+      console.log(`[MCP_CONNECT] Connected [Cluster: ${this.clusterId}]`);
       return true;
     } catch (err: any) {
-      console.warn(`[MCP_CONNECT] Managed CockroachDB Cloud MCP Endpoint warning: ${err.message}. Operating in resilient fallback mode.`);
+      console.warn(`[MCP_CONNECT] Warning: ${err.message}. Operating in resilient fallback mode.`);
       this.isConnected = true;
       return true;
     }
   }
 
-  /**
-   * CockroachDB Agent Skill: Inspect Cluster Observability Skill
-   */
   async executeObservabilitySkill(): Promise<any> {
     return {
       skill: 'inspect_cluster_observability_skill',

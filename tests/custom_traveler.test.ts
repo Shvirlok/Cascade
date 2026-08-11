@@ -36,10 +36,11 @@ describe('Custom Traveler Identity & Dynamic State Unit Tests', () => {
 
     expect(result.sent).toBe(true);
     expect(capturedBody).not.toBeNull();
-    expect(capturedBody.text).toContain('Passenger:</b> Yaroslav');
-    expect(capturedBody.text).toContain('FRA ➔ SIN');
+    expect(capturedBody.text).toContain('Yaroslav');          // new format: name in own block
+    expect(capturedBody.text).toContain('FRA ──▶ SIN');         // new arrow format
     expect(capturedBody.text).toContain('Singapore Airlines (SQ-325)');
     expect(capturedBody.text).toContain('0x778899aabbcc');
+    expect(capturedBody.reply_markup).toBeDefined();
 
     global.fetch = globalFetch;
   });

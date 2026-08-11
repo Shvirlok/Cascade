@@ -10,8 +10,14 @@ services:
       - "8080:8080"
     environment:
       - COCKROACH_DATABASE=cascade_db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?type=ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - cockroach_data:/cockroach/cockroach-data
 
 volumes:
   cockroach_data:
+

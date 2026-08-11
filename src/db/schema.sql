@@ -123,6 +123,9 @@ CREATE INDEX idx_segments_prev_segment ON itinerary_segments(previous_segment_id
 CREATE INDEX idx_disruptions_status ON disruption_events(status);
 CREATE INDEX idx_disruptions_itinerary ON disruption_events(itinerary_id);
 
+-- CockroachDB GIN Index for fast JSONB metadata querying
+CREATE INDEX idx_users_preferences_gin ON users USING gin (preferences);
+
 -- CockroachDB HNSW Vector Index for fast approximate nearest neighbor (ANN) search
 CREATE INDEX idx_users_preference_embedding ON users USING hnsw (preference_embedding vector_cosine_ops);
 CREATE INDEX idx_segments_embedding ON itinerary_segments USING hnsw (embedding vector_cosine_ops);

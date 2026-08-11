@@ -1,869 +1,137 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { checkDatabaseConnection, query } from '../config/database.js';
-import { hasValidAwsCredentials, BEDROCK_MODEL_ID } from '../config/aws_config.js';
-import { getItineraryGraph } from '../mcp/tools/db_tools.js';
-import { simulateFlightDisruption } from '../services/disruption_emulator.js';
 import { CDCListenerService, cdcEventEmitter } from '../services/cdc_listener.js';
-import { CascadeAgentEngine } from '../services/agent_engine.js';
-import { generateAuditReport, exportAuditReportMarkdown } from '../services/audit_report_generator.js';
-import { sendTelegramAlert } from '../services/telegram_service.js';
+import { travelersRouter, activeFleetData } from './routes/travelers.js';
+import { disruptionRouter, setDisruptionDeps } from './routes/disruption.js';
+import { systemRouter } from './routes/system.js';
+import { reportsRouter, setReportsDeps } from './routes/reports.js';
 
 dotenv.config();
 
 const app = express();
 const DEFAULT_PORT = parseInt(process.env.PORT || '3000', 10);
-const agentEngine = new CascadeAgentEngine();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), 'src', 'web', 'public')));
 
-// Initialize CockroachDB CDC Listener
 const cdcListener = new CDCListenerService(parseInt(process.env.CDC_POLL_INTERVAL_MS || '3000', 10));
 cdcListener.startListening();
 
-// Active SSE client connections
 const sseClients: Response[] = [];
+
+export const ACTIVE_FLEET_TRIPS: any[] = activeFleetData;
 
 function broadcastSSE(eventType: string, data: any) {
   const payload = `event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`;
-  sseClients.forEach((client) => client.write(payload));
+  const dead: Response[] = [];
+  sseClients.forEach((client) => {
+    try {
+      client.write(payload);
+    } catch (_err) {
+      dead.push(client);
+    }
+  });
+  dead.forEach((client) => {
+    const idx = sseClients.indexOf(client);
+    if (idx !== -1) sseClients.splice(idx, 1);
+  });
 }
 
-// Forward CDC event emitter steps to SSE web clients
 cdcEventEmitter.on('cdc_event', (data) => broadcastSSE('cdc_event', data));
 cdcEventEmitter.on('agent_step', (data) => broadcastSSE('agent_step', data));
 cdcEventEmitter.on('cascade_healed', (data) => broadcastSSE('cascade_healed', data));
 cdcEventEmitter.on('human_approval_required', (data) => broadcastSSE('human_approval_required', data));
 
-// In-Memory Fleet Database State
-let activeFleetData = [
-  { id: 'itin-101', traveler: 'Sarah Jenkins', route: 'SFO → LHR', status: 'SELF_HEALED', legs: 'Flight · Train · Hotel · Flight', last_event: 'Flight delayed +150m — automatically rebooked to next Amtrak Acela Express', region: 'us-east-1' },
-  { id: 'itin-102', traveler: 'Marcus Vance', route: 'JFK → CDG', status: 'SCHEDULED', legs: 'Flight · Express Rail · Hotel', last_event: 'All connections on schedule with comfortable buffer', region: 'eu-west-1' },
-  { id: 'itin-103', traveler: 'Elena Rostova', route: 'ORD → HND', status: 'IN_TRANSIT', legs: 'Flight · Shinkansen · Hotel', last_event: 'First leg departed on time', region: 'ap-northeast-1' },
-  { id: 'itin-104', traveler: 'David Chen', route: 'MIA → LHR', status: 'SELF_HEALED', legs: 'Flight · Taxi · Hotel', last_event: 'Hotel check-in adjusted for late arrival — guaranteed at no extra cost', region: 'us-east-1' },
-];
+setDisruptionDeps(broadcastSSE, cdcListener);
+setReportsDeps(cdcListener);
 
-let inMemoryGraphCache: any = {
-  itinerary: {
-    id: 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22',
-    title: 'Transatlantic Multi-Modal Executive Trip',
-    origin: 'SFO (San Francisco)',
-    destination: 'LHR (London Heathrow)',
-    status: 'SCHEDULED',
-    total_cost: 2850.00,
-  },
-  user: {
-    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-    name: 'Sarah Jenkins',
-    email: 'sarah.jenkins@acme.com',
-    preferences: {
-      preferred_cabin: 'business',
-      max_layover_hours: 3,
-      transit_mode_priority: ['FLIGHT', 'TRAIN', 'HOTEL', 'TAXI'],
-      seat_preference: 'aisle',
-      hotel_min_stars: 4,
-      auto_rebook_threshold_min: 30,
-    },
-  },
-  segments: [
-    {
-      id: 'c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33',
-      sequence_order: 1,
-      segment_type: 'FLIGHT',
-      provider: 'Delta Air Lines',
-      reference_code: 'DL-1402',
-      origin: 'SFO (San Francisco)',
-      destination: 'JFK (New York)',
-      scheduled_departure: '2026-07-25T12:00:00.000Z',
-      scheduled_arrival: '2026-07-25T17:00:00.000Z',
-      status: 'SCHEDULED',
-      delay_minutes: 0,
-    },
-    {
-      id: 'd3fbc999-6c0b-4ef8-bb6d-9bb9bd380a44',
-      sequence_order: 2,
-      segment_type: 'TRAIN',
-      provider: 'Amtrak Acela Express',
-      reference_code: 'AMT-2150',
-      origin: 'NY Moynihan Train Hall',
-      destination: 'Philadelphia 30th St',
-      scheduled_departure: '2026-07-25T18:30:00.000Z',
-      scheduled_arrival: '2026-07-25T19:45:00.000Z',
-      status: 'SCHEDULED',
-      delay_minutes: 0,
-    },
-    {
-      id: 'e4fbc999-5c0b-4ef8-bb6d-0bb9bd380a55',
-      sequence_order: 3,
-      segment_type: 'HOTEL',
-      provider: 'Ritz-Carlton Philadelphia',
-      reference_code: 'HTL-9921',
-      origin: 'Philadelphia Downtown',
-      destination: 'Philadelphia Downtown',
-      scheduled_departure: '2026-07-25T20:15:00.000Z',
-      scheduled_arrival: '2026-07-26T12:00:00.000Z',
-      status: 'SCHEDULED',
-      delay_minutes: 0,
-    },
-    {
-      id: 'f5fbc999-4c0b-4ef8-bb6d-1bb9bd380a66',
-      sequence_order: 4,
-      segment_type: 'FLIGHT',
-      provider: 'British Airways',
-      reference_code: 'BA-178',
-      origin: 'PHL (Philadelphia)',
-      destination: 'LHR (London Heathrow)',
-      scheduled_departure: '2026-07-26T15:00:00.000Z',
-      scheduled_arrival: '2026-07-26T22:00:00.000Z',
-      status: 'SCHEDULED',
-      delay_minutes: 0,
-    },
-  ],
-};
+app.use(travelersRouter);
+app.use(disruptionRouter);
+app.use(systemRouter);
+app.use(reportsRouter);
 
-/**
- * Enterprise Dashboard Overview Metrics
- */
-app.get('/api/dashboard', async (_req: Request, res: Response) => {
-  res.json({
-    metrics: {
-      active_itineraries: activeFleetData.length + 1416,
-      self_healed_rate: '99.4%',
-      crdb_p99_latency: '18ms',
-      bedrock_uptime: '100%',
-      active_cdc_changefeeds: 4,
-      total_disruptions_healed_24h: 384,
-      cache_hit_ratio: '98.6%',
-      tps_throughput: 1250,
-    },
-    active_fleet: activeFleetData,
-  });
-});
-
-/**
- * Create / Import Executive Itinerary Endpoint
- */
-app.post('/api/itinerary/create', async (req: Request, res: Response) => {
-  const { travelerName, travelerEmail, origin, destination, strategy, originLat, originLng, destLat, destLng } = req.body;
-
-  const newId = `traveler_${Date.now()}`;
-  const origCode = (origin || 'JFK').split(' ')[0].split('—')[0].trim();
-  const destCode = (destination || 'LHR').split(' ')[0].split('—')[0].trim();
-  const routeStr = `${origCode} ➔ ${destCode}`;
-
-  const resolvedOrigLat = typeof originLat === 'number' ? originLat : 37.6213;
-  const resolvedOrigLng = typeof originLng === 'number' ? originLng : -122.3790;
-  const resolvedDestLat = typeof destLat === 'number' ? destLat : 51.4700;
-  const resolvedDestLng = typeof destLng === 'number' ? destLng : -0.4543;
-
-  const cLat = (resolvedOrigLat + resolvedDestLat) / 2;
-  const cLng = (resolvedOrigLng + resolvedDestLng) / 2;
-
-  const newProfile = {
-    id: newId,
-    name: travelerName || 'Executive Traveler',
-    email: travelerEmail || 'executive@acme.com',
-    route: routeStr,
-    originCode: origCode,
-    destinationCode: destCode,
-    originLat: resolvedOrigLat,
-    originLng: resolvedOrigLng,
-    destLat: resolvedDestLat,
-    destLng: resolvedDestLng,
-    status: 'SCHEDULED',
-    policyTier: strategy === 'COMFORT_BUSINESS' ? 'VIP Executive ($500 Limit)' : 'Executive Tier ($300 Limit)',
-    policyLimitUsd: strategy === 'COMFORT_BUSINESS' ? 500 : 300,
-    preferredCabin: strategy === 'COMFORT_BUSINESS' ? 'First Class Quiet Car' : 'Business Class Direct',
-    vectorScore: 0.965,
-    centerLat: cLat,
-    centerLng: cLng,
-    zoom: 3,
-    legs: [
-      { type: 'FLIGHT', provider: `Executive Air (${origCode}-${Math.floor(100+Math.random()*899)})`, route: `${origCode} → ${destCode}`, status: 'SCHEDULED' },
-      { type: 'TRAIN', provider: 'Express Rail Connection', route: `${destCode} Central Station`, status: 'SCHEDULED' },
-      { type: 'HOTEL', provider: 'Luxury Five-Star Executive Hotel', route: `${destCode} Downtown`, status: 'CONFIRMED' },
-    ],
-  };
-
-  TRAVELER_PROFILES[newId] = newProfile;
-
-  const newTrip = {
-    id: newId,
-    traveler: newProfile.name,
-    route: routeStr,
-    status: 'SCHEDULED',
-    legs: 'Flight · Express Rail · Hotel',
-    last_event: `New trip created (${routeStr}). Traveler preferences loaded.`,
-    region: 'us-east-1',
-  };
-
-  activeFleetData.unshift(newTrip);
-
-  res.json({
-    success: true,
-    itineraryId: newId,
-    newTrip,
-    profile: newProfile,
-    message: 'Trip created and traveler preferences loaded successfully.',
-  });
-});
-
-const TRAVELER_PROFILES: Record<string, any> = {
-  'itin-101': {
-    id: 'itin-101',
-    name: 'Sarah Jenkins',
-    email: 'sarah.jenkins@acme.com',
-    route: 'SFO ➔ LHR',
-    originCode: 'SFO',
-    destinationCode: 'LHR',
-    originLat: 37.6213,
-    originLng: -122.3790,
-    destLat: 51.4700,
-    destLng: -0.4543,
-    status: 'SELF_HEALED',
-    policyTier: 'Executive Tier ($300 Limit)',
-    policyLimitUsd: 300,
-    preferredCabin: 'Business Class Quiet Car',
-    vectorScore: 0.984,
-    centerLat: 45.0,
-    centerLng: -60.0,
-    zoom: 3,
-    legs: [
-      { type: 'FLIGHT', provider: 'Delta Air Lines (DL-1402)', route: 'SFO → JFK', status: 'DELAYED' },
-      { type: 'TRAIN', provider: 'Amtrak Acela Express (AMT-2158)', route: 'NY Moynihan → PHL 30th St', status: 'REBOOKED' },
-      { type: 'HOTEL', provider: 'Ritz-Carlton Philadelphia', route: 'Philadelphia Downtown', status: 'CONFIRMED' },
-      { type: 'FLIGHT', provider: 'British Airways (BA-178)', route: 'PHL → LHR', status: 'SCHEDULED' },
-    ],
-  },
-  'itin-102': {
-    id: 'itin-102',
-    name: 'Marcus Vance',
-    email: 'marcus.vance@acme.com',
-    route: 'JFK ➔ CDG',
-    originCode: 'JFK',
-    destinationCode: 'CDG',
-    originLat: 40.6413,
-    originLng: -73.7781,
-    destLat: 49.0097,
-    destLng: 2.5479,
-    status: 'SCHEDULED',
-    policyTier: 'VIP Executive ($500 Limit)',
-    policyLimitUsd: 500,
-    preferredCabin: 'First Class Express',
-    vectorScore: 0.962,
-    centerLat: 44.0,
-    centerLng: -35.0,
-    zoom: 4,
-    legs: [
-      { type: 'FLIGHT', provider: 'Air France (AF-007)', route: 'JFK → CDG', status: 'SCHEDULED' },
-      { type: 'TRAIN', provider: 'TGV InOui (TGV-6821)', route: 'Paris CDG → Lyon Part-Dieu', status: 'SCHEDULED' },
-      { type: 'HOTEL', provider: 'Four Seasons Hotel George V', route: 'Paris Eighth Arrondissement', status: 'CONFIRMED' },
-    ],
-  },
-  'itin-103': {
-    id: 'itin-103',
-    name: 'Elena Rostova',
-    email: 'elena.rostova@acme.com',
-    route: 'ORD ➔ HND',
-    originCode: 'ORD',
-    destinationCode: 'HND',
-    originLat: 41.9742,
-    originLng: -87.9073,
-    destLat: 35.5494,
-    destLng: 139.7798,
-    status: 'IN_TRANSIT',
-    policyTier: 'Global Operations ($250 Limit)',
-    policyLimitUsd: 250,
-    preferredCabin: 'Premium Economy',
-    vectorScore: 0.941,
-    centerLat: 38.0,
-    centerLng: 170.0,
-    zoom: 3,
-    legs: [
-      { type: 'FLIGHT', provider: 'ANA All Nippon Airways (NH-111)', route: 'ORD → HND', status: 'IN_TRANSIT' },
-      { type: 'TRAIN', provider: 'Shinkansen Nozomi (NK-309)', route: 'Tokyo → Kyoto', status: 'SCHEDULED' },
-      { type: 'HOTEL', provider: 'Park Hyatt Tokyo', route: 'Shinjuku Tokyo', status: 'CONFIRMED' },
-    ],
-  },
-  'itin-104': {
-    id: 'itin-104',
-    name: 'David Chen',
-    email: 'david.chen@acme.com',
-    route: 'MIA ➔ LHR',
-    originCode: 'MIA',
-    destinationCode: 'LHR',
-    originLat: 25.7959,
-    originLng: -80.2870,
-    destLat: 51.4700,
-    destLng: -0.4543,
-    status: 'SELF_HEALED',
-    policyTier: 'Executive Tier ($300 Limit)',
-    policyLimitUsd: 300,
-    preferredCabin: 'Business Class Aisle',
-    vectorScore: 0.975,
-    centerLat: 38.0,
-    centerLng: -40.0,
-    zoom: 3,
-    legs: [
-      { type: 'FLIGHT', provider: 'American Airlines (AA-038)', route: 'MIA → LHR', status: 'REBOOKED' },
-      { type: 'TAXI', provider: 'Executive Airport Chauffeur', route: 'LHR → Central London', status: 'CONFIRMED' },
-      { type: 'HOTEL', provider: 'The Savoy London', route: 'Strand London', status: 'CONFIRMED' },
-    ],
-  },
-};
-
-/**
- * Endpoint: List All Executive Travelers
- */
-app.get('/api/travelers', (_req: Request, res: Response) => {
-  res.json(Object.values(TRAVELER_PROFILES));
-});
-
-/**
- * Endpoint: Get Traveler Inspection Context by ID
- */
-app.get('/api/traveler/:id', (req: Request, res: Response) => {
-  const profile = TRAVELER_PROFILES[req.params.id] || TRAVELER_PROFILES['itin-101'];
-  res.json(profile);
-});
-
-/**
- * Sub-10ms Cached Itinerary Endpoint
- */
-app.get('/api/itinerary', async (_req: Request, res: Response) => {
-  res.setHeader('X-Cache-Status', 'HIT');
-  res.setHeader('X-Response-Time-Ms', '3');
-  res.json(inMemoryGraphCache);
-});
-
-app.get('/api/itinerary/:id', async (req: Request, res: Response) => {
-  const profile = TRAVELER_PROFILES[req.params.id];
-  if (profile) {
-    res.json({
-      itinerary: {
-        id: profile.id,
-        title: `${profile.name} — ${profile.route}`,
-        origin: profile.originCode,
-        destination: profile.destinationCode,
-        status: profile.status,
-        total_cost: 2850.00,
-      },
-      user: {
-        id: 'user-' + profile.id,
-        name: profile.name,
-        email: profile.email,
-        preferences: {
-          preferred_cabin: profile.preferredCabin,
-          policy_tier: profile.policyTier,
-        },
-      },
-      profile,
-      segments: profile.legs,
-    });
-  } else {
-    res.json(inMemoryGraphCache);
-  }
-});
-
-/**
- * Pillar 4: Production-Grade Audit Proof Artifact Generator
- */
-app.get('/api/itinerary/artifact', (req: Request, res: Response) => {
-  const artifactId = (req.query.id as string) || 'PROOF-REC-994821';
-  const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
-
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Disposition', `attachment; filename="${artifactId}.json"`);
-  res.json({
-    artifact_id: artifactId,
-    signature: 'sha256-cockroach-bedrock-0x8f4b2c1e9a3d7b4c8e',
-    timestamp_iso: new Date().toISOString(),
-    cockroachdb_telemetry: {
-      tx_hash: txHash,
-      isolation_level: 'SERIALIZABLE',
-      cdc_event_trigger_id: 'cdc-evt-' + Date.now(),
-      region_locality: ['us-east-1', 'eu-west-1', 'ap-northeast-1'],
-    },
-    user_preference_matching: {
-      user_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-      name: 'Sarah Jenkins',
-      vector_match_confidence: 0.984,
-      hnsw_index: 'idx_users_preference_embedding (HNSW vector_cosine_ops)',
-      cross_session_recall: 'Trip #101 (SFO->LHR) preference recalled',
-    },
-    financial_and_time_delta: {
-      original_arrival: 'Jul 25, 05:00 PM',
-      new_arrival: 'Jul 25, 07:30 PM',
-      time_lost_formatted: '+2h 30m',
-      rebooking_fee: '$0.00 (Carrier Covered)',
-      hotel_voucher: '+$0.00 (Executive Voucher Applied)',
-      total_cost_delta: '$0.00',
-    },
-    saga_status: 'COMPLETED',
-    agent_swarm_consensus: 'AGREED (Disruption Recovery Agent + Preference Guard Agent)',
-  });
-});
-
-/**
- * Multi-Region Region Failover Simulator Trigger
- */
-app.post('/api/disrupt/region-failover', async (_req: Request, res: Response) => {
-  const result = await agentEngine.processRegionFailover((stepLog) => {
-    broadcastSSE('agent_step', stepLog);
-  });
-  res.json(result);
-});
-
-/**
- * Pillar 1: Simultaneous Resource Contention Scenario Trigger
- */
-app.post('/api/disrupt/contention', async (_req: Request, res: Response) => {
-  const result = await agentEngine.processContention((stepLog) => {
-    broadcastSSE('agent_step', stepLog);
-  });
-  res.json(result);
-});
-
-/**
- * Pillar 5: Cascade Chaos Mode (Multi-Failure Iterative Engine)
- */
-app.post('/api/disrupt/chaos', async (_req: Request, res: Response) => {
-  const result = await agentEngine.processChaos((stepLog) => {
-    broadcastSSE('agent_step', stepLog);
-  });
-  res.json(result);
-});
-
-/**
- * HNSW Vector Knowledge Base Profiles & Matrix
- */
-app.get('/api/vectors', async (_req: Request, res: Response) => {
-  const dummyVector = new Array(1536).fill(0).map((_, i) => Math.sin(i * 0.05).toFixed(4));
-  res.json({
-    user_profile: {
-      name: 'Sarah Jenkins',
-      email: 'sarah.jenkins@acme.com',
-      vector_index: 'idx_users_preference_embedding (HNSW vector_cosine_ops)',
-      embedding_dim: 1536,
-      vector_preview: dummyVector.slice(0, 16),
-      preferences: {
-        preferred_cabin: 'business',
-        max_layover_hours: 3,
-        transit_mode_priority: ['FLIGHT', 'TRAIN', 'HOTEL', 'TAXI'],
-        seat_preference: 'aisle',
-        hotel_min_stars: 4,
-        auto_rebook_threshold_min: 30,
-      },
-    },
-    similarity_matrix: [
-      { option: 'Amtrak Acela Express (Train 2158)', type: 'TRAIN', cosine_score: 0.984, rank: 1, match: 'EXACT_PREFERENCE_MATCH' },
-      { option: 'Amtrak Regional Express (Train 175)', type: 'TRAIN', cosine_score: 0.891, rank: 2, match: 'HIGH_SIMILARITY' },
-      { option: 'Ritz-Carlton Executive Suite Late Check-in', type: 'HOTEL', cosine_score: 0.962, rank: 1, match: 'EXACT_PREFERENCE_MATCH' },
-      { option: 'Delta Air Lines Re-route (Flight DL-1990)', type: 'FLIGHT', cosine_score: 0.925, rank: 1, match: 'CABIN_CLASS_MATCH' },
-    ],
-  });
-});
-
-/**
- * CDC Changefeed Raw Streams & Tool Call Audit Log
- */
-app.get('/api/ops', async (_req: Request, res: Response) => {
-  res.json({
-    cdc_changefeed: {
-      topic: 'itinerary_segments',
-      sink: 'webhook://localhost:3000/api/cdc-webhook',
-      resolved_timestamp: new Date().toISOString(),
-      recent_events: [
-        {
-          event_id: 'cdc-evt-991',
-          table: 'itinerary_segments',
-          operation: 'UPDATE',
-          primary_key: ['c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33'],
-          before: { status: 'SCHEDULED', delay_minutes: 0 },
-          after: { status: 'DELAYED', delay_minutes: 150 },
-          timestamp: new Date(Date.now() - 15000).toISOString(),
-        },
-      ],
-    },
-    mcp_tool_audit: [
-      { tool: 'get_itinerary_graph', params: { itinerary_id: 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22' }, status: 'SUCCESS', latency_ms: 12 },
-      { tool: 'search_user_preferences_vector', params: { user_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', top_k: 1 }, status: 'SUCCESS', latency_ms: 18 },
-      { tool: 'query_transit_availability', params: { transit_type: 'TRAIN', origin: 'NY Moynihan', destination: 'PHL 30th St' }, status: 'SUCCESS', latency_ms: 45 },
-      { tool: 'rebook_cascade_segment', params: { segment_id: 'd3fbc999-6c0b-4ef8-bb6d-9bb9bd380a44', new_provider: 'Amtrak Acela Express' }, status: 'COMMITTED', latency_ms: 32 },
-    ],
-  });
-});
-
-/**
- * Enhanced System Health & Live Database Telemetry via crdb_internal
- */
-app.get('/api/health', async (_req: Request, res: Response) => {
-  const dbStatus = await checkDatabaseConnection();
-  const awsConfigured = hasValidAwsCredentials();
-
-  let liveCrdbTelemetry = {
-    build: 'CockroachDB v23.2 (SERIALIZABLE)',
-    node_status: 'HEALTHY (Multi-Region Active)',
-    live_latency_ms: 18,
-    active_connections: 12,
-  };
-
-  if (dbStatus) {
-    try {
-      const resCrdb = await query('SELECT count(*) FROM crdb_internal.node_build_info');
-      liveCrdbTelemetry.live_latency_ms = Math.floor(12 + Math.random() * 8);
-    } catch (_err) {
-      // Dynamic simulated live metrics
-      liveCrdbTelemetry.live_latency_ms = Math.floor(14 + Math.random() * 6);
-    }
-  }
-
-  res.json({
-    status: 'ONLINE',
-    engine: 'CASCADE Ultra-Fast Production Engine',
-    rbac_scope: 'Service Account (ccloud) • Restricted Table Access',
-    throughput: {
-      tps: 1250,
-      cache_hit_ratio: '98.6%',
-      sub_second_sla: 'GUARANTEED (1000ms Heuristic Fallback)',
-    },
-    cockroach_db: {
-      status: dbStatus ? 'CONNECTED' : 'EMULATED_OFFLINE',
-      isolation_level: 'SERIALIZABLE',
-      p99_latency: `${liveCrdbTelemetry.live_latency_ms}ms`,
-      active_connections: `${liveCrdbTelemetry.active_connections} / 20`,
-      multi_region_locality: ['us-east-1', 'eu-west-1', 'ap-northeast-1'],
-      crdb_internal_status: liveCrdbTelemetry.node_status,
-    },
-    aws_bedrock: {
-      status: awsConfigured ? 'ONLINE' : 'HEURISTIC_FALLBACK_READY',
-      model_id: BEDROCK_MODEL_ID,
-      region: process.env.AWS_REGION || 'us-east-1',
-      total_tokens_24h: 42190,
-      sla_timeout_ms: 1000,
-    },
-    mcp_tools: '6 TOOLS REGISTERED (inspect_cluster_observability_skill ACTIVE)',
-    cdc_changefeed: 'ACTIVE (POLLING 3000ms)',
-  });
-});
-
-/**
- * Interactive What-If Scenario Trigger Endpoint
- */
-app.post('/api/disrupt', async (req: Request, res: Response) => {
-  const {
-    itineraryId = 'itin-101',
-    segmentReference = 'DL-1402',
-    delayMinutes = 150,
-    type = 'FLIGHT_DELAY',
-    disruptionType = 'FLIGHT_DELAY',
-    strategy = 'EXECUTIVE_SPEED',
-    costDelta,
-  } = req.body;
-
-  const targetProfile = TRAVELER_PROFILES[itineraryId] || {
-    name: inMemoryGraphCache.user?.name || 'Sarah Jenkins',
-    originCode: 'SFO',
-    destinationCode: 'LHR',
-  };
-
-  const actualDisruptionType = type || disruptionType;
-  const parsedDelay = parseInt(String(delayMinutes), 10);
-  const customCost = typeof costDelta === 'number' ? costDelta : (strategy === 'HIGH_COST_GUARDRAIL' ? 450 : 0);
-
-  // Update in-memory graph cache state instantly
-  inMemoryGraphCache.segments[0].status = 'DELAYED';
-  inMemoryGraphCache.segments[0].delay_minutes = parsedDelay;
-  inMemoryGraphCache.segments[1].status = 'DELAYED';
-
-  cdcListener.triggerAgentHealingDirectly(
-    inMemoryGraphCache.itinerary.id,
-    inMemoryGraphCache.segments[0].id,
-    parsedDelay,
-    actualDisruptionType,
-    strategy,
-    customCost
-  ).catch((err) => console.warn('Agent healing notice:', err.message));
-
-  const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
-
-  // Dispatch Enterprise Control Room Broadcast Alert
-  sendTelegramAlert({
-    travelerId: itineraryId,
-    travelerName: targetProfile.name || 'Executive Traveler',
-    origin: targetProfile.originCode || 'SFO',
-    destination: targetProfile.destinationCode || 'LHR',
-    newCarrier: 'Amtrak Acela Express (AMT-2158)',
-    transportType: 'Express Rail Re-route',
-    timeSaved: '4.5 Hours',
-    newArrivalTime: 'Jul 25, 07:30 PM',
-    costDeltaFormatted: customCost > 0 ? `+$${customCost}.00` : '$0.00 Net Delta',
-    approvalType: customCost > 300 ? 'HUMAN_APPROVAL_REQUIRED' : 'AUTO_APPROVED',
-    txHash,
-    resolutionSLA: 392,
-  }).catch((err) => console.warn('Telegram notice:', err.message));
-
-  res.json({
-    success: true,
-    disruptionId: 'disc-evt-' + Date.now(),
-    itineraryId,
-    travelerName: targetProfile.name,
-    segmentReference,
-    delayMinutes: parsedDelay,
-    disruptionType: actualDisruptionType,
-    strategy,
-    costDelta: customCost,
-    txHash,
-  });
-});
-
-/**
- * Interactive What-If Scenario Builder Endpoint
- */
-app.post('/api/disrupt/what-if', async (req: Request, res: Response) => {
-  const { hubCode = 'SFO', eventType = 'AIRPORT_STRIKE', delayMinutes = 180 } = req.body;
-
-  const targetHub = String(hubCode).toUpperCase();
-  const affectedTravelers: any[] = [];
-
-  Object.values(TRAVELER_PROFILES).forEach((profile: any) => {
-    if (profile.originCode === targetHub || profile.destinationCode === targetHub || profile.route.includes(targetHub)) {
-      affectedTravelers.push({
-        id: profile.id,
-        name: profile.name,
-        route: profile.route,
-        status: 'AUTO_HEALED',
-        newCarrier: 'Amtrak Acela Express / Alternate Carrier',
-      });
-    }
-  });
-
-  const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
-
-  // Broadcast Telegram alert for what-if scenario
-  const primaryTraveler = affectedTravelers[0] || { name: 'Corporate Fleet Travelers', route: `${targetHub} Network` };
-  sendTelegramAlert({
-    travelerName: `${primaryTraveler.name} (+${Math.max(0, affectedTravelers.length - 1)} others)`,
-    origin: targetHub,
-    destination: 'Multi-Hub Route',
-    newCarrier: 'Multimodal Failover Fleet',
-    transportType: eventType.replace('_', ' '),
-    timeSaved: '4.8 Hours',
-    newArrivalTime: 'Jul 25, 08:15 PM',
-    costDeltaFormatted: '$0.00 Net Delta',
-    approvalType: 'AUTO_APPROVED',
-    txHash,
-    resolutionSLA: 280,
-  }).catch((err) => console.warn('Telegram what-if notice:', err.message));
-
-  res.json({
-    success: true,
-    scenarioId: 'whatif-evt-' + Date.now(),
-    hubCode: targetHub,
-    eventType,
-    delayMinutes,
-    affectedCount: affectedTravelers.length,
-    affectedTravelers,
-    txHash,
-    resolutionSLA: 280,
-  });
-});
-
-/**
- * Enterprise Control Room Broadcast Test Endpoint
- */
-app.post('/api/telegram/test', async (req: Request, res: Response) => {
-  const { travelerId = 'itin-101' } = req.body;
-  const targetProfile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
-
-  const result = await sendTelegramAlert({
-    travelerId: targetProfile.id,
-    travelerName: targetProfile.name,
-    origin: targetProfile.originCode,
-    destination: targetProfile.destinationCode,
-    newCarrier: 'Amtrak Acela Express (AMT-2158)',
-    transportType: 'Express Rail Re-route',
-    timeSaved: '4.5 Hours',
-    newArrivalTime: 'Jul 25, 07:30 PM',
-    costDeltaFormatted: '$0.00 Net Delta',
-    approvalType: 'AUTO_APPROVED',
-    txHash: '0x' + Math.random().toString(16).substring(2, 12),
-    resolutionSLA: 392,
-  });
-  res.json({ success: result.sent, result });
-});
-
-/**
- * Feature 1: Human-in-the-Loop Rebooking Approval Endpoint
- */
-app.post('/api/itinerary/approve', async (req: Request, res: Response) => {
-  const { itineraryId = 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22' } = req.body;
-  const result = agentEngine.approvePendingRebooking(itineraryId);
-  if (!result) {
-    return res.status(404).json({ success: false, error: 'No pending human approval found for itinerary.' });
-  }
-
-  // Update in-memory graph state
-  inMemoryGraphCache.segments[0].status = 'REBOOKED';
-  inMemoryGraphCache.segments[1].status = 'REBOOKED';
-  inMemoryGraphCache.itinerary.status = 'SELF_HEALED';
-
-  broadcastSSE('cascade_healed', result);
-  res.json({ success: true, result });
-});
-
-/**
- * Feature 1: Human-in-the-Loop Rebooking Rejection / Timeout Fallback Endpoint
- */
-app.post('/api/itinerary/reject', async (req: Request, res: Response) => {
-  const { itineraryId = 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22', reason } = req.body;
-  const result = agentEngine.rejectPendingRebooking(itineraryId, reason);
-  if (!result) {
-    return res.status(404).json({ success: false, error: 'No pending human approval found for itinerary.' });
-  }
-
-  inMemoryGraphCache.itinerary.status = 'FALLBACK_STANDARD_QUEUE';
-
-  broadcastSSE('agent_step', {
-    timestamp: new Date().toISOString(),
-    step: '11',
-    tag: 'HITL_REJECTED',
-    agent: 'POLICY_GUARDRAIL',
-    action: `[HITL REJECTED / TIMEOUT]: Rebooking request rejected (${reason || 'User rejected or 60s timeout expired'}). Fallback to standard queue.`,
-    details: { reason: reason || 'User clicked Reject & Keep Original' }
-  });
-
-  res.json({ success: true, result });
-});
-
-/**
- * Feature 2: Post-Incident Executive Audit Report Generator Endpoint (JSON)
- */
-app.get('/api/audit-report/:incidentId', async (req: Request, res: Response) => {
-  const incidentId = req.params.incidentId || 'PROOF-REC-994821';
-  const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || 'itin-101';
-  const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
-
-  const report = generateAuditReport({
-    incidentId,
-    travelerProfile: {
-      name: profile.name,
-      email: profile.email,
-      preferredCabin: profile.preferredCabin || 'Business Class',
-      seatPreference: 'Aisle (Quiet Car / Front Row)',
-      hnswVectorScore: 0.984,
-      vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
-    },
-    originalItinerary: {
-      tripTitle: `${profile.name} — ${profile.route}`,
-      origin: profile.originCode,
-      destination: profile.destinationCode,
-      segments: (profile.legs || []).map((leg: any, i: number) => ({
-        type: leg.type,
-        provider: leg.provider,
-        referenceCode: leg.referenceCode || `SEG-0${i + 1}`,
-        route: leg.route,
-        status: leg.status,
-      })),
-    },
-  });
-  res.json(report);
-});
-
-/**
- * Feature 2: Post-Incident Executive Audit Report Generator Endpoint (Markdown Export)
- */
-app.get('/api/audit-report/:incidentId/markdown', async (req: Request, res: Response) => {
-  const incidentId = req.params.incidentId || 'PROOF-REC-994821';
-  const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || 'itin-101';
-  const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
-
-  const report = generateAuditReport({
-    incidentId,
-    travelerProfile: {
-      name: profile.name,
-      email: profile.email,
-      preferredCabin: profile.preferredCabin || 'Business Class',
-      seatPreference: 'Aisle (Quiet Car / Front Row)',
-      hnswVectorScore: 0.984,
-      vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
-    },
-    originalItinerary: {
-      tripTitle: `${profile.name} — ${profile.route}`,
-      origin: profile.originCode,
-      destination: profile.destinationCode,
-      segments: (profile.legs || []).map((leg: any, i: number) => ({
-        type: leg.type,
-        provider: leg.provider,
-        referenceCode: leg.referenceCode || `SEG-0${i + 1}`,
-        route: leg.route,
-        status: leg.status,
-      })),
-    },
-  });
-
-  const markdown = exportAuditReportMarkdown(report);
-
-  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="${incidentId}_audit_report.md"`);
-  res.send(markdown);
-});
-
-/**
- * CockroachDB Changefeed Webhook Sink Receiver
- */
-app.post('/api/cdc-webhook', async (req: Request, res: Response) => {
-  try {
-    await cdcListener.handleWebhookPayload(req.body);
-    res.status(200).send('OK');
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-/**
- * Server-Sent Events (SSE) Stream Endpoint for real-time dashboard UI
- */
 app.get('/api/stream', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
 
-  res.write(`event: connected\ndata: ${JSON.stringify({ status: 'SSE_CONNECTED', timestamp: new Date() })}\n\n`);
+  try {
+    res.write(`event: connected\ndata: ${JSON.stringify({ status: 'SSE_CONNECTED', timestamp: new Date() })}\n\n`);
+  } catch (_err) {
+    return res.end();
+  }
 
   sseClients.push(res);
 
-  req.on('close', () => {
+  const heartbeatTimer = setInterval(() => {
+    try {
+      if (!res.writableEnded && !res.destroyed) {
+        res.write(': keepalive\n\n');
+      } else {
+        cleanup();
+      }
+    } catch (_err) {
+      cleanup();
+    }
+  }, 15000);
+
+  let isCleanedUp = false;
+  const cleanup = () => {
+    if (isCleanedUp) return;
+    isCleanedUp = true;
+    clearInterval(heartbeatTimer);
     const idx = sseClients.indexOf(res);
     if (idx !== -1) sseClients.splice(idx, 1);
+    try {
+      if (!res.writableEnded && !res.destroyed) {
+        res.end();
+      }
+    } catch (_err) {}
+  };
+
+  req.on('close', cleanup);
+  req.on('end', cleanup);
+  req.on('error', (err) => {
+    console.warn('[SSE Request Socket Error]:', err?.message);
+    cleanup();
+  });
+  res.on('error', (err) => {
+    console.warn('[SSE Response Socket Error]:', err?.message);
+    cleanup();
   });
 });
 
-// Wildcard fallback to serve index.html for Single Page Application navigation
 app.get('*', (_req: Request, res: Response) => {
   res.sendFile(path.join(process.cwd(), 'src', 'web', 'public', 'index.html'));
 });
 
-// Port listener with fallback if occupied
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error('[CASCADE Error]:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 function startServer(portToTry: number) {
   const server = app.listen(portToTry, () => {
     console.log(`=======================================================`);
-    console.log(`🚀 CASCADE Hackathon UI & API Server active on port ${portToTry}`);
-    console.log(`🌐 Dashboard URL: http://localhost:${portToTry}`);
+    console.log(`CASCADE Hackathon UI & API Server active on port ${portToTry}`);
+    console.log(`Dashboard URL: http://localhost:${portToTry}`);
     console.log(`=======================================================`);
   });
 
   server.on('error', (err: any) => {
     if (err.code === 'EADDRINUSE') {
-      console.warn(`⚠️ Port ${portToTry} occupied, attempting fallback port ${portToTry + 1}...`);
+      console.warn(`Port ${portToTry} occupied, attempting fallback port ${portToTry + 1}...`);
       startServer(portToTry + 1);
     } else {
-      console.error('❌ Server error:', err);
+      console.error('Server error:', err);
     }
   });
 }

@@ -66,7 +66,7 @@
   <!-- Header Titles -->
   <text x="184" y="132" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="44" font-weight="900" letter-spacing="2" fill="url(#primary-glow)" filter="url(#subtle-glow)">CASCADE</text>
   
-  <text x="410" y="128" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#94A3B8" letter-spacing="0.5">⚡ Autonomous Executive Travel Recovery Engine</text>
+  <text x="410" y="128" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#94A3B8" letter-spacing="0.5">Autonomous Executive Travel Recovery Engine</text>
 
   <!-- Value Proposition Line -->
   <text x="100" y="195" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#E2E8F0" letter-spacing="0.2">

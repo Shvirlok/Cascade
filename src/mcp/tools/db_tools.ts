@@ -6,9 +6,6 @@ export interface ItineraryGraphResult {
   segments: any[];
 }
 
-/**
- * Fetch the complete transactional graph (nodes & edges) for a given itinerary
- */
 export async function getItineraryGraph(itineraryId: string): Promise<ItineraryGraphResult> {
   const itinResult = await query(
     `SELECT * FROM itineraries WHERE id = $1`,
@@ -38,43 +35,27 @@ export async function getItineraryGraph(itineraryId: string): Promise<ItineraryG
     [itineraryId]
   );
 
-  return {
-    itinerary,
-    user,
-    segments: segmentsResult.rows,
-  };
+  return { itinerary, user, segments: segmentsResult.rows };
 }
 
-/**
- * Vector similarity search against CockroachDB embedded user preferences
- * Uses Cosine Distance operator (<=> or cosine_distance function)
- */
 export async function searchUserPreferencesVector(
   userId: string,
   targetEmbedding: number[],
   topK: number = 3
 ): Promise<any[]> {
   const vecParam = formatVector(targetEmbedding);
-  
   const sql = `
-    SELECT 
-      id, 
-      name, 
-      preferences,
+    SELECT id, name, preferences,
       (preference_embedding <=> $1::VECTOR(1536)) AS distance
     FROM users 
     WHERE id = $2
     ORDER BY distance ASC
     LIMIT $3;
   `;
-
   const result = await query(sql, [vecParam, userId, topK]);
   return result.rows;
 }
 
-/**
- * Perform atomic status update for a segment in CockroachDB
- */
 export async function updateSegmentStatus(
   segmentId: string,
   status: string,
@@ -95,7 +76,6 @@ export async function updateSegmentStatus(
 
     const updatedSeg = res.rows[0];
 
-    // If segment is delayed or cancelled, mark parent itinerary as DISRUPTED
     if (status === 'DELAYED' || status === 'CANCELLED') {
       await client.query(
         `UPDATE itineraries 
@@ -109,9 +89,6 @@ export async function updateSegmentStatus(
   });
 }
 
-/**
- * Log a disruption event in CockroachDB for agent intervention logging
- */
 export async function logDisruptionEvent(
   itineraryId: string,
   segmentId: string,
@@ -125,14 +102,10 @@ export async function logDisruptionEvent(
     ) VALUES ($1, $2, $3, $4, $5, 'PENDING')
     RETURNING *;
   `;
-
   const res = await query(sql, [itineraryId, segmentId, eventType, delayMinutes, impactDescription]);
   return res.rows[0];
 }
 
-/**
- * Rebook a broken downstream segment atomically and update itinerary status to SELF_HEALED
- */
 export async function rebookCascadeSegment(
   segmentId: string,
   newProvider: string,
@@ -143,7 +116,6 @@ export async function rebookCascadeSegment(
   newMetadata: object = {}
 ): Promise<any> {
   return await withTransaction(async (client) => {
-    // 1. Update Segment record
     const segRes = await client.query(
       `UPDATE itinerary_segments 
        SET provider = $1, 
@@ -165,7 +137,6 @@ export async function rebookCascadeSegment(
 
     const rebookedSeg = segRes.rows[0];
 
-    // 2. Adjust total itinerary cost
     await client.query(
       `UPDATE itineraries 
        SET total_cost = total_cost + $1, 
@@ -175,7 +146,6 @@ export async function rebookCascadeSegment(
       [additionalCost, rebookedSeg.itinerary_id]
     );
 
-    // 3. Resolve associated pending disruption event
     await client.query(
       `UPDATE disruption_events 
        SET status = 'RESOLVED', 

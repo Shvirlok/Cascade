@@ -9,18 +9,15 @@ export interface DisruptionSimulationResult {
   message: string;
 }
 
-/**
- * Trigger a simulated flight disruption in CockroachDB
- * Modifies segment status to DELAYED and inserts a pending CDC disruption event.
- */
+
 export async function simulateFlightDisruption(
   segmentReference: string = 'DL-1402',
   delayMinutes: number = 150
 ): Promise<DisruptionSimulationResult> {
-  console.log(`✈️ Emulating Flight Disruption: Flight ${segmentReference} delayed by ${delayMinutes} minutes...`);
+  console.log(`Emulating Flight Disruption: Flight ${segmentReference} delayed by ${delayMinutes} minutes...`);
 
   return await withTransaction(async (client) => {
-    // 1. Fetch targeted segment
+
     const segRes = await client.query(
       `SELECT id, itinerary_id, provider, reference_code, origin, destination 
        FROM itinerary_segments 
@@ -35,7 +32,7 @@ export async function simulateFlightDisruption(
 
     const segment = segRes.rows[0];
 
-    // 2. Mark segment as DELAYED in CockroachDB
+
     await client.query(
       `UPDATE itinerary_segments 
        SET status = 'DELAYED', delay_minutes = $1, updated_at = clock_timestamp() 
@@ -43,7 +40,7 @@ export async function simulateFlightDisruption(
       [delayMinutes, segment.id]
     );
 
-    // 3. Mark parent itinerary as DISRUPTED
+
     await client.query(
       `UPDATE itineraries 
        SET status = 'DISRUPTED', updated_at = clock_timestamp() 
@@ -51,7 +48,7 @@ export async function simulateFlightDisruption(
       [segment.itinerary_id]
     );
 
-    // 4. Insert Disruption Event (which fires the CockroachDB CDC changefeed)
+
     const eventRes = await client.query(
       `INSERT INTO disruption_events (
         itinerary_id, segment_id, event_type, delay_minutes, impact_description, status
@@ -67,7 +64,7 @@ export async function simulateFlightDisruption(
 
     const disruptionId = eventRes.rows[0].id;
 
-    console.log(`⚡ CockroachDB CDC Event Emitted! Disruption ID: ${disruptionId}`);
+    console.log(`CockroachDB CDC Event Emitted! Disruption ID: ${disruptionId}`);
 
     return {
       disruptionId,
@@ -80,12 +77,12 @@ export async function simulateFlightDisruption(
   });
 }
 
-// Allow CLI execution
+
 if (process.argv[1]?.includes('disruption_emulator')) {
   (async () => {
     const isAlive = await checkDatabaseConnection();
     if (!isAlive) {
-      console.error('❌ Database not reachable.');
+      console.error('Database not reachable.');
       process.exit(1);
     }
     const flightRef = process.argv[2] || 'DL-1402';
