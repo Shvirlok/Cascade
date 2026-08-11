@@ -45,29 +45,30 @@ export function setReportsDeps(cdcListener: CDCListenerService) {
 
   reportsRouter.get('/api/audit-report/:incidentId', (req: Request, res: Response) => {
     const incidentId = req.params.incidentId || 'PROOF-REC-994821';
-    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || 'itin-101';
-    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
+    const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
+    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || (req.body?.itineraryId as string) || (req.body?.travelerId as string) || defaultKey;
+    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES[defaultKey] || { name: 'Sarah Jenkins', email: 'sarah.jenkins@acme.com', route: 'SFO ➔ LHR', originCode: 'SFO', destinationCode: 'LHR' };
 
     const report = generateAuditReport({
       incidentId,
       travelerProfile: {
-        name: profile.name,
-        email: profile.email,
-        preferredCabin: profile.preferredCabin || 'Business Class',
+        name: profile?.name || 'Executive Traveler',
+        email: profile?.email || 'traveler@acme.com',
+        preferredCabin: profile?.preferredCabin || 'Business Class',
         seatPreference: 'Aisle (Quiet Car / Front Row)',
         hnswVectorScore: 0.984,
         vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
       },
       originalItinerary: {
-        tripTitle: `${profile.name} — ${profile.route}`,
-        origin: profile.originCode,
-        destination: profile.destinationCode,
-        segments: (profile.legs || []).map((leg: any, i: number) => ({
-          type: leg.type,
-          provider: leg.provider,
-          referenceCode: leg.referenceCode || `SEG-0${i + 1}`,
-          route: leg.route,
-          status: leg.status,
+        tripTitle: `${profile?.name || 'Traveler'} — ${profile?.route || 'Executive Route'}`,
+        origin: profile?.originCode || 'SFO',
+        destination: profile?.destinationCode || 'LHR',
+        segments: (profile?.legs || []).map((leg: any, i: number) => ({
+          type: leg?.type,
+          provider: leg?.provider,
+          referenceCode: leg?.referenceCode || `SEG-0${i + 1}`,
+          route: leg?.route,
+          status: leg?.status,
         })),
       },
     });
@@ -76,29 +77,30 @@ export function setReportsDeps(cdcListener: CDCListenerService) {
 
   reportsRouter.get('/api/audit-report/:incidentId/markdown', (req: Request, res: Response) => {
     const incidentId = req.params.incidentId || 'PROOF-REC-994821';
-    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || 'itin-101';
-    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
+    const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
+    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || (req.body?.itineraryId as string) || (req.body?.travelerId as string) || defaultKey;
+    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES[defaultKey] || { name: 'Sarah Jenkins', email: 'sarah.jenkins@acme.com', route: 'SFO ➔ LHR', originCode: 'SFO', destinationCode: 'LHR' };
 
     const report = generateAuditReport({
       incidentId,
       travelerProfile: {
-        name: profile.name,
-        email: profile.email,
-        preferredCabin: profile.preferredCabin || 'Business Class',
+        name: profile?.name || 'Executive Traveler',
+        email: profile?.email || 'traveler@acme.com',
+        preferredCabin: profile?.preferredCabin || 'Business Class',
         seatPreference: 'Aisle (Quiet Car / Front Row)',
         hnswVectorScore: 0.984,
         vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
       },
       originalItinerary: {
-        tripTitle: `${profile.name} — ${profile.route}`,
-        origin: profile.originCode,
-        destination: profile.destinationCode,
-        segments: (profile.legs || []).map((leg: any, i: number) => ({
-          type: leg.type,
-          provider: leg.provider,
-          referenceCode: leg.referenceCode || `SEG-0${i + 1}`,
-          route: leg.route,
-          status: leg.status,
+        tripTitle: `${profile?.name || 'Traveler'} — ${profile?.route || 'Executive Route'}`,
+        origin: profile?.originCode || 'SFO',
+        destination: profile?.destinationCode || 'LHR',
+        segments: (profile?.legs || []).map((leg: any, i: number) => ({
+          type: leg?.type,
+          provider: leg?.provider,
+          referenceCode: leg?.referenceCode || `SEG-0${i + 1}`,
+          route: leg?.route,
+          status: leg?.status,
         })),
       },
     });
@@ -111,29 +113,30 @@ export function setReportsDeps(cdcListener: CDCListenerService) {
 
   reportsRouter.get('/api/audit-report/:incidentId/pdf', async (req: Request, res: Response) => {
     const incidentId = req.params.incidentId || 'PROOF-REC-994821';
-    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || 'itin-101';
-    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
+    const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
+    const travelerId = (req.query.travelerId as string) || (req.query.traveler as string) || (req.body?.itineraryId as string) || (req.body?.travelerId as string) || defaultKey;
+    const profile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES[defaultKey] || { name: 'Sarah Jenkins', email: 'sarah.jenkins@acme.com', route: 'SFO ➔ LHR', originCode: 'SFO', destinationCode: 'LHR' };
 
     const report = generateAuditReport({
       incidentId,
       travelerProfile: {
-        name: profile.name,
-        email: profile.email,
-        preferredCabin: profile.preferredCabin || 'Business Class',
+        name: profile?.name || 'Executive Traveler',
+        email: profile?.email || 'traveler@acme.com',
+        preferredCabin: profile?.preferredCabin || 'Business Class',
         seatPreference: 'Aisle (Quiet Car / Front Row)',
         hnswVectorScore: 0.984,
         vectorIndex: 'idx_users_preference_embedding (HNSW 1536-dim)',
       },
       originalItinerary: {
-        tripTitle: `${profile.name} — ${profile.route}`,
-        origin: profile.originCode,
-        destination: profile.destinationCode,
-        segments: (profile.legs || []).map((leg: any, i: number) => ({
-          type: leg.type,
-          provider: leg.provider,
-          referenceCode: leg.referenceCode || `SEG-0${i + 1}`,
-          route: leg.route,
-          status: leg.status,
+        tripTitle: `${profile?.name || 'Traveler'} — ${profile?.route || 'Executive Route'}`,
+        origin: profile?.originCode || 'SFO',
+        destination: profile?.destinationCode || 'LHR',
+        segments: (profile?.legs || []).map((leg: any, i: number) => ({
+          type: leg?.type,
+          provider: leg?.provider,
+          referenceCode: leg?.referenceCode || `SEG-0${i + 1}`,
+          route: leg?.route,
+          status: leg?.status,
         })),
       },
     });

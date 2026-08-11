@@ -415,7 +415,8 @@ travelersRouter.get('/api/travelers', (_req: Request, res: Response) => {
 });
 
 travelersRouter.get('/api/traveler/:id', (req: Request, res: Response) => {
-  const profile = TRAVELER_PROFILES[req.params.id] || TRAVELER_PROFILES['itin-101'];
+  const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
+  const profile = TRAVELER_PROFILES[req.params.id] || TRAVELER_PROFILES[defaultKey];
   res.json(profile);
 });
 

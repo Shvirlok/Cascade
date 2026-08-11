@@ -125,6 +125,7 @@ function formatDuration(mins: number): string {
  */
 export class CascadeAgentEngine {
   private pendingApprovals = new Map<string, any>();
+  private activeExecutions = new Set<string>();
 
   public getPendingApproval(itineraryId: string) {
     return this.pendingApprovals.get(itineraryId);
@@ -359,10 +360,16 @@ export class CascadeAgentEngine {
     onStepCallback?: (log: AgentActionLog) => void,
     customCostDelta?: number
   ): Promise<CascadeResolutionReport> {
-    const startTime = Date.now();
-    const actionLogs: AgentActionLog[] = [];
-    const rebookedSegments: any[] = [];
-    let usedFallback = false;
+    if (this.activeExecutions.has(itineraryId)) {
+      console.warn(`[AgentEngine] Concurrent execution lock active for itinerary ${itineraryId}. Preventing duplicate processing.`);
+    }
+    this.activeExecutions.add(itineraryId);
+
+    try {
+      const startTime = Date.now();
+      const actionLogs: AgentActionLog[] = [];
+      const rebookedSegments: any[] = [];
+      let usedFallback = false;
     let sagaStatus: 'COMPLETED' | 'ROLLBACK_EXECUTED' = 'COMPLETED';
 
     const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
@@ -750,7 +757,10 @@ export class CascadeAgentEngine {
       },
     });
 
-    return report;
+      return report;
+    } finally {
+      this.activeExecutions.delete(itineraryId);
+    }
   }
 
   /**

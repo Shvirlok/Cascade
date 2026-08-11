@@ -64,17 +64,57 @@ app.use(reportsRouter);
  */
 app.get('/api/stream', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
 
-  res.write(`event: connected\ndata: ${JSON.stringify({ status: 'SSE_CONNECTED', timestamp: new Date() })}\n\n`);
+  try {
+    res.write(`event: connected\ndata: ${JSON.stringify({ status: 'SSE_CONNECTED', timestamp: new Date() })}\n\n`);
+  } catch (_err) {
+    return res.end();
+  }
 
   sseClients.push(res);
 
-  req.on('close', () => {
+  // Periodic heartbeat timer to keep socket alive and detect dead connections early
+  const heartbeatTimer = setInterval(() => {
+    try {
+      if (!res.writableEnded && !res.destroyed) {
+        res.write(': keepalive\n\n');
+      } else {
+        cleanup();
+      }
+    } catch (_err) {
+      cleanup();
+    }
+  }, 15000);
+
+  let isCleanedUp = false;
+  const cleanup = () => {
+    if (isCleanedUp) return;
+    isCleanedUp = true;
+    clearInterval(heartbeatTimer);
     const idx = sseClients.indexOf(res);
     if (idx !== -1) sseClients.splice(idx, 1);
+    try {
+      if (!res.writableEnded && !res.destroyed) {
+        res.end();
+      }
+    } catch (_err) {
+      // Ignore socket termination errors
+    }
+  };
+
+  req.on('close', cleanup);
+  req.on('end', cleanup);
+  req.on('error', (err) => {
+    console.warn('[SSE Request Socket Error]:', err?.message);
+    cleanup();
+  });
+  res.on('error', (err) => {
+    console.warn('[SSE Response Socket Error]:', err?.message);
+    cleanup();
   });
 });
 

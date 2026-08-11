@@ -131,7 +131,8 @@ systemRouter.get('/api/ops', async (_req: Request, res: Response) => {
 
 systemRouter.post('/api/telegram/test', async (req: Request, res: Response) => {
   const {
-    travelerId = 'itin-101',
+    travelerId: inputTravelerId,
+    itineraryId: inputItineraryId,
     actionType = 'flight_delay',
     customNote,
     newCarrier,
@@ -139,9 +140,11 @@ systemRouter.post('/api/telegram/test', async (req: Request, res: Response) => {
     timeSaved,
     costDeltaFormatted,
     approvalType,
-  } = req.body;
+  } = req.body || {};
 
-  const targetProfile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES['itin-101'];
+  const defaultKey = Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
+  const travelerId = inputTravelerId || inputItineraryId || defaultKey;
+  const targetProfile = TRAVELER_PROFILES[travelerId] || TRAVELER_PROFILES[defaultKey] || { id: travelerId, name: 'Sarah Jenkins', originCode: 'SFO', destinationCode: 'LHR' };
 
   const actionMap: Record<string, any> = {
     flight_delay: {

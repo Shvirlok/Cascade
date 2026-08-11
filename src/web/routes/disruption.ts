@@ -17,8 +17,9 @@ export function setDisruptionDeps(
   // map is shared between API-triggered and CDC-triggered disruptions.
   const agentEngine = cdcListener.getAgentEngine();
   const DisruptSchema = z.object({
-    itineraryId: z.string().optional().default('itin-101'),
-    segmentReference: z.string().optional().default('DL-1402'),
+    itineraryId: z.string().optional(),
+    travelerId: z.string().optional(),
+    segmentReference: z.string().optional(),
     delayMinutes: z.union([z.number(), z.string()]).transform((val) => parseInt(String(val), 10) || 150),
     type: z.string().optional(),
     disruptionType: z.string().optional().default('FLIGHT_DELAY'),
@@ -33,8 +34,9 @@ export function setDisruptionDeps(
     }
 
     const {
-      itineraryId,
-      segmentReference,
+      itineraryId: rawItinId,
+      travelerId: rawTravelerId,
+      segmentReference: rawSegRef,
       delayMinutes,
       type,
       disruptionType,
@@ -42,8 +44,11 @@ export function setDisruptionDeps(
       costDelta,
     } = parseResult.data;
 
+    const itineraryId = rawItinId || rawTravelerId || req.body?.itineraryId || req.body?.travelerId || Object.keys(TRAVELER_PROFILES)[0] || 'itin-101';
+    const segmentReference = rawSegRef || req.body?.segmentReference || 'DL-1402';
+
     const targetProfile = TRAVELER_PROFILES[itineraryId] || {
-      name: inMemoryGraphCache.user?.name || 'Sarah Jenkins',
+      name: inMemoryGraphCache?.user?.name || 'Sarah Jenkins',
       originCode: 'SFO',
       destinationCode: 'LHR',
     };
@@ -51,17 +56,21 @@ export function setDisruptionDeps(
     const actualDisruptionType = type || disruptionType;
     const customCost = typeof costDelta === 'number' ? costDelta : (strategy === 'HIGH_COST_GUARDRAIL' ? 450 : 0);
 
-    // Only mutate the shared in-memory graph if this disruption targets the default itinerary
-    if (itineraryId === 'itin-101' || itineraryId === inMemoryGraphCache.itinerary.id) {
+    // Safe optional chaining for in-memory graph cache mutation
+    if (inMemoryGraphCache?.segments?.[0]) {
       inMemoryGraphCache.segments[0].status = 'DELAYED';
       inMemoryGraphCache.segments[0].delay_minutes = delayMinutes;
+    }
+    if (inMemoryGraphCache?.segments?.[1]) {
       inMemoryGraphCache.segments[1].status = 'DELAYED';
     }
     sessionDisruptionsHealed++;
 
+    const segIdToTrigger = inMemoryGraphCache?.segments?.[0]?.id || segmentReference || 'seg-001';
+
     cdcListener.triggerAgentHealingDirectly(
-      inMemoryGraphCache.itinerary.id,
-      inMemoryGraphCache.segments[0].id,
+      itineraryId,
+      segIdToTrigger,
       delayMinutes,
       actualDisruptionType,
       strategy,
@@ -72,9 +81,9 @@ export function setDisruptionDeps(
 
     sendTelegramAlert({
       travelerId: itineraryId,
-      travelerName: targetProfile.name || 'Executive Traveler',
-      origin: targetProfile.originCode || 'SFO',
-      destination: targetProfile.destinationCode || 'LHR',
+      travelerName: targetProfile?.name || 'Executive Traveler',
+      origin: targetProfile?.originCode || 'SFO',
+      destination: targetProfile?.destinationCode || 'LHR',
       newCarrier: 'Amtrak Acela Express (AMT-2158)',
       transportType: 'Express Rail Re-route',
       timeSaved: '4.5 Hours',
@@ -89,7 +98,7 @@ export function setDisruptionDeps(
       success: true,
       disruptionId: 'disc-evt-' + Date.now(),
       itineraryId,
-      travelerName: targetProfile.name,
+      travelerName: targetProfile?.name,
       segmentReference,
       delayMinutes,
       disruptionType: actualDisruptionType,
@@ -100,21 +109,23 @@ export function setDisruptionDeps(
   });
 
   disruptionRouter.post('/api/disrupt/what-if', async (req: Request, res: Response) => {
-    const { hubCode = 'SFO', eventType = 'AIRPORT_STRIKE', delayMinutes = 180 } = req.body;
+    const { hubCode = 'SFO', eventType = 'AIRPORT_STRIKE', delayMinutes = 180 } = req.body || {};
     const targetHub = String(hubCode).toUpperCase();
     const affectedTravelers: any[] = [];
 
-    Object.values(TRAVELER_PROFILES).forEach((profile: any) => {
-      if (profile.originCode === targetHub || profile.destinationCode === targetHub || profile.route.includes(targetHub)) {
-        affectedTravelers.push({
-          id: profile.id,
-          name: profile.name,
-          route: profile.route,
-          status: 'AUTO_HEALED',
-          newCarrier: 'Amtrak Acela Express / Alternate Carrier',
-        });
-      }
-    });
+    if (TRAVELER_PROFILES) {
+      Object.values(TRAVELER_PROFILES).forEach((profile: any) => {
+        if (profile?.originCode === targetHub || profile?.destinationCode === targetHub || profile?.route?.includes(targetHub)) {
+          affectedTravelers.push({
+            id: profile.id,
+            name: profile.name,
+            route: profile.route,
+            status: 'AUTO_HEALED',
+            newCarrier: 'Amtrak Acela Express / Alternate Carrier',
+          });
+        }
+      });
+    }
 
     const txHash = '0x' + Math.random().toString(16).substring(2, 12) + Math.random().toString(16).substring(2, 10);
     const primaryTraveler = affectedTravelers[0] || { name: 'Corporate Fleet Travelers', route: `${targetHub} Network` };
@@ -168,28 +179,29 @@ export function setDisruptionDeps(
   });
 
   disruptionRouter.post('/api/itinerary/approve', async (req: Request, res: Response) => {
-    const { itineraryId = 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22' } = req.body;
+    const itineraryId = req.body?.itineraryId || req.body?.travelerId || inMemoryGraphCache?.itinerary?.id || Object.keys(TRAVELER_PROFILES)[0];
     const result = agentEngine.approvePendingRebooking(itineraryId);
     if (!result) {
       return res.status(404).json({ success: false, error: 'No pending human approval found for itinerary.' });
     }
 
-    inMemoryGraphCache.segments[0].status = 'REBOOKED';
-    inMemoryGraphCache.segments[1].status = 'REBOOKED';
-    inMemoryGraphCache.itinerary.status = 'SELF_HEALED';
+    if (inMemoryGraphCache?.segments?.[0]) inMemoryGraphCache.segments[0].status = 'REBOOKED';
+    if (inMemoryGraphCache?.segments?.[1]) inMemoryGraphCache.segments[1].status = 'REBOOKED';
+    if (inMemoryGraphCache?.itinerary) inMemoryGraphCache.itinerary.status = 'SELF_HEALED';
 
     broadcastSSE('cascade_healed', result);
     res.json({ success: true, result });
   });
 
   disruptionRouter.post('/api/itinerary/reject', async (req: Request, res: Response) => {
-    const { itineraryId = 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22', reason } = req.body;
+    const itineraryId = req.body?.itineraryId || req.body?.travelerId || inMemoryGraphCache?.itinerary?.id || Object.keys(TRAVELER_PROFILES)[0];
+    const reason = req.body?.reason;
     const result = agentEngine.rejectPendingRebooking(itineraryId, reason);
     if (!result) {
       return res.status(404).json({ success: false, error: 'No pending human approval found for itinerary.' });
     }
 
-    inMemoryGraphCache.itinerary.status = 'FALLBACK_STANDARD_QUEUE';
+    if (inMemoryGraphCache?.itinerary) inMemoryGraphCache.itinerary.status = 'FALLBACK_STANDARD_QUEUE';
 
     broadcastSSE('agent_step', {
       timestamp: new Date().toISOString(),

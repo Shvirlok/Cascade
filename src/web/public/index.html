@@ -3673,110 +3673,122 @@
       const source = new EventSource('/api/stream');
 
       source.addEventListener('agent_step', (e) => {
-        const data = JSON.parse(e.data);
-        const tag = data.tag || 'STEP';
-        const agent = data.agent || 'ENGINE';
-        const action = data.action || '';
+        try {
+          const data = JSON.parse(e.data);
+          const tag = data.tag || 'STEP';
+          const agent = data.agent || 'ENGINE';
+          const action = data.action || '';
 
-        appendCotLog(`[${tag}] (${agent}) ${action}`);
+          appendCotLog(`[${tag}] (${agent}) ${action}`);
 
-        if (data.step === '7' || data.step === '8' || data.step === '10') {
-          graphNodes[1] = { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' };
-          graphNodes[2] = { ...graphNodes[2], status: 'REBOOKED' };
-          renderItineraryNodes(graphNodes);
+          if (data.step === '7' || data.step === '8' || data.step === '10') {
+            graphNodes[1] = { ...graphNodes[1], status: 'REBOOKED', provider: 'Amtrak Acela Express (Train 2158 at 18:30)' };
+            graphNodes[2] = { ...graphNodes[2], status: 'REBOOKED' };
+            renderItineraryNodes(graphNodes);
+          }
+        } catch (err) {
+          console.warn('[SSE agent_step frame error]:', err, e?.data);
         }
       });
 
       source.addEventListener('human_approval_required', (e) => {
-        const data = JSON.parse(e.data);
-        showHitlApprovalBanner(data.report);
+        try {
+          const data = JSON.parse(e.data);
+          showHitlApprovalBanner(data.report);
 
-        if (data.report) {
-          const r = data.report;
+          if (data.report) {
+            const r = data.report;
+            const travelerMap = {
+              'itin-101': { name: 'Sarah Jenkins', origin: 'SFO', destination: 'LHR' },
+              'itin-102': { name: 'Marcus Vance', origin: 'JFK', destination: 'CDG' },
+              'itin-103': { name: 'Elena Rostova', origin: 'ORD', destination: 'HND' },
+              'itin-104': { name: 'David Chen', origin: 'MIA', destination: 'LHR' }
+            };
+            const tInfo = travelerMap[r.itineraryId] || { name: 'Executive Traveler', origin: 'SFO', destination: 'LHR' };
+
+            appendTelegramAlertMessage({
+              travelerId: r.itineraryId,
+              travelerName: tInfo.name,
+              origin: tInfo.origin,
+              destination: tInfo.destination,
+              newCarrier: (r.winningBranch && r.winningBranch.provider) || 'Business Upgrade Pending',
+              transportType: 'Human Approval Required (Cost Limit Exceeded)',
+              timeSaved: (r.deltaAnalytics && r.deltaAnalytics.delayFormatted) || '+150m',
+              costDeltaFormatted: r.costDeltaFormatted || '+$450.00',
+              approvalType: 'HUMAN_APPROVAL_REQUIRED',
+              customNote: 'Proposed upgrade exceeds $300 limit. Awaiting Corporate Admin confirmation.',
+              txHash: r.txHash || ('0x' + Math.random().toString(16).substring(2, 12)),
+            });
+          }
+        } catch (err) {
+          console.warn('[SSE human_approval_required frame error]:', err, e?.data);
+        }
+      });
+
+      source.addEventListener('cascade_healed', (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.report && data.report.auditReport) {
+            latestAuditData = data.report.auditReport;
+          }
+          if (data.report && data.report.firstMileSwitchOccurred) {
+            renderFirstMileSwitchCallout('nodes-container');
+          }
+
           const travelerMap = {
             'itin-101': { name: 'Sarah Jenkins', origin: 'SFO', destination: 'LHR' },
             'itin-102': { name: 'Marcus Vance', origin: 'JFK', destination: 'CDG' },
             'itin-103': { name: 'Elena Rostova', origin: 'ORD', destination: 'HND' },
             'itin-104': { name: 'David Chen', origin: 'MIA', destination: 'LHR' }
           };
-          const tInfo = travelerMap[r.itineraryId] || { name: 'Executive Traveler', origin: 'SFO', destination: 'LHR' };
+          const itinId = data.itineraryId || (data.report && data.report.itineraryId) || 'itin-101';
+          const tInfo = travelerMap[itinId] || { name: 'Executive Traveler', origin: 'SFO', destination: 'LHR' };
+          const r = data.report || {};
 
           appendTelegramAlertMessage({
-            travelerId: r.itineraryId,
+            travelerId: itinId,
             travelerName: tInfo.name,
             origin: tInfo.origin,
             destination: tInfo.destination,
-            newCarrier: (r.winningBranch && r.winningBranch.provider) || 'Business Upgrade Pending',
-            transportType: 'Human Approval Required (Cost Limit Exceeded)',
-            timeSaved: (r.deltaAnalytics && r.deltaAnalytics.delayFormatted) || '+150m',
-            costDeltaFormatted: r.costDeltaFormatted || '+$450.00',
-            approvalType: 'HUMAN_APPROVAL_REQUIRED',
-            customNote: 'Proposed upgrade exceeds $300 limit. Awaiting Corporate Admin confirmation.',
+            newCarrier: (r.winningBranch && r.winningBranch.provider) || 'Amtrak Acela Express (AMT-2158)',
+            transportType: data.strategy === 'EXECUTIVE_SPEED' ? 'Express Rail Re-route' : (data.strategy || 'Autonomous Self-Healing'),
+            timeSaved: (r.deltaAnalytics && r.deltaAnalytics.delayFormatted) || '4.5 Hours',
+            costDeltaFormatted: r.costDeltaFormatted || '$0.00 Net Delta',
+            approvalType: 'AUTO_APPROVED',
             txHash: r.txHash || ('0x' + Math.random().toString(16).substring(2, 12)),
           });
-        }
-      });
 
-      source.addEventListener('cascade_healed', (e) => {
-        const data = JSON.parse(e.data);
-        if (data.report && data.report.auditReport) {
-          latestAuditData = data.report.auditReport;
-        }
-        if (data.report && data.report.firstMileSwitchOccurred) {
-          renderFirstMileSwitchCallout('nodes-container');
-        }
-
-        const travelerMap = {
-          'itin-101': { name: 'Sarah Jenkins', origin: 'SFO', destination: 'LHR' },
-          'itin-102': { name: 'Marcus Vance', origin: 'JFK', destination: 'CDG' },
-          'itin-103': { name: 'Elena Rostova', origin: 'ORD', destination: 'HND' },
-          'itin-104': { name: 'David Chen', origin: 'MIA', destination: 'LHR' }
-        };
-        const itinId = data.itineraryId || (data.report && data.report.itineraryId) || 'itin-101';
-        const tInfo = travelerMap[itinId] || { name: 'Executive Traveler', origin: 'SFO', destination: 'LHR' };
-        const r = data.report || {};
-
-        appendTelegramAlertMessage({
-          travelerId: itinId,
-          travelerName: tInfo.name,
-          origin: tInfo.origin,
-          destination: tInfo.destination,
-          newCarrier: (r.winningBranch && r.winningBranch.provider) || 'Amtrak Acela Express (AMT-2158)',
-          transportType: data.strategy === 'EXECUTIVE_SPEED' ? 'Express Rail Re-route' : (data.strategy || 'Autonomous Self-Healing'),
-          timeSaved: (r.deltaAnalytics && r.deltaAnalytics.delayFormatted) || '4.5 Hours',
-          costDeltaFormatted: r.costDeltaFormatted || '$0.00 Net Delta',
-          approvalType: 'AUTO_APPROVED',
-          txHash: r.txHash || ('0x' + Math.random().toString(16).substring(2, 12)),
-        });
-
-        // ── Concierge Fallback Panel ─────────────────────────────────
-        const conciergePanel = document.getElementById('concierge-options-panel');
-        const conciergeList = document.getElementById('concierge-options-list');
-        if (r.status === 'CONCIERGE_FALLBACK' && r.conciergeOptions && conciergePanel && conciergeList) {
-          conciergeList.innerHTML = r.conciergeOptions.map((opt, i) => `
-            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-color); border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.2s;"
-              onmouseover="this.style.borderColor='rgba(99,102,241,0.6)'" onmouseout="this.style.borderColor='var(--border-color)'">
-              <div style="font-size:11px; color:#818CF8; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Option ${i + 1}</div>
-              <div style="font-size:13px; font-weight:700; color:var(--text-primary); margin-bottom:2px;">${opt.title}</div>
-              <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">${opt.provider}</div>
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:12px; color:#10B981; font-weight:700;">${opt.price}</span>
-                <span style="font-size:11px; color:var(--text-muted);">Arrives: ${opt.arrival}</span>
-              </div>
-            </div>`).join('');
-          conciergePanel.style.display = 'block';
-          appendCotLog(`[CONCIERGE_FALLBACK] Automated threshold exceeded. ${r.conciergeOptions.length} premium options presented to Corporate Admin.`);
-        } else if (conciergePanel) {
-          conciergePanel.style.display = 'none';
-        }
-
-        // Refresh live counter badge
-        fetch('/api/dashboard').then(res => res.json()).then(d => {
-          if (d.metrics && d.metrics.total_disruptions_healed_24h) {
-            const el = document.getElementById('stat-total-healed');
-            if (el) el.textContent = `${d.metrics.total_disruptions_healed_24h} Trips`;
+          // ── Concierge Fallback Panel ─────────────────────────────────
+          const conciergePanel = document.getElementById('concierge-options-panel');
+          const conciergeList = document.getElementById('concierge-options-list');
+          if (r.status === 'CONCIERGE_FALLBACK' && r.conciergeOptions && conciergePanel && conciergeList) {
+            conciergeList.innerHTML = r.conciergeOptions.map((opt, i) => `
+              <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-color); border-radius:10px; padding:14px; cursor:pointer; transition:border-color 0.2s;"
+                onmouseover="this.style.borderColor='rgba(99,102,241,0.6)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                <div style="font-size:11px; color:#818CF8; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Option ${i + 1}</div>
+                <div style="font-size:13px; font-weight:700; color:var(--text-primary); margin-bottom:2px;">${opt.title}</div>
+                <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">${opt.provider}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:12px; color:#10B981; font-weight:700;">${opt.price}</span>
+                  <span style="font-size:11px; color:var(--text-muted);">Arrives: ${opt.arrival}</span>
+                </div>
+              </div>`).join('');
+            conciergePanel.style.display = 'block';
+            appendCotLog(`[CONCIERGE_FALLBACK] Automated threshold exceeded. ${r.conciergeOptions.length} premium options presented to Corporate Admin.`);
+          } else if (conciergePanel) {
+            conciergePanel.style.display = 'none';
           }
-        }).catch(() => {});
+
+          // Refresh live counter badge
+          fetch('/api/dashboard').then(res => res.json()).then(d => {
+            if (d.metrics && d.metrics.total_disruptions_healed_24h) {
+              const el = document.getElementById('stat-total-healed');
+              if (el) el.textContent = `${d.metrics.total_disruptions_healed_24h} Trips`;
+            }
+          }).catch(() => {});
+        } catch (err) {
+          console.warn('[SSE cascade_healed frame error]:', err, e?.data);
+        }
       });
     }
 

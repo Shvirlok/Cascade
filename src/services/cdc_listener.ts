@@ -13,6 +13,7 @@ export class CDCListenerService {
   private isPolling: boolean = false;
   private pollIntervalMs: number;
   private pollTimer: NodeJS.Timeout | null = null;
+  private inFlightHealings: Set<string> = new Set();
 
   constructor(pollIntervalMs: number = 3000) {
     this.agentEngine = new CascadeAgentEngine();
@@ -79,6 +80,10 @@ export class CDCListenerService {
       );
 
       for (const row of pendingRes.rows) {
+        if (this.inFlightHealings.has(row.itinerary_id)) {
+          continue;
+        }
+
         await query(
           `UPDATE disruption_events SET status = 'PROCESSING' WHERE id = $1`,
           [row.id]
@@ -110,9 +115,16 @@ export class CDCListenerService {
     strategy: string = 'EXECUTIVE_SPEED',
     customCostDelta?: number
   ): Promise<void> {
-    const defaultItinId = itineraryId || 'b1fbc999-8c0b-4ef8-bb6d-7bb9bd380a22';
+    const defaultItinId = itineraryId || 'itin-101';
     const defaultSegId = segmentId || 'c2fbc999-7c0b-4ef8-bb6d-8bb9bd380a33';
     const safeDelayMinutes = (typeof delayMinutes === 'number' && !isNaN(delayMinutes)) ? delayMinutes : 150;
+
+    if (this.inFlightHealings.has(defaultItinId)) {
+      console.warn(`[CDCListener] In-flight execution lock active for itinerary ${defaultItinId}. Skipping duplicate resolution.`);
+      return;
+    }
+
+    this.inFlightHealings.add(defaultItinId);
 
     try {
       const report = await this.agentEngine.processDisruption(
@@ -257,6 +269,8 @@ export class CDCListenerService {
         strategy,
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      this.inFlightHealings.delete(defaultItinId);
     }
   }
 }
