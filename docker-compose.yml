@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:v23.2.3
+    container_name: cascade-cockroachdb
+    command: start-single-node --insecure --store=type=mem,size=1GB
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    environment:
+      - COCKROACH_DATABASE=cascade_db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?type=ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - cockroach_data:/cockroach/cockroach-data
+
+volumes:
+  cockroach_data:
+
