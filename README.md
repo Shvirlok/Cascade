@@ -16,8 +16,6 @@
 [![Render Live](https://img.shields.io/badge/Render-Live_Deploy-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://cascade-recovery.onrender.com)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-[🌐 **Live Demo (Render)**](https://cascade-recovery.onrender.com) &nbsp;·&nbsp; [📖 API Reference](#-api-reference) &nbsp;·&nbsp; [⚡ Quick Start](#-quick-start--deployment) &nbsp;·&nbsp; [🏗️ Architecture](#️-system--cloud-architecture)
-
 </div>
 
 ---
@@ -61,40 +59,41 @@ Every itinerary is stored as an **ACID-compliant transactional graph** inside **
 
 ## 🏗️ System &amp; Cloud Architecture
 
-![CASCADE Architecture Diagram](assets/readme/architecture-diagram.svg)
-
 ```mermaid
 flowchart TD
-    A["Frontend Dashboard\n(Glassmorphism SPA)"] -->|HTTP / REST| B
-    A <-->|SSE text/event-stream| B
+    A["Frontend Dashboard\n(Glassmorphism SPA)"] -->|HTTP / REST| B["Express API Server\n:3000"]
+    A <-->|SSE Stream| B
+    A -->|HITL Approval| B
 
-    subgraph RENDER["Render.com — Express Web Service"]
-        B["Express API Server\n:3000"]
-        C["CDC Listener\n(3 000 ms poll)"]
+    subgraph RENDER ["Render.com — Express Web Service"]
+        B
+        C["CDC Listener\n(3000 ms poll)"]
         B --> C
     end
 
-    C -->|Trigger healing pipeline| D
+    C -->|Trigger healing| D
 
-    subgraph BEDROCK["AWS Bedrock Multi-Agent Engine (MCP)"]
+    subgraph BEDROCK ["AWS Bedrock Multi-Agent Engine (MCP)"]
         D["CascadeAgentEngine\nagent_engine.ts"]
         E["MCP Server\n6 CockroachDB tools\n:3001 stdio"]
-        D <-->|Tool calls via MCP SDK| E
-        D -->|InvokeModelCommand| F["Claude 3.5 Sonnet\nChain-of-Thought CoT"]
-        D -->|Titan Embed v2 1536-dim| G["HNSW Vector Search\nPreference Recall"]
+        F["Claude 3.5 Sonnet\nChain-of-Thought CoT"]
+        G["HNSW Vector Search\nPreference Recall"]
+        
+        D <-->|MCP SDK| E
+        D -->|InvokeModel| F
+        D -->|Titan Embed v2| G
     end
 
     E <-->|pg driver — SERIALIZABLE| H
 
-    subgraph CRDB["CockroachDB Serverless Cluster"]
-        H["users\n(VECTOR 1536-dim + HNSW idx)"]
+    subgraph CRDB ["CockroachDB Serverless Cluster"]
+        H["users\n(VECTOR 1536-dim)"]
         I["itineraries + segments\n(ACID graph + CDC queue)"]
         J["disruption_events\n(Changefeed source)"]
         H --- I --- J
     end
 
-    D -->|HTML alert + inline keyboard| K["Telegram Bot\n@CascadeAWS_bot"]
-    A -->|Approve / Reject HITL| B
+    D -->|HTML alert| K["Telegram Bot\n@CascadeAWS_bot"]
 ```
 
 ### 10-Step Agent Pipeline
@@ -137,7 +136,7 @@ Step 10   CASCADE_COMPLETE — Proof artifact + Telegram alert dispatched
 
 ## ⚡ Quick Start &amp; Deployment
 
-### Option A — Local Development *(fastest for offline evaluation)*
+### Option A - Local Development *(fastest for offline evaluation)*
 
 > **No cloud accounts required.** The engine falls back to deterministic heuristics when AWS credentials are absent, and enters `IS_OFFLINE_FALLBACK` mode when CockroachDB is unavailable. Every feature remains fully demonstrable.
 
@@ -145,8 +144,7 @@ Step 10   CASCADE_COMPLETE — Proof artifact + Telegram alert dispatched
 
 ```bash
 # 1. Clone & install
-git clone https://github.com/<your-org>/cascade-logistics.git
-cd cascade-logistics
+git clone [https://github.com/Shvirlok/Cascade.git](https://github.com/Shvirlok/Cascade.git)
 npm install
 
 # 2. Configure environment
@@ -422,29 +420,5 @@ cascade-logistics/
 ---
 
 ## 📜 License
-
-```
-MIT License
-
-Copyright (c) 2026 Yaroslav
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
 
 See [LICENSE](LICENSE) for the full text.
