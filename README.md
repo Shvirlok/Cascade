@@ -7,234 +7,430 @@
 *Built for the CockroachDB × AWS Hackathon on Devpost*
 
 [![Node.js](https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![CockroachDB](https://img.shields.io/badge/CockroachDB-Serverless-6933FF?style=for-the-badge&logo=cockroachlabs&logoColor=white)](https://www.cockroachlabs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![CockroachDB](https://img.shields.io/badge/CockroachDB-v23.2_Serverless-6933FF?style=for-the-badge&logo=cockroachlabs&logoColor=white)](https://www.cockroachlabs.com/)
 [![AWS Bedrock](https://img.shields.io/badge/AWS_Bedrock-Claude_3.5_Sonnet-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/bedrock/)
-[![MCP SDK](https://img.shields.io/badge/Model_Context_Protocol-SDK_1.0-10B981?style=for-the-badge&logo=open-ai&logoColor=white)](https://modelcontextprotocol.io/)
+[![MCP SDK](https://img.shields.io/badge/Model_Context_Protocol-SDK_1.0-10B981?style=for-the-badge)](https://modelcontextprotocol.io/)
+[![Express](https://img.shields.io/badge/Express-4.19-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Telegram](https://img.shields.io/badge/Telegram_Bot-Alerts-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 </div>
 
 ---
 
-## Executive Summary & Enterprise Value Proposition
+## Executive Summary
 
-**CASCADE** is an autonomous, self-healing executive travel and multi-modal logistics recovery engine powered by **CockroachDB Cloud Change Data Capture (CDC)**, **1536-dimensional HNSW vector search**, and **AWS Bedrock Claude 3.5 Sonnet** multi-agent orchestration.
+**CASCADE** is an autonomous, self-healing executive travel and multi-modal logistics recovery engine.
 
-In real-world travel, a single flight delay sets off a catastrophic domino effect—causing missed train connections, invalidated hotel check-in windows, and stranded travelers. Standard travel platforms leave executives trapped in manual customer service queues. **CASCADE** eliminates manual intervention by turning user itineraries into ACID-compliant transactional graphs in CockroachDB that automatically recalculate, rebook, and self-heal downstream legs in **under 392ms**.
+When a single flight is delayed, the downstream domino effect—missed train connections, invalidated hotel windows, stranded executives—is instantaneous. Legacy travel platforms leave passengers in manual customer-service queues for hours. CASCADE eliminates that entirely.
 
----
-
-## Key Capabilities & Verified Performance
-
-| Feature Layer | Core Mechanism | Verified Tech & Specification |
-| :--- | :--- | :--- |
-| **Reactive CDC Engine** | Zero-Polling Changefeeds | Streams database mutations from CockroachDB to Node.js listener instant webhook. |
-| **Vector Memory Recall** | HNSW Cosine Similarity | `VECTOR(1536)` embeddings matching cabin, quiet car, and layover tolerances (`vector_cosine_ops`). |
-| **Multi-Agent Engine** | AWS Bedrock Orchestration | Risk evaluation, layover buffer calculation, and CoT reasoning powered by Claude 3.5 Sonnet. |
-| **MCP Standard Tooling** | Protocol Tool API | 6 registered MCP tools (`get_itinerary_graph`, `search_user_preferences_vector`, etc.). |
-| **Transaction Safety** | SERIALIZABLE Isolation | Atomic multi-segment rebooking with automatic CockroachDB `40001` conflict retry & Saga rollback. |
-| **Live UI Visualizer** | SSE Event Streaming | Interactive glassmorphism dashboard with Leaflet.js & Turf.js great-circle route animation. |
+At its core, every itinerary is stored as an **ACID-compliant transactional graph** inside **CockroachDB**. A live **Change Data Capture (CDC)** listener watches the database for disruption events and automatically triggers a multi-agent reasoning pipeline powered by **AWS Bedrock (Claude 3.5 Sonnet)**. Within a sub-second SLA, the engine queries 1536-dimensional **HNSW vector embeddings** to recall executive preferences, evaluates multi-branch rebooking candidates, commits the winner in a **SERIALIZABLE** transaction, and broadcasts the result over a live **SSE event stream** to the dashboard and via a **Telegram Bot alert**.
 
 ---
 
-## What & Why: The Autonomous Self-Healing Mechanism
-
-### The Problem: Travel Disruption Cascade
-When a flight leg (`DL-1402`) experiences a 2.5-hour delay:
-1. **Upstream Disruption**: Flight arrives late at Moynihan Transit Hub.
-2. **Downstream Breakage**: Executive misses connecting Amtrak Acela train (`AMT-2150`).
-3. **Tertiary Failure**: Hotel check-in window expires, and car shuttle reservation is lost.
-4. **Legacy Failure**: Traditional systems require manual human rebooking, resulting in hours of delay.
+## System Architecture
 
 ```
-[ Flight DL-1402 Delay (+150m) ] ➔ [ Missed Amtrak Train 2150 ] ➔ [ Cancelled Hotel Window ]
-```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              CASCADE — Autonomous Recovery Engine                       │
+└────────────────────────────────────────────────────────────────────────────────────────┘
 
-### The Solution: CASCADE Autonomous Self-Healing
-CASCADE turns passive itineraries into active, reactive state graphs:
-1. **CDC Mutation**: Delay update in CockroachDB fires a real-time Changefeed event.
-2. **Vector Preference Search**: AI agents query CockroachDB using 1536-dim HNSW vector search to pull executive travel preferences (e.g. First Class Quiet Car, layover buffer > 60m).
-3. **Multi-Branch Candidate Evaluation**: Agents evaluate candidate rebooking branches (Branch Alpha, Beta, Gamma) and select the highest HNSW match score.
-4. **Atomic Rebooking**: Rebooked legs are committed inside a CockroachDB `SERIALIZABLE` transaction with automatic conflict resolution.
-
-```
-[ CDC Event ] ➔ [ 1536-Dim HNSW Vector Recall ] ➔ [ Bedrock Branch Evaluation ] ➔ [ SERIALIZABLE Rebook (<392ms) ]
+  Browser / Telegram                  Express API Server (port 3000)
+  ┌─────────────────┐                 ┌──────────────────────────────────────────────────┐
+  │  Glassmorphism  │◄── SSE Stream ──│  GET /api/stream       (text/event-stream)        │
+  │  Dashboard      │                 │  POST /api/disrupt     (trigger healing)          │
+  │  (index.html)   │────HTTP/REST───►│  POST /api/itinerary/create  (3-step modal)      │
+  │                 │                 │  GET /api/dashboard    (live metrics)             │
+  │  @CascadeAWS    │◄── Bot Alert ───│  GET /api/health       (CRDB + AWS status)       │
+  │  _bot Telegram  │                 │  GET /api/itinerary/artifact  (proof download)   │
+  └─────────────────┘                 │  GET /api/reports/pdf  (PDF export)              │
+                                      └────────────────────────┬─────────────────────────┘
+                                                               │
+                              ┌────────────────────────────────▼──────────────────────────┐
+                              │                   CDC Listener Service                      │
+                              │  Polls disruption_events every 3 000ms                     │
+                              │  Accepts webhook payloads from CockroachDB Changefeed       │
+                              │  Emits: cdc_event · agent_step · cascade_healed ·           │
+                              │         human_approval_required  →  SSE broadcast           │
+                              └────────────────────────────────┬──────────────────────────┘
+                                                               │
+                              ┌────────────────────────────────▼──────────────────────────┐
+                              │              CascadeAgentEngine  (agent_engine.ts)         │
+                              │                                                             │
+                              │  Step 0    MCP_CONNECT      CockroachDB MCP Cloud Server   │
+                              │  Step 0b   CRDB_SKILL_EXEC  Observability index health     │
+                              │  Step 1    CDC_EVENT        Disruption ingested             │
+                              │  Step 2    PREDICTIVE_GUARD Risk score 0–99                │
+                              │  Step 3    AGENT_MEMORY     1536-dim HNSW vector recall    │
+                              │  Step 3c–f FIRST_MILE       Smart bypass: air → rail       │
+                              │  Step 4    VECTOR_EXPLAIN   Candidate scoring (HNSW)       │
+                              │  Step 5    BRANCH_EVAL      Alpha · Beta · Gamma           │
+                              │  Step 5b   HITL_GUARDRAIL   Policy check $300 limit        │
+                              │  Step 6–7  SAGA_ROLLBACK    Compensation on major delay    │
+                              │  Step 8    BEDROCK_AGENT    Claude 3.5 Sonnet CoT          │
+                              │  Step 9    CRDB_ACID        SERIALIZABLE TX commit         │
+                              │  Step 10   CASCADE_COMPLETE Proof artifact + Telegram      │
+                              └────────────────────────────────┬──────────────────────────┘
+                                                               │
+                    ┌──────────────────────────┐   ┌───────────▼───────────────────────────┐
+                    │   AWS Bedrock             │   │   CockroachDB v23.2 (Serverless)       │
+                    │   Claude 3.5 Sonnet       │   │                                        │
+                    │   Titan Embed v2 (1536d)  │   │  users              (VECTOR 1536-dim)  │
+                    │   InvokeModelCommand      │   │  itineraries        (status graph)     │
+                    │   @aws-sdk/client-        │   │  itinerary_segments (graph nodes)      │
+                    │   bedrock-runtime         │   │  disruption_events  (CDC queue)        │
+                    └──────────────────────────┘   │                                        │
+                                                    │  HNSW idx: vector_cosine_ops           │
+                    ┌──────────────────────────┐   │  GIN idx:  JSONB preferences           │
+                    │   MCP Server (port 3001)  │   │  Changefeed → webhook / polling        │
+                    │   @modelcontextprotocol   │   │  SERIALIZABLE isolation                │
+                    │   /sdk  (StdioTransport)  │   │  40001 conflict auto-retry             │
+                    │                           │   └───────────────────────────────────────┘
+                    │   Tools exposed:          │
+                    │   get_itinerary_graph     │
+                    │   search_user_prefs_vec   │
+                    │   update_segment_status   │
+                    │   query_transit_avail     │
+                    │   estimate_cascade_impact │
+                    │   rebook_cascade_segment  │
+                    └──────────────────────────┘
 ```
 
 ---
 
-## End-to-End System Architecture
+## Key Features
 
-<div align="center">
+### 1. 3-Step Route Builder Modal
 
-![CASCADE Architecture Diagram](assets/readme/architecture-diagram.svg)
+The `POST /api/itinerary/create` endpoint accepts a three-layer trip definition built from the frontend modal:
 
-</div>
+| Step | Field | Description |
+|------|-------|-------------|
+| **Step 1 — Traveler** | `travelerName`, `travelerEmail`, `cabinPref`, `strategy` | Profile and corporate policy tier |
+| **Step 2 — Route** | `firstMileMode`, `origin`, `destination`, `primaryMode`, `lastMileMode` | Multi-modal leg config (FLIGHT / RAIL / CAR / BUS / SHUTTLE) |
+| **Step 3 — Schedule** | `depDate`, `depTime`, `arrDate`, `arrTime` | Departure and arrival windows |
 
-### Architectural Pipeline Breakdown
-
-#### 1. Transactional Route Graph (CockroachDB Cloud)
-User itineraries are modeled as linked graph nodes inside `itinerary_segments`. Each node contains spatial parameters, temporal schedules, execution statuses, and preceding node pointers (`previous_segment_id`).
-
-#### 2. Change Data Capture (CDC) Changefeeds
-CockroachDB Changefeeds stream row-level `UPDATE` mutations on `itinerary_segments` and `disruption_events` to the CASCADE CDC Listener service without database polling.
-
-#### 3. AWS Bedrock Multi-Agent Engine
-The orchestrator executes multi-agent reasoning:
-- **Risk Engine**: Calculates disruption severity scores and adds pre-emptive layover buffers (+45m).
-- **Vector Agent**: Executes cosine similarity search over `users.preference_embedding VECTOR(1536)` using CockroachDB's HNSW index (`idx_users_preference_embedding`).
-- **Branch Evaluator**: Compares candidate strategies:
-  - `Branch Alpha (Speed Priority)`: Score 0.74
-  - `Branch Beta (Zero Cost)`: Score 0.82
-  - `Branch Gamma (HNSW Vector Winner)`: Score 0.96 (Amtrak Acela First Class Quiet Car)
-
-#### 4. Model Context Protocol (MCP) Server
-Exposes standardized tool interfaces over Stdio/HTTP transport to Bedrock agents:
-
-| MCP Tool Name | Purpose & Inputs | Output |
-| :--- | :--- | :--- |
-| `get_itinerary_graph` | Fetches route nodes and edges for `itinerary_id` | Complete graph representation |
-| `search_user_preferences_vector` | Executes 1536-dim cosine similarity search in CockroachDB | Top-K nearest preference matches |
-| `update_segment_status` | Updates segment status and delay minutes | Updated segment status |
-| `query_transit_availability` | Searches external transit providers (Amtrak, Delta, Hotels) | Available transit options |
-| `estimate_cascade_impact` | Calculates downstream connecting leg buffer overlap | Impact diagnosis & slack window |
-| `rebook_cascade_segment` | Atomically replaces broken segment in CockroachDB transaction | Committed rebooked segment |
-
-#### 5. Transactional Safety & Serialization Failure Handling
-Multi-agent rebookings run under `SERIALIZABLE` isolation. Concurrent seat claim conflicts automatically trigger CockroachDB error `40001_SERIALIZATION_FAILURE` handling, executing clean retries and Saga transaction rollbacks.
-
-#### 6. Live Dashboard Visualizer (Leaflet.js + SSE)
-Express streams Server-Sent Events (SSE) to the glassmorphism frontend. Leaflet.js and Turf.js calculate great-circle flight arcs, render real-time graph node state shifts, and display live agent Chain-of-Thought execution logs.
+The backend assembles `multiModalWaypoints` and `legs` arrays, persists them to the in-memory traveler fleet, and returns a fully structured itinerary profile ready for disruption simulation.
 
 ---
 
-## Quickstart Setup & Execution Guide
+### 2. AWS Bedrock Multi-Agent Engine
+
+The `CascadeAgentEngine` class (`src/services/agent_engine.ts`) implements **six architectural pillars**:
+
+| Pillar | Method | Description |
+|--------|--------|-------------|
+| **Reactive CDC Healing** | `processDisruption()` | Main 10-step chain-of-thought resolution pipeline |
+| **Resource Contention** | `processContention()` | SERIALIZABLE `40001` conflict — two travelers claim the same seat |
+| **Smart First-Mile Bypass** | `evaluateFirstMileBypass()` | Replaces delayed flight with High-Speed Rail when delay > 45 min |
+| **Human-in-the-Loop** | `approvePendingRebooking()` / `rejectPendingRebooking()` | Halts autonomous commit when cost delta exceeds $300 policy limit |
+| **Cascade Chaos Mode** | `processChaos()` | Iterative resolution of 3 simultaneous failures (flight + train + hotel) |
+| **Multi-Region Failover** | `processRegionFailover()` | Simulates `us-east-1` → `eu-west-1` CockroachDB region failover |
+
+When AWS credentials are present, the engine invokes `InvokeModelCommand` against `anthropic.claude-3-5-sonnet-20240620-v1:0` for final chain-of-thought synthesis. When absent, it falls back to deterministic heuristics within the same sub-second SLA.
+
+**Multi-branch rebooking scoring:**
+
+```
+Branch Alpha  — Speed Priority        (FLIGHT  DL-1990)          Score: 0.74   +$85.00
+Branch Beta   — Zero Cost / Carrier   (TRAIN   AMT-175)           Score: 0.82   $0.00
+Branch Gamma  — HNSW Preference Win   (TRAIN   AMT-2158 1st Cls)  Score: 0.96   ← WINNER
+```
+
+---
+
+### 3. CockroachDB Audit Trail
+
+Every resolved disruption produces an `AuditReportData` artifact (`src/services/audit_report_generator.ts`) containing:
+
+- **Traveler profile** — name, email, cabin preference, HNSW vector score, index name
+- **Original itinerary** — all segments with provider, reference code, and status
+- **Healed itinerary** — winning branch, strategy, and post-recovery segments
+- **Chain-of-thought execution log** — every `AgentActionLog` step with timestamp, tag, agent, and details payload
+- **Financial delta** — original cost, rebooking fee, carrier coverage, total delta, policy approval status
+- **CockroachDB telemetry** — `txHash`, isolation level (`SERIALIZABLE`), region locality (`us-east-1` · `eu-west-1` · `ap-northeast-1`), CDC event ID, SHA-256 proof signature
+
+The artifact is downloadable as JSON via `GET /api/itinerary/artifact?id=PROOF-REC-XXXXXX` and as a formatted PDF via `GET /api/reports/pdf` (rendered with `pdfkit`).
+
+---
+
+### 4. SSE Event Stream
+
+`GET /api/stream` (`src/web/app.ts`) establishes a persistent `text/event-stream` connection:
+
+| Event | Emitted When |
+|-------|-------------|
+| `connected` | Client first subscribes |
+| `cdc_event` | CDC poll detects a `PENDING` disruption |
+| `agent_step` | Each step of `processDisruption()` completes |
+| `cascade_healed` | Full resolution report is finalized |
+| `human_approval_required` | Cost delta exceeds $300 policy auto-approval limit |
+
+A 15-second keepalive heartbeat (`': keepalive\n\n'`) prevents proxy timeouts. Dead clients are pruned from the `sseClients[]` array on every broadcast.
+
+---
+
+### 5. Telegram Bot Alerts
+
+`src/services/telegram_service.ts` sends formatted HTML messages to `@CascadeAWS_bot` after every disruption resolution:
+
+- **Resolution header** — `✅ CASCADE SELF-HEALED` / `⚠️ HUMAN APPROVAL REQUIRED` / `🔴 REBOOKING REJECTED`
+- **Passenger name**, disrupted route (`origin ──▶ destination`), resolution mode + carrier, time recovered, new arrival time
+- **Financial impact badge** — colour-coded cost delta
+- **CockroachDB proof-of-commit** — transaction hash, isolation level, resolution SLA in milliseconds
+- **Inline keyboard button** — deep link to `https://t.me/CascadeAWS_bot`
+
+---
+
+### 6. CockroachDB Vector Search & CDC
+
+**Schema highlights** (`src/db/schema.sql`):
+
+```sql
+-- 1536-dimensional preference embeddings with HNSW index
+CREATE TABLE users (
+    preference_embedding VECTOR(1536),
+    preferences          JSONB DEFAULT '{...}'
+);
+CREATE INDEX idx_users_preference_embedding ON users
+    USING hnsw (preference_embedding vector_cosine_ops);
+
+-- Itinerary segment graph with FK chain
+CREATE TABLE itinerary_segments (
+    previous_segment_id UUID REFERENCES itinerary_segments(id),
+    embedding           VECTOR(1536),
+    status VARCHAR(50) CHECK (status IN (
+        'SCHEDULED','IN_TRANSIT','DELAYED','CANCELLED',
+        'RESCHEDULED','REBOOKED','COMPLETED'))
+);
+
+-- CDC Changefeed (webhook or polling fallback)
+-- CREATE CHANGEFEED FOR TABLE itinerary_segments, disruption_events
+-- INTO 'webhook://http://localhost:3000/api/cdc-webhook?...'
+-- WITH updated, resolved='10s', format=json;
+```
+
+**MCP Tool surface** (`src/mcp/server.ts` — 6 registered tools):
+
+| Tool | Purpose |
+|------|---------|
+| `get_itinerary_graph` | Fetch full itinerary + user + segments from CockroachDB |
+| `search_user_preferences_vector` | Cosine-similarity ANN search over 1536-dim preference embeddings |
+| `update_segment_status` | Atomic status update + parent itinerary status cascade |
+| `log_disruption_event` | Insert new `PENDING` disruption event into CDC queue |
+| `rebook_cascade_segment` | Atomic rebook: update segment, adjust cost, resolve disruption event |
+| `estimate_cascade_impact` | Calculate connection viability from delay + buffer parameters |
+| `query_transit_availability` | Search mock provider pool (Delta, Amtrak, Hotels, Eurostar) |
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Version |
+|-------|-----------|---------|
+| Runtime | Node.js | ≥ 18 |
+| Language | TypeScript | 5.4 |
+| Web framework | Express | 4.19 |
+| Database | CockroachDB | v23.2 (pgvector-compatible) |
+| DB driver | `pg` (node-postgres) | 8.22 |
+| Vector dimensions | Amazon Titan Embed v2 / CockroachDB HNSW | 1536-dim |
+| AI reasoning | AWS Bedrock — Claude 3.5 Sonnet | `anthropic.claude-3-5-sonnet-20240620-v1:0` |
+| AI SDK | `@aws-sdk/client-bedrock-runtime` | ^3.500 |
+| Agent protocol | Model Context Protocol SDK | 1.0 |
+| Validation | Zod | 3.23 |
+| Notifications | Telegram Bot API | HTTP REST |
+| PDF export | PDFKit | 0.19 |
+| Testing | Jest + ts-jest | 29 |
+| Containerisation | Docker Compose (CockroachDB v23.2.3) | — |
+
+---
+
+## Project Structure
+
+```
+cascade-logistics/
+├── src/
+│   ├── config/
+│   │   ├── aws_config.ts           # Bedrock client + credential validation
+│   │   └── database.ts             # CockroachDB pool, SERIALIZABLE retry, offline fallback
+│   ├── db/
+│   │   ├── schema.sql              # Full schema (VECTOR, HNSW, GIN, CDC)
+│   │   ├── seed.sql                # Sample travelers, itineraries, segments
+│   │   └── seed_runner.ts          # Schema init + seed execution
+│   ├── mcp/
+│   │   ├── server.ts               # MCP stdio server with 6 registered tools
+│   │   └── tools/
+│   │       ├── db_tools.ts         # CockroachDB MCP tools
+│   │       └── transport_tools.ts  # Transit availability + cascade impact tools
+│   ├── services/
+│   │   ├── agent_engine.ts         # CascadeAgentEngine — 6-pillar orchestrator (796 lines)
+│   │   ├── audit_report_generator.ts   # Post-incident executive audit report
+│   │   ├── cdc_listener.ts         # CDC polling + webhook handler + SSE emitter
+│   │   ├── disruption_emulator.ts  # Standalone disruption injection CLI
+│   │   ├── mcp_client.ts           # MCP client connector
+│   │   ├── pdf_report_generator.ts # PDFKit audit report renderer
+│   │   └── telegram_service.ts     # Telegram Bot HTML alert builder + sender
+│   └── web/
+│       ├── app.ts                  # Express server, SSE endpoint, CDC wiring
+│       ├── public/
+│       │   ├── index.html          # Glassmorphism dashboard SPA (294 KB)
+│       │   ├── styles.css          # Dashboard CSS (54 KB)
+│       │   └── audit-report-template.html
+│       └── routes/
+│           ├── disruption.ts       # POST /api/disrupt
+│           ├── reports.ts          # GET /api/reports/pdf, /api/itinerary/artifact
+│           ├── system.ts           # GET /api/dashboard, /api/health
+│           └── travelers.ts        # GET|POST /api/itinerary/* + 3-step modal
+├── tests/                          # 12 Jest test files
+├── assets/
+│   ├── readme/
+│   │   ├── hero-banner.svg
+│   │   └── architecture-diagram.svg
+│   └── pdf-template.html
+├── docker-compose.yml              # CockroachDB v23.2.3 single-node
+├── .env.example
+├── package.json
+└── tsconfig.json
+```
+
+---
+
+## Installation
 
 ### Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
-- **CockroachDB**: CockroachDB Cloud Serverless account OR local Docker container
 
-### 1. Clone & Install Dependencies
+- Node.js ≥ 18
+- CockroachDB Cloud account **or** Docker (for local single-node)
+- AWS account with Bedrock access (Claude 3.5 Sonnet enabled in `us-east-1`)
+- Telegram Bot token (optional — alerts skipped gracefully if absent)
+
+### 1. Clone & Install
+
 ```bash
-git clone https://github.com/your-username/cascade.git
-cd cascade
+git clone https://github.com/<your-org>/cascade-logistics.git
+cd cascade-logistics
 npm install
 ```
 
-### 2. Configure Environment Variables
-Copy `.env.example` to `.env`:
+### 2. Configure Environment
+
 ```bash
 cp .env.example .env
 ```
-Fill in your CockroachDB connection string and AWS credentials:
-```env
-PORT=3000
-DATABASE_URL=postgresql://user:password@free-tier.gcp-us-central1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your-aws-access-key
-AWS_SECRET_ACCESS_KEY=your-aws-secret-key
-BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20240620-v1:0
+
+Edit `.env` with your credentials (see `.env.example` for all keys).
+
+> **Without AWS credentials** — the agent engine automatically falls back to deterministic heuristics. The full healing pipeline runs; only the final Claude CoT synthesis step is bypassed.
+>
+> **Without CockroachDB** — the server enters `IS_OFFLINE_FALLBACK` mode and serves all data from in-memory state. Every feature remains fully demonstrable.
+
+### 3. Start CockroachDB (Docker)
+
+```bash
+docker-compose up -d
 ```
 
-### 3. Run Database Migration & Vector Seeding
-Seed CockroachDB schema, HNSW vector indices, and 1536-dimensional user preference embeddings:
+Starts CockroachDB v23.2.3 on port `26257`; Admin UI on `8080`.
+
+### 4. Initialise Schema & Seed
+
 ```bash
 npm run seed
 ```
 
-### 4. Start the Application
-Launch the Express server and SSE engine:
-```bash
-npm start
-```
-Open **`http://localhost:3000`** in your browser to access the live glassmorphism visualizer.
+### 5. Run the Application
 
-### 5. Trigger Live Disruption Demo
-Click the **"Simulate 2.5h Flight Delay (DL-1402)"** button on the UI, or execute via CLI in a separate terminal:
 ```bash
-npm run emulator
+npm run dev        # hot-reload
+# or
+npm start          # production
 ```
 
-### 6. Additional Engine Commands
+Open **http://localhost:3000** for the live dashboard.
+
+### 6. (Optional) Start the MCP Server
 
 ```bash
-# Run Model Context Protocol (MCP) Server standalone over stdio
 npm run mcp:server
-
-# Run CockroachDB CDC Changefeed Listener standalone
-npm run cdc:listener
-
-# Run automated test suite (Jest)
-npm test
 ```
 
----
+Exposes 6 CockroachDB MCP tools over `stdio` transport to any compatible client.
 
-## Repository Structure
+### 7. Run Tests
 
-```
-cascade/
-├── assets/
-│   └── readme/
-│       ├── hero-banner.svg          # Pure SVG hero banner graphic
-│       └── architecture-diagram.svg # End-to-end system architecture SVG
-├── src/
-│   ├── config/
-│   │   ├── database.ts              # CockroachDB pool & serializable transaction runner
-│   │   └── aws_config.ts            # AWS Bedrock runtime client configuration
-│   ├── db/
-│   │   ├── schema.sql               # CockroachDB schema (VECTOR(1536), HNSW index, DDL)
-│   │   ├── seed.sql                 # Base itinerary graph seed data
-│   │   └── seed_runner.ts           # Migration runner & 1536-dim embedding generator
-│   ├── mcp/
-│   │   ├── server.ts                # Model Context Protocol (MCP) server
-│   │   └── tools/
-│   │       ├── db_tools.ts          # CockroachDB graph queries & vector search tools
-│   │       └── transport_tools.ts   # Transit availability & impact estimation tools
-│   ├── services/
-│   │   ├── agent_engine.ts          # AWS Bedrock multi-agent orchestrator & CoT engine
-│   │   ├── cdc_listener.ts          # CockroachDB Changefeed event listener service
-│   │   └── disruption_emulator.ts   # CLI disruption injection utility
-│   └── web/
-│       ├── app.ts                   # Express server & SSE event hub
-│       └── public/
-│           ├── index.html           # Glassmorphism dashboard UI
-│           └── styles.css           # Custom CSS styling tokens
-└── tests/
-    ├── cdc.test.ts                  # CDC listener & impact estimation unit tests
-    └── agent.test.ts                # Agent engine & MCP tool integration tests
-```
-
----
-
-## Automated Test Suite
-
-Run the full integration and unit test suite:
 ```bash
 npm test
 ```
-The test suite verifies:
-- `tests/cdc.test.ts`: Connection buffer calculations, lag detection, and delay impact assessment logic.
-- `tests/agent.test.ts`: Agent fallback execution, MCP tool responses, and vector similarity ranking.
 
 ---
 
-## Hackathon Submission Checklist
+## API Reference
 
-- [x] **CockroachDB Cloud Integration**: Full serverless SQL schema with graph relationships.
-- [x] **Vector Search Engine**: `VECTOR(1536)` types, HNSW index (`idx_users_preference_embedding`), and cosine similarity (`vector_cosine_ops`).
-- [x] **Change Data Capture (CDC)**: Zero-polling Changefeeds for real-time disruption detection.
-- [x] **AWS Bedrock AI Integration**: Multi-agent reasoning powered by Claude 3.5 Sonnet.
-- [x] **Model Context Protocol (MCP)**: 6 registered tools exposed via standard MCP SDK interfaces.
-- [x] **ACID Resilience**: CockroachDB `SERIALIZABLE` isolation with `40001` retry and Saga rollback handling.
-- [x] **Real-Time Web Visualizer**: SSE-powered glassmorphism dashboard with Leaflet.js route maps.
-- [x] **Comprehensive Documentation**: Complete setup instructions and architecture SVGs.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/stream` | SSE event stream (`text/event-stream`) |
+| `GET` | `/api/dashboard` | Live fleet metrics + active itineraries |
+| `GET` | `/api/health` | CockroachDB + AWS Bedrock health status |
+| `POST` | `/api/disrupt` | Trigger a disruption + autonomous healing |
+| `POST` | `/api/itinerary/create` | 3-step route builder — create new itinerary |
+| `GET` | `/api/itinerary/graph` | Fetch transactional itinerary graph from CRDB |
+| `GET` | `/api/itinerary/artifact` | Download proof-of-commit JSON artifact |
+| `GET` | `/api/reports/pdf` | Export audit report as PDF |
+
+### Trigger a Disruption
+
+```bash
+curl -X POST http://localhost:3000/api/disrupt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "itineraryId": "itin-101",
+    "delayMinutes": 150,
+    "disruptionType": "FLIGHT_DELAY",
+    "strategy": "EXECUTIVE_SPEED"
+  }'
+```
+
+### High-Cost HITL Guardrail
+
+```bash
+curl -X POST http://localhost:3000/api/disrupt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "itineraryId": "itin-101",
+    "delayMinutes": 150,
+    "strategy": "HIGH_COST_GUARDRAIL",
+    "costDelta": 450
+  }'
+# → status: HUMAN_APPROVAL_REQUIRED  ($450 > $300 auto-approval limit)
+# → broadcasts human_approval_required SSE event to all connected clients
+```
 
 ---
 
-<div align="center">
+## Seeded Traveler Profiles
 
-*Built for the CockroachDB × AWS Hackathon*
+| Itinerary | Traveler | Route | Mode Chain | Policy Tier | HNSW Score |
+|-----------|----------|-------|------------|-------------|------------|
+| `itin-101` | Sarah Jenkins | SFO → LHR | Flight · Train · Hotel · Flight | Executive ($300) | 0.984 |
+| `itin-102` | Marcus Vance | JFK → CDG | Flight · TGV Rail · Hotel | VIP Executive ($500) | 0.962 |
+| `itin-103` | Elena Rostova | ORD → HND | Flight · Shinkansen · Hotel | Global Ops ($250) | 0.941 |
+| `itin-104` | David Chen | MIA → LHR | Flight · Taxi · Hotel | Executive ($300) | 0.975 |
+| `itin-105` | Yaroslav Vane | FRA → SIN | Car · Flight · MRT Rail · Hotel | VIP Executive ($500) | 0.991 |
+| `itin-106` | Alexander Wright | LHR → FRA | Car · Flight · ICE Rail · Hotel | Executive ($300) | 0.982 |
 
-</div>
+---
+
+## Disruption Simulation Strategies
+
+| Strategy Key | Behaviour |
+|---|---|
+| `EXECUTIVE_SPEED` | Fastest rebooking regardless of cost (within $300 policy) |
+| `COST_OPTIMIZATION` | Prefers carrier-covered or zero-delta options |
+| `HIGH_COST_GUARDRAIL` | Forces cost delta above policy limit to demonstrate HITL approval flow |
+
+---
+
+## License
+
+MIT © CASCADE Team
