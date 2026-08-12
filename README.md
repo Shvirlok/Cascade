@@ -59,7 +59,7 @@ Every itinerary is stored as an **ACID-compliant transactional graph** inside **
 
 ## 🏗️ System &amp; Cloud Architecture
 
-![CASCADE Architecture Diagram](./assets/readme/architecture-diagram.svg)
+![CASCADE Architecture Diagram](./assets/readme/architecture-diagram.png)
 
 ### 10-Step Agent Pipeline
 
