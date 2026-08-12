@@ -59,42 +59,7 @@ Every itinerary is stored as an **ACID-compliant transactional graph** inside **
 
 ## 🏗️ System &amp; Cloud Architecture
 
-```mermaid
-flowchart TD
-    A["Frontend Dashboard\n(Glassmorphism SPA)"] -->|HTTP / REST| B["Express API Server\n:3000"]
-    A <-->|SSE Stream| B
-    A -->|HITL Approval| B
-
-    subgraph RENDER ["Render.com — Express Web Service"]
-        B
-        C["CDC Listener\n(3000 ms poll)"]
-        B --> C
-    end
-
-    C -->|Trigger healing| D
-
-    subgraph BEDROCK ["AWS Bedrock Multi-Agent Engine (MCP)"]
-        D["CascadeAgentEngine\nagent_engine.ts"]
-        E["MCP Server\n6 CockroachDB tools\n:3001 stdio"]
-        F["Claude 3.5 Sonnet\nChain-of-Thought CoT"]
-        G["HNSW Vector Search\nPreference Recall"]
-        
-        D <-->|MCP SDK| E
-        D -->|InvokeModel| F
-        D -->|Titan Embed v2| G
-    end
-
-    E <-->|pg driver — SERIALIZABLE| H
-
-    subgraph CRDB ["CockroachDB Serverless Cluster"]
-        H["users\n(VECTOR 1536-dim)"]
-        I["itineraries + segments\n(ACID graph + CDC queue)"]
-        J["disruption_events\n(Changefeed source)"]
-        H --- I --- J
-    end
-
-    D -->|HTML alert| K["Telegram Bot\n@CascadeAWS_bot"]
-```
+![CASCADE Architecture Diagram](./assets/readme/architecture-diagram.svg)
 
 ### 10-Step Agent Pipeline
 
