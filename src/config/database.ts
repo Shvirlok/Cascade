@@ -10,11 +10,22 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://root@localhos
 export let IS_OFFLINE_FALLBACK = false;
 let hasLoggedOfflineWarning = false;
 
+// When connecting via remote DATABASE_URL (CockroachDB Cloud / Heroku / production), configure SSL
+const isRemoteDb = Boolean(
+  process.env.DATABASE_URL &&
+  !process.env.DATABASE_URL.includes('localhost') &&
+  !process.env.DATABASE_URL.includes('127.0.0.1') &&
+  !process.env.DATABASE_URL.includes('sslmode=disable')
+);
+
 export const pool = new Pool({
   connectionString,
+  ssl: isRemoteDb || process.env.NODE_ENV === 'production'
+    ? { rejectUnauthorized: false }
+    : undefined,
   max: 10,
   idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
 });
 
 pool.on('error', (_err) => {
