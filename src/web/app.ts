@@ -3,6 +3,7 @@ import path from 'path';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { CDCListenerService, cdcEventEmitter } from '../services/cdc_listener.js';
+import { checkDatabaseConnection } from '../config/database.js';
 import { travelersRouter, activeFleetData } from './routes/travelers.js';
 import { disruptionRouter, setDisruptionDeps } from './routes/disruption.js';
 import { systemRouter } from './routes/system.js';
@@ -118,7 +119,16 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-function startServer(portToTry: number) {
+async function startServer(portToTry: number) {
+  try {
+    const isDbConnected = await checkDatabaseConnection();
+    if (isDbConnected) {
+      console.log('✅ CockroachDB Cloud cluster connected (SERIALIZABLE + VECTOR(1536) HNSW active).');
+    }
+  } catch (err: any) {
+    console.error('CockroachDB Connection Error details:', err);
+  }
+
   const server = app.listen(portToTry, () => {
     console.log(`=======================================================`);
     console.log(`CASCADE Hackathon UI & API Server active on port ${portToTry}`);

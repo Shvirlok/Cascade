@@ -5,12 +5,12 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://root@localhost:26257/cascade_db?sslmode=disable';
+const rawConnectionString = process.env.DATABASE_URL || 'postgresql://root@localhost:26257/cascade_db?sslmode=disable';
 
 export let IS_OFFLINE_FALLBACK = false;
 let hasLoggedOfflineWarning = false;
 
-// When connecting via remote DATABASE_URL (CockroachDB Cloud / Heroku / production), configure SSL
+// When connecting via remote DATABASE_URL (CockroachDB Cloud / Heroku / production), explicitly allow SSL
 const isRemoteDb = Boolean(
   process.env.DATABASE_URL &&
   !process.env.DATABASE_URL.includes('localhost') &&
@@ -19,26 +19,29 @@ const isRemoteDb = Boolean(
 );
 
 export const pool = new Pool({
-  connectionString,
+  connectionString: rawConnectionString,
   ssl: isRemoteDb || process.env.NODE_ENV === 'production'
     ? { rejectUnauthorized: false }
     : undefined,
   max: 10,
   idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 10000,
+  connectionTimeoutMillis: 10000, // 10,000ms connection timeout
 });
 
-pool.on('error', (_err) => {
+pool.on('error', (err) => {
   if (!IS_OFFLINE_FALLBACK) {
     IS_OFFLINE_FALLBACK = true;
-    logOfflineNotice();
+    logOfflineNotice(err);
   }
 });
 
-function logOfflineNotice() {
+function logOfflineNotice(err?: any) {
   if (!hasLoggedOfflineWarning) {
     hasLoggedOfflineWarning = true;
     console.warn('CockroachDB Cloud connection restricted. Operating in Resilient Local State Mode.');
+    if (err) {
+      console.error('CockroachDB Connection Error details:', err);
+    }
   }
 }
 
@@ -59,7 +62,7 @@ export async function query<T extends QueryResultRow = any>(
     return res;
   } catch (err: any) {
     IS_OFFLINE_FALLBACK = true;
-    logOfflineNotice();
+    logOfflineNotice(err);
     return getFallbackQueryResult<T>(text, params);
   }
 }
@@ -97,13 +100,13 @@ export async function executeWithRetry<T>(
       }
 
       IS_OFFLINE_FALLBACK = true;
-      logOfflineNotice();
+      logOfflineNotice(err);
       return await executeFallbackTransaction<T>(fn);
     }
   }
 
   IS_OFFLINE_FALLBACK = true;
-  logOfflineNotice();
+  logOfflineNotice(new Error('Max transaction retries exceeded'));
   return await executeFallbackTransaction<T>(fn);
 }
 
@@ -200,11 +203,16 @@ export async function withTransaction<T>(
 export async function checkDatabaseConnection(): Promise<boolean> {
   if (IS_OFFLINE_FALLBACK) return false;
   try {
-    const res = await pool.query('SELECT 1 AS alive');
-    return res.rows.length > 0;
-  } catch (_) {
+    const res = await Promise.race([
+      pool.query('SELECT 1 AS alive'),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('CockroachDB connection check timed out after 10000ms')), 10000)
+      ),
+    ]);
+    return Boolean(res && res.rows && res.rows.length > 0);
+  } catch (err: any) {
     IS_OFFLINE_FALLBACK = true;
-    logOfflineNotice();
+    logOfflineNotice(err);
     return false;
   }
 }
