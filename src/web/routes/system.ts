@@ -39,7 +39,7 @@ systemRouter.get('/api/health', async (_req: Request, res: Response) => {
 
   if (dbStatus) {
     try {
-      await query('SELECT count(*) FROM crdb_internal.node_build_info');
+      await query('SELECT count(*) FROM users');
       liveCrdbTelemetry.live_latency_ms = Math.floor(12 + Math.random() * 8);
     } catch (_err) {
       liveCrdbTelemetry.live_latency_ms = Math.floor(14 + Math.random() * 6);
